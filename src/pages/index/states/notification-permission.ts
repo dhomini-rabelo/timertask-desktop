@@ -1,7 +1,9 @@
 import { atom } from "jotai";
 
+export type NotificationPermissionStatus = "granted" | "denied" | "prompt";
+
 interface NotificationPermissionState {
- permissionStatus: NotificationPermission | null;
+  permissionStatus: NotificationPermissionStatus | null;
   isRequestingPermission: boolean;
 }
 

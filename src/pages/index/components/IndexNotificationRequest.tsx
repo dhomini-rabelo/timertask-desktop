@@ -1,3 +1,4 @@
+import { requestPermission } from "@tauri-apps/plugin-notification";
 import { useAtom } from "jotai";
 import { BellOff } from "lucide-react";
 import { Box } from "../../../layout/components/atoms/Box";
@@ -10,38 +11,30 @@ export function IndexNotificationRequest() {
   const isPermissionDenied =
     stateNotificationPermission.permissionStatus === "denied";
 
-  function handleRequestPermission() {
-    const isNotificationSupported =
-      typeof window !== "undefined" && typeof Notification !== "undefined";
+  function normalizePermissionStatus(permission: NotificationPermission) {
+    return permission === "default" ? "prompt" : permission;
+  }
 
-    if (!isNotificationSupported) {
-      setStateNotificationPermission((currentState) => ({
-        ...currentState,
-        permissionStatus: "denied",
-      }));
-      return;
-    }
-
+  async function handleRequestPermission() {
     setStateNotificationPermission((currentState) => ({
       ...currentState,
       isRequestingPermission: true,
     }));
 
-    Notification.requestPermission()
-      .then((permissionStatus) => {
-        setStateNotificationPermission((currentState) => ({
-          ...currentState,
-          permissionStatus: permissionStatus,
-          isRequestingPermission: false,
-        }));
-      })
-      .catch(() => {
-        setStateNotificationPermission((currentState) => ({
-          ...currentState,
-          permissionStatus: "denied",
-          isRequestingPermission: false,
-        }));
-      });
+    try {
+      const permissionStatus = await requestPermission();
+      setStateNotificationPermission((currentState) => ({
+        ...currentState,
+        permissionStatus: normalizePermissionStatus(permissionStatus),
+        isRequestingPermission: false,
+      }));
+    } catch {
+      setStateNotificationPermission((currentState) => ({
+        ...currentState,
+        permissionStatus: "denied",
+        isRequestingPermission: false,
+      }));
+    }
   }
 
   return (

@@ -43,7 +43,7 @@ export function UpdateTimerDialog() {
         description="Adjust the activity duration for this cycle."
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between text-sm font-medium text-Black-500">
+          <div className="flex items-center justify-between text-sm font-medium text-Black-450">
             <span>Activity time</span>
             <span>{activityMinutes} min</span>
           </div>

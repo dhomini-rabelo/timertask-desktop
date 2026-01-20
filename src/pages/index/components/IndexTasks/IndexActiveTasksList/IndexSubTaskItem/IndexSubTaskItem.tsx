@@ -1,3 +1,4 @@
+import { sendNotification } from "@tauri-apps/plugin-notification";
 import { useAtom, useSetAtom } from "jotai";
 import {
   Check,
@@ -87,15 +88,13 @@ export function IndexSubTaskItem({
       .play()
       .catch(() => {})
       .then(() => {
-        new Notification("Task Alert", {
-          icon: "/logo.svg",
+        sendNotification({
+          title: "Task Alert",
           body: `Time: ${formatTime(currentTimeInSeconds)}${
             debuggingTimeInSeconds > 0
               ? ` | Debug: ${formatTime(debuggingTimeInSeconds)}`
               : ""
           }`,
-          requireInteraction: false,
-          silent: true,
         });
       });
   }

@@ -1,3 +1,4 @@
+import { sendNotification } from "@tauri-apps/plugin-notification";
 import { addSeconds, differenceInMilliseconds } from "date-fns";
 import { create } from "zustand";
 
@@ -49,11 +50,9 @@ function playAlertSound() {
     .play()
     .catch(() => {})
     .then(() => {
-      new Notification("Timer Alert", {
-        icon: "/logo.svg",
+      sendNotification({
+        title: "Timer Alert",
         body: "Countdown finished.",
-        requireInteraction: false,
-        silent: true,
       });
     });
 }

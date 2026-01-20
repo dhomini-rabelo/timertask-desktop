@@ -1,3 +1,4 @@
+import { isPermissionGranted } from "@tauri-apps/plugin-notification";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
 import { IndexHeader } from "./components/IndexHeader/IndexHeader";
@@ -17,21 +18,36 @@ export function IndexPage() {
     stateNotificationPermission.permissionStatus !== null;
 
   useEffect(() => {
-    const isNotificationSupported =
-      typeof window !== "undefined" && typeof Notification !== "undefined";
+    let isMounted = true;
 
-    if (!isNotificationSupported) {
-      setStateNotificationPermission((currentState) => ({
-        ...currentState,
-        permissionStatus: "denied",
-      }));
-      return;
+    async function loadPermissionStatus() {
+      try {
+        const permissionGranted = await isPermissionGranted();
+        if (!isMounted) {
+          return;
+        }
+
+        setStateNotificationPermission((currentState) => ({
+          ...currentState,
+          permissionStatus: permissionGranted ? "granted" : "prompt",
+        }));
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        setStateNotificationPermission((currentState) => ({
+          ...currentState,
+          permissionStatus: "denied",
+        }));
+      }
     }
 
-    setStateNotificationPermission((currentState) => ({
-      ...currentState,
-      permissionStatus: Notification.permission,
-    }));
+    loadPermissionStatus();
+
+    return () => {
+      isMounted = false;
+    };
   }, [setStateNotificationPermission]);
 
   return (

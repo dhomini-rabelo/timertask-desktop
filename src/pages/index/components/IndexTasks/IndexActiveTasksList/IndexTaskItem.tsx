@@ -39,8 +39,10 @@ export function IndexTaskItem({
   const hasSubtaskBeenStarted = activeSubtask?.timeEvents.some(
     (event) => event.type === "start",
   );
-  const isSubtaskTimerActive =
-    activeSubtask?.timeEvents.at(-1)?.type === "start";
+  const lastSubtaskEvent = activeSubtask?.timeEvents.length
+    ? activeSubtask.timeEvents[activeSubtask.timeEvents.length - 1]
+    : undefined;
+  const isSubtaskTimerActive = lastSubtaskEvent?.type === "start";
   const subtaskTitleState = useState("");
 
   function handleEditTask(taskId: string) {
