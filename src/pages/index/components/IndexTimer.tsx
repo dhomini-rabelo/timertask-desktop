@@ -101,7 +101,6 @@ export function IndexTimer() {
                     variant="primary"
                     onClick={() => {
                       reset();
-                      start();
                     }}
                   >
                     Skip <ArrowRight size={20} />
