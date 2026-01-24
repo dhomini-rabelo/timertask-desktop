@@ -50,10 +50,12 @@ export function IndexSubTaskItem({
   const isGlobalTimerRunning = useCountdownTimerState(
     (store) => store.state.isRunning,
   );
+  const isResting = useCountdownTimerState((store) => store.state.isResting);
   const { actions: timerActions, state: timerState } = useCountUpTimer({
     initialSeconds: calculateTotalTimeInSeconds(task.timeEvents),
     autoStart:
       isGlobalTimerRunning &&
+      !isResting &&
       task.isRunning &&
       shouldAutoStart(task.timeEvents),
   });
@@ -65,10 +67,10 @@ export function IndexSubTaskItem({
 
   function handleToggleSubtaskTimer(isGlobalTimerRunning: boolean) {
     if (!timerState.isRunning) {
-      if (isGlobalTimerRunning) {
+      if (isGlobalTimerRunning && !isResting) {
         executeSubTask(task.id);
         timerActions.start();
-      } else {
+      } else if (!isResting) {
         dispatchErrorMessage("Global timer is not running");
       }
     } else {

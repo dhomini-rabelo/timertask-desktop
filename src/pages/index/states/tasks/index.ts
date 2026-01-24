@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getActiveTask } from "../../components/IndexTasks/utils";
+import { useCountdownTimerState } from "../countdownTimer";
 import { useWorkflowsState } from "../workflows";
 
 export type SubTaskTimeEvent = {
@@ -405,6 +406,10 @@ export const useTasksState = create<TasksStore>((set, get) => {
   }
 
   function executeSubtask(subtaskId: string) {
+    if (useCountdownTimerState.getState().state.isResting) {
+      return
+    }
+
     set((store) => {
       const activeTask = getActiveWorkflowTask(store.state.tasks);
       if (!activeTask) {
