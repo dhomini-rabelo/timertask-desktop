@@ -1,9 +1,8 @@
 import {
-    differenceInSeconds,
-    isSameDay,
-    isToday,
-    startOfDay,
-    subDays,
+  differenceInSeconds,
+  isSameDay,
+  startOfDay,
+  subDays
 } from "date-fns";
 import type { SubTaskTimeEvent, Task } from "./index";
 
@@ -106,14 +105,14 @@ export function calculateTodayFocusedTime(tasks: Task[]): number {
   return totalSeconds;
 }
 
-export function calculateTasksCompletedToday(tasks: Task[]): number {
+export function calculateTasksCompleted(tasks: Task[]): number {
   let count = 0;
 
   tasks.forEach((task) => {
     task.subtasks.forEach((subtask) => {
       const hasCompletedToday = subtask.timeEvents.some(
         (event) =>
-          event.type === "complete" && isToday(new Date(event.createdAt)),
+          event.type === "complete",
       );
       if (hasCompletedToday) {
         count++;

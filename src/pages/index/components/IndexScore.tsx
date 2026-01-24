@@ -1,19 +1,11 @@
-import {
-  Award,
-  BarChart2,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  Zap,
-} from "lucide-react";
+import { Award, CheckCircle2, Clock, Zap } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { Box } from "../../../layout/components/atoms/Box";
 import { useCountdownTimerState } from "../states/countdownTimer";
 import { useTasksState } from "../states/tasks";
 import {
   calculateCurrentStreak,
-  calculateTasksCompletedToday,
-  calculateTodayFocusedTime,
+  calculateTasksCompleted,
   calculateTotalFocusedTime,
 } from "../states/tasks/scoreUtils";
 
@@ -37,12 +29,8 @@ export function IndexScore() {
   const tasks = useTasksState((store) => store.state.tasks);
 
   const totalFocusedTime = calculateTotalFocusedTime(tasks);
-  const todayFocusedTime = calculateTodayFocusedTime(tasks);
   const currentStreak = calculateCurrentStreak(tasks);
-  const tasksCompletedToday = calculateTasksCompletedToday(tasks);
-
-  const averageCycleDuration =
-    totalCycles > 0 ? Math.round(totalFocusedTime / 60 / totalCycles) : 0;
+  const tasksCompleted = calculateTasksCompleted(tasks);
 
   const scoreItems = [
     {
@@ -53,25 +41,18 @@ export function IndexScore() {
       bg: "bg-Green-100",
     },
     {
-      label: "Total Focused Time",
+      label: "Tasks Completed",
+      value: `${tasksCompleted} tasks`,
+      icon: CheckCircle2,
+      color: "text-Green-400",
+      bg: "bg-Green-100",
+    },
+    {
+      label: "Focused Time",
       value: formatDuration(totalFocusedTime),
       icon: Clock,
       color: "text-Blue-400",
       bg: "bg-Blue-100",
-    },
-    {
-      label: "Today's Focused Time",
-      value: formatDuration(todayFocusedTime),
-      icon: Calendar,
-      color: "text-Blue-400",
-      bg: "bg-Blue-100",
-    },
-    {
-      label: "Average Cycle Duration",
-      value: `${averageCycleDuration}m`,
-      icon: BarChart2,
-      color: "text-Yellow-400",
-      bg: "bg-Yellow-100",
     },
     {
       label: "Current Streak",
@@ -79,13 +60,6 @@ export function IndexScore() {
       icon: Zap,
       color: "text-Red-400",
       bg: "bg-Red-100",
-    },
-    {
-      label: "Tasks Completed Today",
-      value: `${tasksCompletedToday} tasks`,
-      icon: CheckCircle2,
-      color: "text-Green-400",
-      bg: "bg-Green-100",
     },
   ];
 
