@@ -43,6 +43,11 @@
 
 html, body, #root {
   height: 100%;
+  background-color: var(--color-White);
+}
+
+.dark, .dark body, .dark #root {
+  background-color: var(--color-Black-900);
 }
 
 button {
@@ -60,7 +65,6 @@ button {
 }
 
 .body-df {
-  display: table;
   height: 100%;
   width: 100%;
   background-color: var(--color-White);

@@ -47,7 +47,7 @@ export function IndexTasks() {
   }
 
   return (
-    <Box className="w-full max-w-[600px] mx-auto p-6 flex flex-col gap-8">
+    <Box className="w-full max-w-[600px] ml-auto p-6 flex flex-col gap-8">
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-bold text-Black-700 dark:text-White flex items-center gap-1.5">
           {listingMode === "subtasks" && activeTask ? (
