@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../../layout/components/atoms/Button";
 import { useTasksState } from "../../../states/tasks";
+import { IndexTaskNoteDialog } from "../IndexActiveTasksList/IndexTaskNoteDialog";
 
 function getHeaderLabel() {
   return "Notes";
@@ -87,7 +88,13 @@ export function IndexTaskNote({ taskId, className }: IndexTaskNoteProps) {
             placeholder="Write your notes here..."
             className="w-full min-h-[200px] p-4 text-sm text-Black-700 placeholder:text-Black-400 bg-Black-50/20 border border-Black-100 rounded-xl outline-none focus:border-Green-400 focus:ring-1 focus:ring-Green-400 transition-all resize-none dark:bg-Black-800 dark:border-Black-500 dark:text-White field-sizing-content"
           />
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-2">
+            <IndexTaskNoteDialog
+              taskId={taskId}
+              label="View"
+              note={state.note}
+              buttonClassName="flex items-center gap-2 h-9 px-4 text-sm w-auto"
+            />
             <Button
               onClick={handleSave}
               disabled={!isDirty}

@@ -12,6 +12,8 @@ interface IndexTaskNoteDialogProps {
   taskId: string;
   className?: string;
   label?: string;
+  note?: string;
+  buttonClassName?: string;
 }
 
 interface IndexTaskNoteDialogState {
@@ -23,6 +25,8 @@ export function IndexTaskNoteDialog({
   taskId,
   className,
   label,
+  note,
+  buttonClassName,
 }: IndexTaskNoteDialogProps) {
   const task = useTasksState((store) =>
     store.state.tasks.find((item) => item.id === taskId),
@@ -30,14 +34,19 @@ export function IndexTaskNoteDialog({
   const saveTaskNote = useTasksState((store) => store.actions.saveTaskNote);
   const [dialogState, setDialogState] = useState<IndexTaskNoteDialogState>({
     isOpen: false,
-    note: task?.note ?? "",
+    note: note ?? task?.note ?? "",
   });
 
   const isDirty = dialogState.note !== (task?.note ?? "");
 
   useEffect(() => {
-    setDialogState((prev) => ({ ...prev, note: task?.note ?? "" }));
-  }, [task?.note, setDialogState]);
+    if (!dialogState.isOpen) return;
+
+    setDialogState((prev) => ({
+      ...prev,
+      note: note ?? task?.note ?? "",
+    }));
+  }, [dialogState.isOpen, note, task?.note]);
 
   function handleOpenChange(isOpen: boolean) {
     setDialogState((prev) => ({ ...prev, isOpen }));
@@ -69,7 +78,9 @@ export function IndexTaskNoteDialog({
         <Dialog.Trigger>
           <Button
             variant="secondary"
-            className="flex items-center gap-2 p-1.5 text-xs"
+            className={
+              buttonClassName ?? "flex items-center gap-2 p-1.5 text-xs"
+            }
           >
             <NotebookPen className="w-3.5 h-3.5 text-white" />
             {label ?? ""}
