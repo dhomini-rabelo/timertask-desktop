@@ -1,6 +1,4 @@
-import { Settings } from "lucide-react";
 import type { ChangeEvent } from "react";
-import { Button } from "../../../layout/components/atoms/Button";
 import { Dialog } from "../../../layout/components/atoms/Dialog";
 import { useCountdownTimerState } from "../states/countdownTimer";
 
@@ -15,7 +13,15 @@ function formatMinutes(minutes: number) {
   return minutes.toFixed(1);
 }
 
-export function UpdateTimerDialog() {
+type UpdateTimerDialogProps = {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
+export function UpdateTimerDialog({
+  isOpen,
+  onOpenChange,
+}: UpdateTimerDialogProps) {
   const activityMinutes = useCountdownTimerState(
     (store) => store.state.activityMinutes,
   );
@@ -32,12 +38,7 @@ export function UpdateTimerDialog() {
   }
 
   return (
-    <Dialog.Root>
-      <Dialog.Trigger>
-        <Button className="px-3 py-2 text-base font-medium" variant="secondary">
-          <Settings size={20} />
-        </Button>
-      </Dialog.Trigger>
+    <Dialog.Root isOpen={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Content
         title="Pomodoro settings"
         description="Adjust the activity duration for this cycle."

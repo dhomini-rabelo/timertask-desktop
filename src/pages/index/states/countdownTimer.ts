@@ -29,7 +29,7 @@ interface CountdownTimerStore {
 
 const secondsPerMinute = 60;
 const millisecondsPerSecond = 1000;
-const initialActivityMinutes = 25;
+const initialActivityMinutes = 1;
 
 function getRestMinutes(activityMinutes: number) {
   return activityMinutes * 0.2;

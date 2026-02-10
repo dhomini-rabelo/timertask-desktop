@@ -1,4 +1,4 @@
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw, Settings } from "lucide-react";
 import { useState } from "react";
 import { SECONDS_PER_MINUTE } from "../../../code/utils/date";
 import { Button } from "../../../layout/components/atoms/Button";
@@ -28,6 +28,7 @@ export function IndexTimer() {
   const [lastExtraAddedMinutes, setLastExtraAddedMinutes] = useState<
     number | undefined
   >(undefined);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const hasTimerStarted =
     currentTimeInSeconds !== initialMinutes * SECONDS_PER_MINUTE;
   const isFinished = currentTimeInSeconds === 0 && !isRunning;
@@ -59,13 +60,25 @@ export function IndexTimer() {
         ) : isFinished ? (
           <div className="flex flex-col gap-2 w-full">
             {isResting ? (
-              <Button
-                className="w-full py-2 text-base font-medium"
-                variant="primary"
-                onClick={reset}
-              >
-                Back to Work
-              </Button>
+              <div className="flex gap-2 w-full align-center items-center">
+                <Button
+                  className="flex-1 py-2 text-sm font-medium"
+                  variant="primary"
+                  onClick={() => {
+                    reset();
+                    start();
+                  }}
+                >
+                  Back to Work
+                </Button>
+                <Button
+                  className="px-3 py-2 text-base font-medium"
+                  variant="secondary"
+                  onClick={() => setIsSettingsOpen(true)}
+                >
+                  <Settings size={20} />
+                </Button>
+              </div>
             ) : (
               <>
                 <div className="flex flex-col gap-2 w-full">
@@ -80,8 +93,8 @@ export function IndexTimer() {
                     className="w-full py-2 text-base font-medium"
                     variant="primary"
                     onClick={() => {
-                      addExtraTime(5);
-                      setLastExtraAddedMinutes(5);
+                      addExtraTime(1);
+                      setLastExtraAddedMinutes(1);
                     }}
                   >
                     +5 min
@@ -96,15 +109,25 @@ export function IndexTimer() {
                   >
                     +10 min
                   </Button>
-                  <Button
-                    className="w-full py-2 text-base font-medium"
-                    variant="primary"
-                    onClick={() => {
-                      reset();
-                    }}
-                  >
-                    Skip <ArrowRight size={20} />
-                  </Button>
+                  <div className="flex gap-2 w-full">
+                    <Button
+                      className="w-full py-2 text-base font-medium"
+                      variant="primary"
+                      onClick={() => {
+                        reset();
+                        start();
+                      }}
+                    >
+                      Skip <ArrowRight size={20} />
+                    </Button>
+                    <Button
+                      className="px-3 py-2 text-base font-medium"
+                      variant="secondary"
+                      onClick={() => setIsSettingsOpen(true)}
+                    >
+                      <Settings size={20} />
+                    </Button>
+                  </div>
                 </div>
               </>
             )}
@@ -125,7 +148,15 @@ export function IndexTimer() {
                   : "Start"}
             </Button>
 
-            {shouldShowSettingsButton ? <UpdateTimerDialog /> : null}
+            {shouldShowSettingsButton ? (
+              <Button
+                className="px-3 py-2 text-base font-medium"
+                variant="secondary"
+                onClick={() => setIsSettingsOpen(true)}
+              >
+                <Settings size={20} />
+              </Button>
+            ) : null}
 
             {hasTimerStarted && (
               <Button
@@ -139,6 +170,10 @@ export function IndexTimer() {
           </div>
         )}
       </div>
+      <UpdateTimerDialog
+        isOpen={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+      />
     </div>
   );
 }
