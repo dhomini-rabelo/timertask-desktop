@@ -33,3 +33,15 @@
   sobre dados reais de produção).
 - Teste de sistema: browser (`npm run dev` :1420). Roteiro no plan-simplified.md e nos critérios de
   aceitação acima.
+
+## Log
+
+- **tests-01: FAIL.** Bug de perda de dados na migração: `migrateEntry()` (`useStoredTasks.ts:95-107`,
+  ramo "legado sem subtasks") hardcoda `timeEvents: []` em vez de `reviveEvents(entry.timeEvents)` —
+  os outros dois ramos (`type==="task"` e o mapeamento de subtask-para-task) chamam `reviveEvents`
+  corretamente. Consequência dupla: Focused Time subcontado e Tasks Completed subcontado (este último
+  porque `calculateTasksCompleted` conta por evento `"complete"`, que nunca é criado quando `timeEvents`
+  vira `[]`), gerando divergência visível entre o card de score e a contagem do rodapé. Resto do roteiro
+  (achatamento, sem accordion, idempotência, 2 tasks rodando ao mesmo tempo, CRUD/nota) passou. Drag
+  reorder não verificável neste ambiente (limitação de pointer-capture do Playwright com dnd-kit,
+  não é defeito do app). Ver `tests-01/verdict.md`.

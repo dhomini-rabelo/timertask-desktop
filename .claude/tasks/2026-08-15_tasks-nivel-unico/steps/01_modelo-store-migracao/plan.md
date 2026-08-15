@@ -281,3 +281,23 @@ handoff limpo se a janela do implementador estourar no meio.
 ## Medição de janela
 
 Nenhum nonce foi fornecido a este planner no prompt de entrada, então `medir-janela.sh` não foi executado.
+
+## Notes after tests-01 (FAIL)
+
+Causa (verdict completo em `tests-01/verdict.md`): em `src/pages/index/hooks/useStoredTasks.ts`,
+`migrateEntry()`, o ramo final de fallback (entrada legada sem `type` e sem `subtasks`, ou seja, uma
+"task solta" no formato antigo — linhas 95-107) monta o `Task` novo com `timeEvents: []` fixo, em vez
+de chamar `reviveEvents(entry.timeEvents)` como os outros dois ramos que produzem `Task`
+(`type === "task"` na linha 65, e o `subtasks.map` na linha 87). Perde os `timeEvents` da task legada
+que não tinha subtasks, e por tabela subconta `Focused Time` (soma os `timeEvents`) e `Tasks Completed`
+(conta por evento `"complete"`, que nunca existe se `timeEvents` virou `[]]`), causando a divergência
+entre o card de score e a contagem do rodapé que o tester relatou.
+
+**Fix (escopo mínimo, um arquivo, uma linha):** em `useStoredTasks.ts:102`, trocar
+`timeEvents: [],` por `timeEvents: reviveEvents(entry.timeEvents),` — mesma chamada usada nos outros
+dois ramos, `entry.timeEvents` já é o campo `LegacyTaskEntry.timeEvents?: LegacyTimeEvent[]` que o tipo
+local já prevê (o tester confirmou que o tipo já antecipa esse dado). Nenhuma outra mudança de escopo:
+não mexer em `TaskGroup` (ainda sem UI própria, gap aceito e documentado no verdict, fora do escopo
+deste step), não mexer em drag-and-drop (não verificável no ambiente do tester, não é defeito do app).
+
+Gate: `npx tsc --noEmit` (mesmo comando do estágio 4, sem mudança de tipos esperada nesta troca).
