@@ -262,3 +262,45 @@ e `src/layout/components/common/Timer` (+ `hooks/useCountUpTimer.ts`).
 - **DnD (dnd-kit) continua não-testável por automação neste ambiente** — confirmado de novo no step 02
   (tester registrou como `## Not run`, mesma razão do step 01: sem pointer-capture real de SO). Não vale
   a pena tentar de novo nos steps seguintes; documentar como Not run direto.
+
+## Padrões capturados no step 03
+
+- **Grupo fecha em 3 arquivos, espelhando o split já existente no diretório**: `IndexSortableTaskGroup.tsx`
+  (wrapper `useSortable` do nível externo, molde 1:1 de `IndexSortableTaskItem.tsx`), `IndexTaskGroup/
+  IndexTaskGroup.tsx` (card: cabeçalho + input próprio + contagem/`ProgressBar`) e `IndexTaskGroup/
+  IndexGroupTasksList.tsx` (`DndContext`+`SortableContext` PRÓPRIOS, molde 1:1 de `IndexActiveTasksList.tsx`).
+  `IndexTaskItem`/`IndexSortableTaskItem` do step 02 são reutilizados literalmente nos dois níveis, sem
+  nenhuma prop nova — `useSortable` se liga ao `DndContext` mais próximo via React context.
+- **DnD de 2 níveis = contextos independentes, não um único `DndContext` com múltiplos `SortableContext`s.**
+  Cada grupo tem seu próprio `DndContext`+`SortableContext` aninhado, escopado só aos ids dos seus filhos.
+  Isso torna mover task entre grupos impossível POR CONSTRUÇÃO (não por guard de lógica) — se um step
+  futuro precisar desse movimento, vai exigir reestruturar para um único `DndContext` com detecção de
+  colisão cross-container, não é um ajuste incremental sobre o que existe.
+  **Zero mudança no store foi necessária**: `reorderItems` já move por id sem noção de bloco/adjacência;
+  o único requisito é que a renderização dos filhos de um grupo seja SEMPRE `filter(t => t.groupId ===
+  group.id)` (preserva ordem relativa, tolera itens ocultos/de outro tipo no meio do array bruto), nunca
+  "os próximos N itens contíguos depois do header".
+- **Gate de lista vazia precisa contar grupos, não só tasks.** `IndexTasks.tsx` gateava em
+  `activeTasks.length === 0`; um grupo com 0 filhos ou todos concluídos zerava essa contagem e o grupo
+  inteiro sumia da tela. Corrigido com um novo campo derivado `activeListItems` em `useListingTasks.ts`
+  (`isTaskGroup(i) || (isTask(i) && groupId === null && !completed)`), que é agora a ÚNICA fonte de
+  verdade de "o que a lista de nível 1 mostra" — consumido tanto pelo gate quanto pela montagem dos ids
+  do `SortableContext` externo. `activeTasks`/`activeRootTasks` ficaram sem consumidores após essa troca
+  (dívida de limpeza não bloqueante, registrada mas não resolvida neste step).
+- **Ações sem mudança de contrato**: colapsar grupo usa `setItemsState` (ler `items`, mapear o grupo alvo,
+  chamar de volta) em vez de uma ação nova — o contrato do store fechado no step 01 continua fechado.
+  Exclusão de grupo e edição de título reaproveitam ações/componentes já existentes (`deleteItem`,
+  `IndexEditInput`) sem exigir digitar `>` de novo para editar.
+  Nenhum modal de confirmação para excluir grupo — é o padrão do resto da lista, resolvido só com o
+  `title` do botão.
+- **Prefixo `>`/`> ` no input principal**: `>` sozinho ou seguido só de espaços NÃO cria nada E NÃO
+  limpa o input (desvio deliberado do padrão "sempre limpa no submit" — limpar sem criar seria perda
+  silenciosa de digitação). Qualquer novo parsing de prefixo em steps futuros deve preservar essa mesma
+  regra de "guard sem side-effect de limpeza".
+- **Tester encontrou um novo contorno**: `browser_click`/`browser_type` com Enter simplesmente não
+  submete neste app (aparentemente perdido nos re-renders contínuos dos timers). Contorno validado:
+  setar o valor via native DOM value-setter + `dispatchEvent('input')`, e usar `element.click()` real
+  via `browser_evaluate` em vez de `browser_click`/tecla Enter — reforça (e estende) o contorno já
+  registrado nos steps 01/02 de evitar `browser_click`.
+- **DnD (dois níveis: grupo-grupo, filho-filho, cross-group impossível) continua Not run** — mesma razão
+  dos steps 01/02, sem tentativa nova de automação.

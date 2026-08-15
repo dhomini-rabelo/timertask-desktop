@@ -46,3 +46,9 @@ Teste de sistema: browser (`npm run dev` :1420 fixa). Sem suíte/runner/Dockerfi
 Contornos: notification permission override via `browser_evaluate`, cliques via `click()` DOM real.
 
 ## Log
+
+- Recon: `complexa`. Plan: Opus, sem dúvidas, escopo único. Implement: Sonnet, 3 arquivos criados +
+  4 editados, `tsc --noEmit` limpo. Validate r1 (Opus): APPROVED. Commit impl: `7fb10d5`.
+- Teste de sistema (browser, `tests-01/`): PASS 13/13 casos executáveis; DnD Not run (razão já
+  registrada nos steps 01/02). Verdict: `tests-01/verdict.md`. Commit teste: ver `git log --oneline -5`.
+- Fechado sem handoff e sem escalonamento para Opus (0 rodadas extras em validação/teste).
