@@ -78,7 +78,7 @@ export function IndexFooter() {
       </div>
 
       {state.showCompleted && completedTasks.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-3 max-h-[calc(100vh-400px)] overflow-y-auto">
           {completedTasks.map((task) => (
             <IndexCompletedTaskItem
               key={task.id}

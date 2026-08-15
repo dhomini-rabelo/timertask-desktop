@@ -27,7 +27,7 @@ export function IndexTasks() {
 
         <IndexErrorMessage />
 
-        <div className="flex flex-col gap-3 max-h-[calc(100vh-400px)] min-h-[250px] overflow-y-auto">
+        <div className="flex flex-col gap-3 min-h-[250px]">
           {activeListItems.length === 0 ? (
             <div className="grow flex items-center justify-center">
               <span className="text-base text-Black-400">
