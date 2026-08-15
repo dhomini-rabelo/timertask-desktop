@@ -5,7 +5,7 @@ description: >-
 mcpServers:
   - playwright:
       type: http
-      url: "http://localhost:8931/mcp"
+      url: "http://localhost:8932/mcp"
 ---
 
 # Browser Tester
