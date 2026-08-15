@@ -237,3 +237,28 @@ e `src/layout/components/common/Timer` (+ `hooks/useCountUpTimer.ts`).
 - **Cliques via Playwright MCP (`browser_click`) dão timeout de "stable"** neste app por causa dos
   cronômetros re-renderizando continuamente; usar `click()` real via DOM (`browser_evaluate`) em vez
   disso é o contorno validado.
+
+## Padrões capturados no step 02
+
+- **Componente único de item de task fecha em
+  `components/IndexTasks/IndexActiveTasksList/IndexTaskItem/IndexTaskItem.tsx`** (renomeado via `git mv`
+  de `IndexSubTaskItem/`, preservando histórico; `IndexAlertSelect.tsx`/`IndexDebugTimer.tsx` foram
+  junto, conteúdo intocado). Prop `isActive` não existe mais em lugar nenhum do componente de item.
+- **Fonte da verdade visual é `isTimerActive = timerState.isRunning` (estado local do cronômetro do
+  item), NUNCA `task.isRunning` direto.** `task.isRunning` sobrevive só no cálculo de `autoStart` do
+  `useCountUpTimer`. Motivo: `useStoredTasks.ts` mantém `isRunning:true` de propósito no `beforeunload`
+  (T4) para não perder o "estava rodando", e se a UI lesse esse campo direto a task apareceria com borda
+  verde + perderia drag handle/lixeira depois de um reload. Qualquer novo condicional visual de task nos
+  steps seguintes deve seguir essa mesma regra (ler o timer local do item, não o campo do store).
+- **Sync com o timer global agora é bidirecional** (pausa E retoma os N itens em paralelo), com memória
+  local por item via `useRef` (`wasAutoPausedRef`), sem tocar store/persistência. `isResting` conta como
+  "timer global parado" (`isGlobalActive = isGlobalTimerRunning && !isResting`), porque `goToRest()`
+  mantém `isRunning:true` e `executeTask` aborta durante o descanso — sem esse detalhe haveria desync
+  silencioso entre cronômetro local e store durante o intervalo de descanso.
+- **Risco aceito e documentado, não corrigido no step 02**: pós-reload, `item.isRunning` fica preso em
+  `true` no store (comportamento intencional de T4), o que faz `reorderItems` bloquear silenciosamente
+  o drag daquela task até o próximo start/stop. Não é regressão deste step; se o step 03/04 mexer em
+  reorder ou nesse campo, considerar esse caso.
+- **DnD (dnd-kit) continua não-testável por automação neste ambiente** — confirmado de novo no step 02
+  (tester registrou como `## Not run`, mesma razão do step 01: sem pointer-capture real de SO). Não vale
+  a pena tentar de novo nos steps seguintes; documentar como Not run direto.

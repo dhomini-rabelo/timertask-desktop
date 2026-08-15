@@ -31,3 +31,9 @@
   app). Roteiro completo em `plan-simplified.md` seção "Modo de teste".
 - **Traps herdadas**: T4 (não auto-retomar pós-reload), T6 (alarme por item), T7 (timer por item), T8
   (React Compiler, imutabilidade).
+
+## Fechamento
+
+Recon `complexa` -> plan Opus -> impl Sonnet (1 rodada) -> validate Opus APPROVED (r1) -> commit `9e8ea62`
+-> teste browser `tests-01/` PASS 9/9 (DnD Not run) -> commit `3877612`. Zero rounds de correção, zero
+escalação. Detalhe em `process.md`.
