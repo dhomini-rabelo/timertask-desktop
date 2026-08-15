@@ -42,3 +42,13 @@ funcionam (native value-setter + `dispatchEvent` + `element.click()`), fixture a
 
 **Recon:** verdict `complexa`. **Plan:** Opus (agentId a2d6b49ac522e619d). Prompt de implementação:
 `prompts/overflow-linha-de-acoes.md`.
+
+## Fechamento
+
+- Implement: commit `e521536` (2 arquivos, 3 linhas, `tsc` limpo).
+- Validate r1: PASS de primeira (`validation-r1.md`), twMerge conferido empiricamente.
+- Teste (tests-01): PASS de primeira (`tests-01/verdict.md`). 4 estados sem overflow, trigger
+  ≤140px, BUG C reproduzido — H0 refutado/não reproduzido (chevron alcançável pré e pós-fix),
+  registrado como informacional, não bloqueia PASS (BUG C nunca foi escopo de implementação, PA1).
+  Commit `a223747`.
+- Nenhum handoff, nenhuma escalação. `step-fechado`.

@@ -262,6 +262,36 @@ Novas desta task:
 
 ---
 
+## Padrões capturados no step 01
+
+- **Fix aplicado (para step 02 não reabrir):** `IndexAlertSelect.tsx:22` className ganhou
+  `w-auto shrink-0`; `IndexTaskItem.tsx:248` ganhou `shrink-0`; `:265` ganhou `min-w-0` (sem
+  `flex-1` — evita o "5 min" escorregar para o meio quando o debug não rodou). `:247` intocado,
+  `flex-wrap` (A3) não foi necessário — medido 472px vs 508px de container no pior caso (grupo +
+  debug rodado). Commit `e521536`.
+- **`twMerge` só derruba uma classe da base do átomo se a nova className trouxer OUTRA do mesmo
+  grupo** (`w-*` derruba `w-*`; `shrink-0` sozinho não deslocaria `w-full`). Qualquer novo override
+  de `Select.Trigger` (ou outro átomo com classe de largura na base) precisa lembrar disso — não é
+  intuitivo por leitura, foi confirmado rodando `twMerge` de verdade no validator.
+- **BUG C não tinha mecanismo — confirmado dinamicamente, não só estaticamente.** Teste em browser
+  reproduziu o chevron do grupo em posição IDÊNTICA pré e pós-fix do BUG A (mesmo com
+  `scrollWidth`/`clientWidth` estourando pré-fix): num layout flex-column com ancestral de largura
+  fixa (`max-w-[600px]`), uma linha-irmã que transborda na horizontal NÃO desloca nem esconde as
+  outras linhas-irmãs (cada uma mantém sua própria caixa). **Step 02 não precisa re-testar BUG C
+  como regressão de layout horizontal** — já está provado que overflow horizontal de uma linha não
+  afeta a alcançabilidade de elementos em linhas vizinhas. (A ressalva de §5 sobre re-testar BUG C
+  no step 02 continua valendo, mas por causa da mudança de ALTURA/scroll vertical do container, não
+  por overflow horizontal — motivo diferente do que se temia.)
+- **`IndexDebugTimer` só renderiza com `hasBeenStarted=true`** (task com evento `start` em
+  `timeEvents`). Para chegar no estado "Check de reset visível" via fixture: plantar
+  start+stop em `timeEvents`, então clicar o Play da task (ativa `isTimerActive`) e clicar "Debug"
+  — sem o timer local da task ativo, o botão "Debug" só dispara aviso, não inicia.
+- **Contorno de fixture mais robusto que "plantar antes do reload":** monkey-patch
+  `Storage.prototype.setItem` para engolir escritas na chave `timertasks:tasks` na página que está
+  saindo, logo após plantar o fixture, e então recarregar — o novo documento tem contexto JS limpo
+  (patch some) e hidrata do fixture intocado. Mais confiável que só torcer para o `beforeunload`
+  não disparar antes do reload.
+
 ## 7. Medição de janela do meta-planner
 
 Nonce `meta-correcao-layout-tasks`. Registro do último checkpoint em `steps.md`. Comando:
