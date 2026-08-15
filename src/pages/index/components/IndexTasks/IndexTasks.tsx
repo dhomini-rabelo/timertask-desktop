@@ -8,7 +8,7 @@ import { IndexFooter } from "./IndexFooter/IndexFooter";
 
 export function IndexTasks() {
   useStoredTasks();
-  const { activeTasks, tasks } = useListingTasks();
+  const { activeListItems, tasks } = useListingTasks();
 
   return (
     <Box className="w-full max-w-[600px] ml-auto p-6 flex flex-col gap-8">
@@ -28,7 +28,7 @@ export function IndexTasks() {
         <IndexErrorMessage />
 
         <div className="flex flex-col gap-3 max-h-[calc(100vh-400px)] min-h-[250px] overflow-y-auto">
-          {activeTasks.length === 0 ? (
+          {activeListItems.length === 0 ? (
             <div className="grow flex items-center justify-center">
               <span className="text-base text-Black-400">
                 {tasks.length > 0

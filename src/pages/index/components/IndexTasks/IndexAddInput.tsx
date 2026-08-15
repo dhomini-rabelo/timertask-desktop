@@ -6,6 +6,7 @@ import { useTasksState } from "../../states/tasks";
 export function IndexAddInput() {
   const [title, setTitle] = useState("");
   const addTask = useTasksState((props) => props.actions.addTask);
+  const addGroup = useTasksState((props) => props.actions.addGroup);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -18,6 +19,18 @@ export function IndexAddInput() {
   }
 
   function handleAdd() {
+    const trimmedStart = title.trimStart();
+
+    if (trimmedStart.startsWith(">")) {
+      const groupTitle = trimmedStart.slice(1).trimStart();
+      if (!groupTitle.trim()) {
+        return;
+      }
+      addGroup(groupTitle);
+      setTitle("");
+      return;
+    }
+
     if (title.trim()) {
       addTask(title, null);
       setTitle("");
@@ -27,7 +40,7 @@ export function IndexAddInput() {
   return (
     <div className="flex gap-3">
       <Input
-        placeholder="Add a new task..."
+        placeholder="Add a task... (use > to create a group)"
         value={title}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

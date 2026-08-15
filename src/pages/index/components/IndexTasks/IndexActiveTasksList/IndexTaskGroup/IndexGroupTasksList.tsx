@@ -12,19 +12,26 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useListingTasks } from "../../../hooks/useListingTasks";
-import { isTaskGroup, useTasksState } from "../../../states/tasks";
-import { IndexSortableTaskGroup } from "./IndexSortableTaskGroup";
-import { IndexSortableTaskItem } from "./IndexSortableTaskItem";
+import { useListingTasks } from "../../../../hooks/useListingTasks";
+import { useTasksState, type TaskGroup } from "../../../../states/tasks";
+import { IndexSortableTaskItem } from "../IndexSortableTaskItem";
 
-export function IndexActiveTasksList() {
+interface IndexGroupTasksListProps {
+  group: TaskGroup;
+}
+
+export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
   const reorderItems = useTasksState((props) => props.actions.reorderItems);
-  const { activeListItems } = useListingTasks();
+  const { tasks } = useListingTasks();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
+  );
+
+  const visibleChildren = tasks.filter(
+    (task) => task.groupId === group.id && !task.completed
   );
 
   function handleDragEnd(event: DragEndEvent) {
@@ -35,6 +42,10 @@ export function IndexActiveTasksList() {
     }
   }
 
+  if (visibleChildren.length === 0) {
+    return <p className="text-sm text-Black-400">No tasks yet.</p>;
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -42,16 +53,12 @@ export function IndexActiveTasksList() {
       onDragEnd={handleDragEnd}
     >
       <SortableContext
-        items={activeListItems.map((item) => item.id)}
+        items={visibleChildren.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        {activeListItems.map((item) =>
-          isTaskGroup(item) ? (
-            <IndexSortableTaskGroup key={item.id} group={item} />
-          ) : (
-            <IndexSortableTaskItem key={item.id} task={item} />
-          ),
-        )}
+        {visibleChildren.map((task) => (
+          <IndexSortableTaskItem key={task.id} task={task} />
+        ))}
       </SortableContext>
     </DndContext>
   );

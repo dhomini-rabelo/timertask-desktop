@@ -15,6 +15,12 @@ export function useListingTasks() {
   const rootTasks = tasks.filter((task) => task.groupId === null);
   const activeTasks = tasks.filter((task) => !task.completed);
   const completedTasks = tasks.filter((task) => task.completed);
+  const activeRootTasks = rootTasks.filter((task) => !task.completed);
+  const activeListItems = workflowItems.filter(
+    (item) =>
+      isTaskGroup(item) ||
+      (isTask(item) && item.groupId === null && !item.completed),
+  );
 
   return {
     workflowItems,
@@ -23,5 +29,7 @@ export function useListingTasks() {
     rootTasks,
     activeTasks,
     completedTasks,
+    activeRootTasks,
+    activeListItems,
   };
 }
