@@ -10,6 +10,7 @@ import { IndexTaskNoteDialog } from "../IndexActiveTasksList/IndexTaskNoteDialog
 
 interface IndexCompletedTaskItemProps {
   task: Task;
+  groupTitle?: string;
 }
 
 function formatClockTime(date: Date) {
@@ -28,7 +29,10 @@ function formatClockValue(date: Date | null) {
   return formatClockTime(date);
 }
 
-export function IndexCompletedTaskItem({ task }: IndexCompletedTaskItemProps) {
+export function IndexCompletedTaskItem({
+  task,
+  groupTitle,
+}: IndexCompletedTaskItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const taskEvents = task.timeEvents.sort(
     (firstEvent, secondEvent) =>
@@ -52,6 +56,11 @@ export function IndexCompletedTaskItem({ task }: IndexCompletedTaskItemProps) {
               {task.title}
             </span>
             <div className="flex items-center gap-2 text-xs text-Black-400">
+              {groupTitle && (
+                <span className="px-2 py-0.5 rounded-full font-medium bg-Black-100/50 text-Black-450 dark:bg-Black-600 dark:text-Black-400 break-all">
+                  {groupTitle}
+                </span>
+              )}
               {hasTrackedTime ? (
                 <>
                   <span className="font-medium">

@@ -17,13 +17,16 @@ export function IndexFooter() {
   });
   const clearItems = useTasksState((props) => props.actions.clearItems);
 
-  const { tasks, completedTasks } = useListingTasks();
+  const { tasks, completedTasks, groups } = useListingTasks();
 
   const totalTasksCount = tasks.length;
   const completedTasksCount = completedTasks.length;
   const progressPercentage = totalTasksCount
     ? Math.round((completedTasksCount / totalTasksCount) * 100)
     : 0;
+  const groupTitleById = new Map(
+    groups.map((group) => [group.id, group.title]),
+  );
 
   function handleReset() {
     clearItems();
@@ -77,7 +80,13 @@ export function IndexFooter() {
       {state.showCompleted && completedTasks.length > 0 && (
         <div className="flex flex-col gap-3">
           {completedTasks.map((task) => (
-            <IndexCompletedTaskItem key={task.id} task={task} />
+            <IndexCompletedTaskItem
+              key={task.id}
+              task={task}
+              groupTitle={
+                task.groupId ? groupTitleById.get(task.groupId) : undefined
+              }
+            />
           ))}
         </div>
       )}
