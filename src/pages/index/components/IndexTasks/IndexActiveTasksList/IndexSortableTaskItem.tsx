@@ -1,11 +1,10 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { Task } from "../../../states/tasks";
-import { IndexSubTaskItem } from "./IndexSubTaskItem/IndexSubTaskItem";
+import { IndexTaskItem } from "./IndexTaskItem/IndexTaskItem";
 
 interface IndexSortableTaskItemProps {
   task: Task;
-  dragHandleProps?: Record<string, unknown>;
 }
 
 export function IndexSortableTaskItem({ task }: IndexSortableTaskItemProps) {
@@ -27,9 +26,8 @@ export function IndexSortableTaskItem({ task }: IndexSortableTaskItemProps) {
 
   return (
     <div ref={setNodeRef} style={style}>
-      <IndexSubTaskItem
+      <IndexTaskItem
         task={task}
-        isActive
         dragHandleProps={{ ...attributes, ...listeners }}
       />
     </div>

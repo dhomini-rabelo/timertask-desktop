@@ -21,32 +21,28 @@ import {
 } from "../../../../states/tasks/utils";
 import { errorMessageAtom, indexTasksPageStateAtom } from "../../shared-state";
 import { IndexEditInput } from "../shared-components/IndexEditInput";
+import { IndexTaskNoteDialog } from "../IndexTaskNoteDialog";
 import { IndexAlertSelect } from "./IndexAlertSelect";
 import { IndexDebugTimer, type IndexDebugTimerHandle } from "./IndexDebugTimer";
 
-interface IndexSubTaskItemState {
+interface IndexTaskItemState {
   alertMinutes: string;
 }
 
-interface IndexSubTaskItemProps {
+interface IndexTaskItemProps {
   task: Task;
-  isActive: boolean;
   dragHandleProps?: Record<string, unknown>;
 }
 
-export function IndexSubTaskItem({
-  task,
-  isActive,
-  dragHandleProps,
-}: IndexSubTaskItemProps) {
+export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   const [indexTasksPageState, setIndexTasksPageState] = useAtom(
     indexTasksPageStateAtom,
   );
   const isEditing = indexTasksPageState.editingTaskId === task?.id;
   const deleteTask = useTasksState((props) => props.actions.deleteItem);
   const executeTask = useTasksState((props) => props.actions.executeTask);
-  const stopSubtask = useTasksState((props) => props.actions.stopTask);
-  const toggleSubtask = useTasksState((props) => props.actions.toggleTask);
+  const stopTask = useTasksState((props) => props.actions.stopTask);
+  const toggleTask = useTasksState((props) => props.actions.toggleTask);
   const isGlobalTimerRunning = useCountdownTimerState(
     (store) => store.state.isRunning,
   );
@@ -59,13 +55,21 @@ export function IndexSubTaskItem({
       task.isRunning &&
       shouldAutoStart(task.timeEvents),
   });
-  const [state, setState] = useState<IndexSubTaskItemState>({
+  const [state, setState] = useState<IndexTaskItemState>({
     alertMinutes: "5",
   });
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
 
-  function handleToggleSubtaskTimer(isGlobalTimerRunning: boolean) {
+  const isTimerActive = timerState.isRunning;
+  const hasBeenStarted = task.timeEvents.some(
+    (event) => event.type === "start",
+  );
+  const isGlobalActive = isGlobalTimerRunning && !isResting;
+  const wasAutoPausedRef = useRef(false);
+
+  function handleToggleTaskTimer(isGlobalTimerRunning: boolean) {
+    wasAutoPausedRef.current = false;
     if (!timerState.isRunning) {
       if (isGlobalTimerRunning && !isResting) {
         executeTask(task.id);
@@ -74,7 +78,7 @@ export function IndexSubTaskItem({
         dispatchErrorMessage("Global timer is not running");
       }
     } else {
-      stopSubtask(task.id);
+      stopTask(task.id);
       timerActions.stop();
     }
   }
@@ -109,11 +113,20 @@ export function IndexSubTaskItem({
   }
 
   useEffect(() => {
-    if (!isGlobalTimerRunning && timerState.isRunning) {
-      stopSubtask(task.id);
-      timerActions.stop();
+    if (!isGlobalActive) {
+      if (timerState.isRunning) {
+        stopTask(task.id);
+        timerActions.stop();
+        wasAutoPausedRef.current = true;
+      }
+      return;
     }
-  }, [isGlobalTimerRunning]);
+    if (wasAutoPausedRef.current && !timerState.isRunning) {
+      executeTask(task.id);
+      timerActions.start();
+    }
+    wasAutoPausedRef.current = false;
+  }, [isGlobalActive]);
 
   useEffect(() => {
     const alertTimerInSeconds = Number(state.alertMinutes) * 60;
@@ -141,7 +154,7 @@ export function IndexSubTaskItem({
     <div className="group space-y-0 bg-Black-100/50 border border-Black-300/15 rounded-xl dark:bg-Black-700/50 dark:border-Black-600">
       <div
         className={`flex items-center justify-between p-4 rounded-xl bg-white border transition-all shadow-sm hover:shadow-md dark:bg-Black-700 ${
-          isActive
+          isTimerActive
             ? "border-Green-400 bg-Green-50/30 dark:bg-Green-400/10"
             : "border-Black-100/30 hover:border-Green-400/50 dark:border-Black-600"
         }`}
@@ -152,7 +165,7 @@ export function IndexSubTaskItem({
           <>
             <div className="flex items-center gap-4 flex-1">
               <div className="flex items-center gap-2">
-                {!task.isRunning && (
+                {!isTimerActive && (
                   <div
                     {...dragHandleProps}
                     className="cursor-grab active:cursor-grabbing text-Black-400 hover:text-Black-700 dark:hover:text-White transition-colors"
@@ -161,7 +174,7 @@ export function IndexSubTaskItem({
                   </div>
                 )}
 
-                {isActive && (
+                {hasBeenStarted && (
                   <div className="flex items-center gap-3">
                     <div className="relative w-16 h-16">
                       <Timer
@@ -178,7 +191,7 @@ export function IndexSubTaskItem({
                 className={`text-sm font-medium transition-colors break-all ${
                   task.completed
                     ? "text-Black-400 line-through"
-                    : isActive
+                    : isTimerActive
                       ? "text-Black-700 dark:text-White font-semibold"
                       : "text-Black-500 dark:text-Black-400"
                 }`}
@@ -187,92 +200,80 @@ export function IndexSubTaskItem({
               </span>
             </div>
             <div className="flex items-center">
-              {!isActive && (
-                <div className="flex items-center mr-2">
-                  <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
-                    <button
-                      onClick={() => handleEditTask(task.id)}
-                      className="text-Yellow-400 hover:text-Yellow-500 transition-all p-2"
-                    >
-                      <Pencil className="w-5 h-5" />
-                    </button>
-                    {!task.isRunning && (
-                      <button
-                        onClick={() => deleteTask(task.id)}
-                        className="text-Red-400 hover:text-Red-500 transition-all p-2"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              )}
+              <button
+                onClick={() => handleToggleTaskTimer(isGlobalTimerRunning)}
+                className="text-Green-400 hover:text-Green-500 transition-all p-2"
+              >
+                {timerState.isRunning ? (
+                  <Square className="w-5 h-5 fill-current" />
+                ) : (
+                  <Play className="w-5 h-5 fill-current" />
+                )}
+              </button>
 
-              {isActive && (
-                <div className="flex items-center">
-                  <button
-                    onClick={() =>
-                      handleToggleSubtaskTimer(isGlobalTimerRunning)
-                    }
-                    className="text-Green-400 hover:text-Green-500 transition-all p-2"
-                  >
-                    {timerState.isRunning ? (
-                      <Square className="w-5 h-5 fill-current" />
-                    ) : (
-                      <Play className="w-5 h-5 fill-current" />
-                    )}
-                  </button>
-
-                  {timerState.isRunning && (
-                    <button
-                      onClick={() => toggleSubtask(task.id)}
-                      className="transition-all p-2"
-                      title="Mark as complete"
-                    >
-                      <Check className="w-5 h-5 text-Green-400" />
-                    </button>
-                  )}
-                </div>
+              {isTimerActive && (
+                <button
+                  onClick={() => toggleTask(task.id)}
+                  className="transition-all p-2"
+                  title="Mark as complete"
+                >
+                  <Check className="w-5 h-5 text-Green-400" />
+                </button>
               )}
             </div>
           </>
         )}
       </div>
 
-      {!isEditing && isActive && (
-        <div className="flex flex-col gap-2 rounded-xl px-3 py-2 transition-all">
-          <div className="flex items-center justify-between transition-all">
-            <div className="flex items-center gap-1 transition-all">
-              <button
-                onClick={() => handleEditTask(task.id)}
-                className="text-Yellow-400 hover:text-Yellow-500 transition-all p-2"
-              >
-                <Pencil className="w-5 h-5" />
-              </button>
-              {!task.isRunning && (
-                <button
-                  onClick={() => deleteTask(task.id)}
-                  className="text-Red-400 hover:text-Red-500 transition-all p-2"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              )}
-            </div>
-            {!task.isRunning && (
-              <div className="w-max-content">
-                <IndexAlertSelect
-                  value={state.alertMinutes}
-                  onChange={(value) =>
-                    setState((previousState) => ({
-                      ...previousState,
-                      alertMinutes: value,
-                    }))
-                  }
-                />
+      {!isEditing && hasBeenStarted && (
+        <div className="flex items-center justify-end">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-Black-100/20 rounded-lg shadow-sm text-sm font-medium text-Black-700 transition-all hover:border-Green-400 hover:text-Green-500 dark:bg-Black-700 dark:border-Black-600 dark:text-White">
+            {isTimerActive ? (
+              <div className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-Green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-Green-500"></span>
               </div>
+            ) : (
+              <div className="h-2 w-2 rounded-full bg-Red-400"></div>
             )}
-            {task.isRunning && (
-              <div className="w-full pl-2">
+            <span className="tabular-nums tracking-wider font-mono">
+              {isTimerActive ? "Running" : "Paused"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {!isEditing && (
+        <div className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition-all">
+          <div className="flex items-center gap-1 transition-all">
+            <button
+              onClick={() => handleEditTask(task.id)}
+              className="text-Yellow-400 hover:text-Yellow-500 transition-all p-2"
+            >
+              <Pencil className="w-5 h-5" />
+            </button>
+            {!isTimerActive && (
+              <button
+                onClick={() => deleteTask(task.id)}
+                className="text-Red-400 hover:text-Red-500 transition-all p-2"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            )}
+            <IndexTaskNoteDialog taskId={task.id} label="Notes" />
+          </div>
+          <div className="flex items-center gap-2">
+            <IndexAlertSelect
+              value={state.alertMinutes}
+              onChange={(value) =>
+                setState((previousState) => ({
+                  ...previousState,
+                  alertMinutes: value,
+                }))
+              }
+            />
+            {hasBeenStarted && (
+              <div className="flex-1 min-w-0">
                 <IndexDebugTimer
                   ref={debuggingTimerRef}
                   isRunning={timerState.isRunning}
