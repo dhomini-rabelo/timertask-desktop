@@ -245,7 +245,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
 
       {!isEditing && (
         <div className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition-all">
-          <div className="flex items-center gap-1 transition-all">
+          <div className="flex items-center gap-1 transition-all shrink-0">
             <button
               onClick={() => handleEditTask(task.id)}
               className="text-Yellow-400 hover:text-Yellow-500 transition-all p-2"
@@ -262,7 +262,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
             )}
             <IndexTaskNoteDialog taskId={task.id} label="Notes" />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             <IndexAlertSelect
               value={state.alertMinutes}
               onChange={(value) =>

@@ -19,7 +19,7 @@ export function IndexAlertSelect(props: IndexAlertSelectProps) {
       value={props.value}
       onValueChange={props.onChange}
     >
-      <Select.Trigger className="h-8 rounded-full px-2.5 py-0 text-Black-700 text-xs">
+      <Select.Trigger className="h-8 rounded-full px-2.5 py-0 text-Black-700 text-xs w-auto shrink-0">
         <Select.DisplayValue
           startIcon={<Bell className="h-4 w-4 text-Yellow-400" />}
         />
