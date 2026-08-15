@@ -304,3 +304,39 @@ e `src/layout/components/common/Timer` (+ `hooks/useCountUpTimer.ts`).
   registrado nos steps 01/02 de evitar `browser_click`.
 - **DnD (dois níveis: grupo-grupo, filho-filho, cross-group impossível) continua Not run** — mesma razão
   dos steps 01/02, sem tentativa nova de automação.
+
+## Padrões capturados no step 04 (último step — task fechada)
+
+- **`IndexFooter.tsx` já tinha sido reescrito inteiro pelo step 01** (para compilar contra o novo store) e
+  isso já entregou ~90% do IN nominal deste step de graça: sem botão "Finish", contagem já plana sobre
+  todas as tasks de nível 1 do workflow (soltas + grupo, grupo fora do denominador), `handleReset`→
+  `clearItems()` já escopado ao workflow. Moral para quem reler esta memória: o footprint declarado num
+  `plan-simplified.md` pode já estar parcialmente resolvido por um step anterior que tocou o mesmo
+  arquivo por outro motivo — sempre ler o arquivo real antes de planejar a implementação, não confiar só
+  no texto do plano-mãe.
+- **Indicação de grupo em item apresentacional = resolver o dado UMA VEZ no componente pai, não passar a
+  lista bruta nem re-assinar o store por item.** `IndexFooter.tsx` constrói `groupTitleById = new
+  Map(groups.map(g => [g.id, g.title]))` uma vez por render (não `useMemo` — o resto do arquivo nunca usa,
+  React Compiler cobre) e passa `groupTitle?: string` já resolvido para `IndexCompletedTaskItem`. Motivo:
+  o accordion de concluídas pode ter 150+ itens em produção (T10); um `.find()` por item ou um
+  `useListingTasks()` dentro do item seria O(n·m) ou N assinaturas de store. Qualquer novo dado derivado
+  de lookup num item de lista longa deve seguir esse mesmo padrão.
+- **Arquivo órfão real encontrado e removido**: `IndexFooter/IndexTaskNote.tsx` (painel de nota da
+  navegação de 2 níveis) tinha zero consumidores — sobrevivera aos steps 01-03 sem ninguém notar porque
+  não dava erro de compilação (só deixava de ser importado). Ao fechar uma task de migração grande, vale
+  sempre rodar `grep -rn "NomeDoComponente\b" src/` para cada arquivo tocado por steps anteriores antes de
+  assumir que "compila limpo" implica "nada órfão".
+- **Duas esquisitices do `IndexScore`/`scoreUtils` são pré-existentes à migração inteira** (confirmado
+  byte-a-byte via `git show eec34ca^`), não regressão de nenhum step 01-04, e ficaram FORA de escopo por
+  decisão do plano deste step: (a) `IndexScore` soma todos os workflows, ignora `selectedWorkflowId`; (b)
+  `calculateTasksCompleted` conta task que já emitiu evento `"complete"` mesmo se desmarcada depois
+  (`toggleTask` só adiciona o evento, nunca remove). Confirmadas de novo no teste de sistema deste step
+  (tests-01, caso 10) como comportamento aceito, não bug.
+- **DnD confirmado `## Not run` pela 4ª vez** (steps 01, 02, 03, 04) — nenhuma tentativa nova de
+  automação valeu a pena em nenhuma rodada; é limitação estrutural do ambiente (Playwright MCP sem
+  pointer-capture real de SO + timers re-renderizando), não do dnd-kit em si.
+- **Task "tasks-nivel-unico" fechada de ponta a ponta neste step**: nível único sem página 2, múltiplas
+  tasks ativas em paralelo, grupo via prefixo `>`, título "Tasks", progresso agregado + progresso por
+  grupo, accordion com indicação de grupo, nota por-task, persistência, Reset escopado, `IndexScore`
+  coerente (com as 2 esquisitices documentadas como aceitas) — todos os 12 casos do teste de sistema
+  final (`tests-01/verdict.md`) PASS.

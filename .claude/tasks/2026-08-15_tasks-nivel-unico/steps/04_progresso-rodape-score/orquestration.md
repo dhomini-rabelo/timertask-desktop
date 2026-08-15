@@ -40,3 +40,10 @@ Reset escopado, IndexScore com as 2 esquisitices pré-existentes anotadas, persi
 `browser_evaluate` em vez de `browser_click`/Enter, plantar fixture antes da hidratação.
 
 Plan completo: `plan.md`. Prompt do implementador: `prompts/rodape-concluidas-grupo.md`.
+
+## Fechamento
+
+Implementação: commit `b4b36c7`. Validação (Opus r1): APPROVED, `validation-r1.md`. Docs de plano/recon/
+validação: commit `a45e46a`. Teste de sistema (browser, tests-01): **PASS 12/12**, `tests-01/verdict.md`,
+commit `bfb14fc`. DnD `## Not run` (4ª confirmação). Step fechado sem escalação nem handoff. Este é o
+último step da task — ver `process.md` para o fechamento da régua inteira do pedido do usuário.
