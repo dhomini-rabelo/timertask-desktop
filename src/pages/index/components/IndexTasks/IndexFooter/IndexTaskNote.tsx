@@ -21,9 +21,9 @@ interface IndexTaskNoteState {
 
 export function IndexTaskNote({ taskId, className }: IndexTaskNoteProps) {
   const task = useTasksState((store) =>
-    store.state.tasks.find((t) => t.id === taskId),
+    store.state.items.find((t) => t.id === taskId),
   );
-  const saveTaskNote = useTasksState((store) => store.actions.saveTaskNote);
+  const saveTaskNote = useTasksState((store) => store.actions.saveNote);
   const [state, setState] = useState<IndexTaskNoteState>({
     isOpen: false,
     note: task?.note ?? "",

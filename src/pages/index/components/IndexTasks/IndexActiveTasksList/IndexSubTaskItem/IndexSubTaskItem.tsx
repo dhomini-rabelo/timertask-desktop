@@ -14,7 +14,7 @@ import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
 import { useCountdownTimerState } from "../../../../states/countdownTimer";
-import { useTasksState, type SubTask } from "../../../../states/tasks";
+import { useTasksState, type Task } from "../../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
   shouldAutoStart,
@@ -29,7 +29,7 @@ interface IndexSubTaskItemState {
 }
 
 interface IndexSubTaskItemProps {
-  task: SubTask;
+  task: Task;
   isActive: boolean;
   dragHandleProps?: Record<string, unknown>;
 }
@@ -43,10 +43,10 @@ export function IndexSubTaskItem({
     indexTasksPageStateAtom,
   );
   const isEditing = indexTasksPageState.editingTaskId === task?.id;
-  const deleteTask = useTasksState((props) => props.actions.deleteSubtask);
-  const executeSubTask = useTasksState((props) => props.actions.executeSubtask);
-  const stopSubtask = useTasksState((props) => props.actions.stopSubtask);
-  const toggleSubtask = useTasksState((props) => props.actions.toggleSubtask);
+  const deleteTask = useTasksState((props) => props.actions.deleteItem);
+  const executeTask = useTasksState((props) => props.actions.executeTask);
+  const stopSubtask = useTasksState((props) => props.actions.stopTask);
+  const toggleSubtask = useTasksState((props) => props.actions.toggleTask);
   const isGlobalTimerRunning = useCountdownTimerState(
     (store) => store.state.isRunning,
   );
@@ -68,7 +68,7 @@ export function IndexSubTaskItem({
   function handleToggleSubtaskTimer(isGlobalTimerRunning: boolean) {
     if (!timerState.isRunning) {
       if (isGlobalTimerRunning && !isResting) {
-        executeSubTask(task.id);
+        executeTask(task.id);
         timerActions.start();
       } else if (!isResting) {
         dispatchErrorMessage("Global timer is not running");
@@ -109,15 +109,9 @@ export function IndexSubTaskItem({
   }
 
   useEffect(() => {
-    const areTheTimersAlreadyInTheSameState =
-      timerState.isRunning === isGlobalTimerRunning;
-
-    if (
-      isActive &&
-      timerState.currentTimeInSeconds > 0 &&
-      !areTheTimersAlreadyInTheSameState
-    ) {
-      handleToggleSubtaskTimer(isGlobalTimerRunning);
+    if (!isGlobalTimerRunning && timerState.isRunning) {
+      stopSubtask(task.id);
+      timerActions.stop();
     }
   }, [isGlobalTimerRunning]);
 
@@ -153,7 +147,7 @@ export function IndexSubTaskItem({
         }`}
       >
         {isEditing ? (
-          <IndexEditInput initialValue={task.title} listingMode="subtasks" />
+          <IndexEditInput initialValue={task.title} />
         ) : (
           <>
             <div className="flex items-center gap-4 flex-1">

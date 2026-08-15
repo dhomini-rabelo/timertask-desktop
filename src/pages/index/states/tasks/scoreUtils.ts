@@ -4,40 +4,10 @@ import {
   startOfDay,
   subDays
 } from "date-fns";
-import type { SubTaskTimeEvent, Task } from "./index";
+import { isTask, type TaskItem, type TaskTimeEvent } from "./index";
+import { calculateTotalTimeInSeconds } from "./utils";
 
-export function calculateSubtaskTime(events: SubTaskTimeEvent[]): number {
-  if (!events || events.length === 0) return 0;
-
-  let totalSeconds = 0;
-  let startTime: Date | null = null;
-
-  const sortedEvents = [...events].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-  );
-
-  for (const event of sortedEvents) {
-    if (event.type === "start") {
-      startTime = new Date(event.createdAt);
-    } else if (event.type === "stop" || event.type === "complete") {
-      if (startTime) {
-        totalSeconds += differenceInSeconds(
-          new Date(event.createdAt),
-          startTime,
-        );
-        startTime = null;
-      }
-    }
-  }
-
-  if (startTime) {
-    totalSeconds += differenceInSeconds(new Date(), startTime);
-  }
-
-  return totalSeconds;
-}
-
-export function calculateSubtaskTimeToday(events: SubTaskTimeEvent[]): number {
+export function calculateTaskTimeToday(events: TaskTimeEvent[]): number {
   if (!events || events.length === 0) return 0;
 
   let totalSeconds = 0;
@@ -85,54 +55,46 @@ export function calculateSubtaskTimeToday(events: SubTaskTimeEvent[]): number {
   return totalSeconds;
 }
 
-export function calculateTotalFocusedTime(tasks: Task[]): number {
+export function calculateTotalFocusedTime(items: TaskItem[]): number {
   let totalSeconds = 0;
-  tasks.forEach((task) => {
-    task.subtasks.forEach((subtask) => {
-      totalSeconds += calculateSubtaskTime(subtask.timeEvents);
-    });
+  items.filter(isTask).forEach((task) => {
+    totalSeconds += calculateTotalTimeInSeconds(task.timeEvents);
   });
   return totalSeconds;
 }
 
-export function calculateTodayFocusedTime(tasks: Task[]): number {
+export function calculateTodayFocusedTime(items: TaskItem[]): number {
   let totalSeconds = 0;
-  tasks.forEach((task) => {
-    task.subtasks.forEach((subtask) => {
-      totalSeconds += calculateSubtaskTimeToday(subtask.timeEvents);
-    });
+  items.filter(isTask).forEach((task) => {
+    totalSeconds += calculateTaskTimeToday(task.timeEvents);
   });
   return totalSeconds;
 }
 
-export function calculateTasksCompleted(tasks: Task[]): number {
+export function calculateTasksCompleted(items: TaskItem[]): number {
   let count = 0;
 
-  tasks.forEach((task) => {
-    task.subtasks.forEach((subtask) => {
-      const hasCompletedToday = subtask.timeEvents.some(
-        (event) =>
-          event.type === "complete",
-      );
-      if (hasCompletedToday) {
-        count++;
-      }
-    });
+  items.filter(isTask).forEach((task) => {
+    const hasCompletedToday = task.timeEvents.some(
+      (event) =>
+        event.type === "complete",
+    );
+    if (hasCompletedToday) {
+      count++;
+    }
   });
 
   return count;
 }
 
-export function calculateCurrentStreak(tasks: Task[]): number {
+export function calculateCurrentStreak(items: TaskItem[]): number {
   const activeDays = new Set<string>();
 
-  tasks.forEach((task) => {
-    task.subtasks.forEach((subtask) => {
-      subtask.timeEvents.forEach((event) => {
-        if (event.type === "start") {
-          activeDays.add(startOfDay(new Date(event.createdAt)).toISOString());
-        }
-      });
+  items.filter(isTask).forEach((task) => {
+    task.timeEvents.forEach((event) => {
+      if (event.type === "start") {
+        activeDays.add(startOfDay(new Date(event.createdAt)).toISOString());
+      }
     });
   });
 

@@ -147,6 +147,14 @@ Decisões de forma que valem para todos os steps:
 Átomos de layout reutilizáveis (não recriar): `src/layout/components/atoms/{Box,Button,Input,ProgressBar,Select,Dialog}`
 e `src/layout/components/common/Timer` (+ `hooks/useCountUpTimer.ts`).
 
+> Step 01 apagou `IndexTaskItem.tsx` e `IndexTaskAccordionSubtaskItem.tsx` (UI da navegação de 2 níveis).
+> Os moldes da tabela que apontam para eles continuam disponíveis em:
+> `git show 8185c5c:src/pages/index/components/IndexTasks/IndexActiveTasksList/IndexTaskItem.tsx`
+> `git show 8185c5c:src/pages/index/components/IndexTasks/IndexActiveTasksList/IndexTaskAccordionSubtaskItem.tsx`
+> `components/IndexTasks/utils.ts` também foi apagado. Ações do store fechadas pelo step 01:
+> `setItemsState addTask(title, groupId?) addGroup toggleTask deleteItem saveEditingItem saveNote
+> reorderItems clearItems executeTask stopTask` + os type guards `isTask`/`isTaskGroup`.
+
 ---
 
 ## 5. Ordem e o que cada step assume do anterior

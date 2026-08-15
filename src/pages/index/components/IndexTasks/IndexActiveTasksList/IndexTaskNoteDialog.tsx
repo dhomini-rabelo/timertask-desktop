@@ -29,9 +29,9 @@ export function IndexTaskNoteDialog({
   buttonClassName,
 }: IndexTaskNoteDialogProps) {
   const task = useTasksState((store) =>
-    store.state.tasks.find((item) => item.id === taskId),
+    store.state.items.find((item) => item.id === taskId),
   );
-  const saveTaskNote = useTasksState((store) => store.actions.saveTaskNote);
+  const saveTaskNote = useTasksState((store) => store.actions.saveNote);
   const [dialogState, setDialogState] = useState<IndexTaskNoteDialogState>({
     isOpen: false,
     note: note ?? task?.note ?? "",

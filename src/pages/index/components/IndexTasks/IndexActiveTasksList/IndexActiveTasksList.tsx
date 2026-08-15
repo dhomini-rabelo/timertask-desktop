@@ -14,26 +14,11 @@ import {
 } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { useTasksState } from "../../../states/tasks";
-import { getActiveTask, getTaskListingMode } from "../utils";
 import { IndexSortableTaskItem } from "./IndexSortableTaskItem";
 
-interface IndexActiveTasksListProps {
-  inExecutionTaskId: string | null;
-}
-
-export function IndexActiveTasksList({
-  inExecutionTaskId,
-}: IndexActiveTasksListProps) {
-  const listMode = getTaskListingMode(inExecutionTaskId);
-  const reorderTasks = useTasksState((props) =>
-    listMode === "tasks-group"
-      ? props.actions.reorderTasks
-      : props.actions.reorderSubtasks
-  );
-  const { activeTasks } = useListingTasks({
-    inExecutionTaskId,
-  });
-  const activeTask = getActiveTask(activeTasks);
+export function IndexActiveTasksList() {
+  const reorderItems = useTasksState((props) => props.actions.reorderItems);
+  const { activeTasks } = useListingTasks();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -45,7 +30,7 @@ export function IndexActiveTasksList({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      reorderTasks(active.id as string, over.id as string);
+      reorderItems(active.id as string, over.id as string);
     }
   }
 
@@ -60,12 +45,7 @@ export function IndexActiveTasksList({
         strategy={verticalListSortingStrategy}
       >
         {activeTasks.map((task) => (
-          <IndexSortableTaskItem
-            key={task.id}
-            task={task}
-            listMode={listMode}
-            isActive={task.id === activeTask?.id}
-          />
+          <IndexSortableTaskItem key={task.id} task={task} />
         ))}
       </SortableContext>
     </DndContext>

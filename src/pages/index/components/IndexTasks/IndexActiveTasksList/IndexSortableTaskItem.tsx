@@ -1,21 +1,14 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { SubTask, Task } from "../../../states/tasks";
-import type { ListingTask, TaskListingMode } from "../utils";
+import type { Task } from "../../../states/tasks";
 import { IndexSubTaskItem } from "./IndexSubTaskItem/IndexSubTaskItem";
-import { IndexTaskItem } from "./IndexTaskItem";
 
 interface IndexSortableTaskItemProps {
-  task: ListingTask;
-  isActive: boolean;
-  listMode: TaskListingMode;
+  task: Task;
+  dragHandleProps?: Record<string, unknown>;
 }
 
-export function IndexSortableTaskItem({
-  task,
-  isActive,
-  listMode,
-}: IndexSortableTaskItemProps) {
+export function IndexSortableTaskItem({ task }: IndexSortableTaskItemProps) {
   const {
     attributes,
     listeners,
@@ -32,30 +25,13 @@ export function IndexSortableTaskItem({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const commonProps = {
-    task,
-    isActive,
-    dragHandleProps: { ...attributes, ...listeners },
-    isDragging,
-  };
-
   return (
     <div ref={setNodeRef} style={style}>
-      {listMode === "tasks-group" ? (
-        <IndexTaskItem
-          {...{
-            ...commonProps,
-            task: task as Task,
-          }}
-        />
-      ) : (
-        <IndexSubTaskItem
-          {...{
-            ...commonProps,
-            task: task as SubTask,
-          }}
-        />
-      )}
+      <IndexSubTaskItem
+        task={task}
+        isActive
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
     </div>
   );
 }

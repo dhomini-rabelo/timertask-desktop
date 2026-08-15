@@ -1,30 +1,26 @@
-import type { ListingTask } from "../components/IndexTasks/utils";
-import { useTasksState } from "../states/tasks";
+import { isTask, isTaskGroup, useTasksState } from "../states/tasks";
 import { useWorkflowsState } from "../states/workflows";
 
-interface UseListingTasksProps {
-  inExecutionTaskId: string | null;
-}
-
-export function useListingTasks({ inExecutionTaskId }: UseListingTasksProps) {
-  const tasks = useTasksState((props) => props.state.tasks);
+export function useListingTasks() {
+  const items = useTasksState((props) => props.state.items);
   const selectedWorkflowId = useWorkflowsState(
     (props) => props.state.selectedWorkflowId,
   );
-  const workflowTasks = selectedWorkflowId
-    ? tasks.filter((task) => task.workflowId === selectedWorkflowId)
+  const workflowItems = selectedWorkflowId
+    ? items.filter((item) => item.workflowId === selectedWorkflowId)
     : [];
-  const activeTask = inExecutionTaskId
-    ? workflowTasks.find((task) => task.id === inExecutionTaskId) || null
-    : null;
-  const listingTasks: ListingTask[] =
-    inExecutionTaskId && activeTask ? activeTask.subtasks : workflowTasks;
-  const activeTasks = listingTasks.filter((task) => !task.completed);
-  const completedTasks = listingTasks.filter((task) => task.completed);
+
+  const groups = workflowItems.filter(isTaskGroup);
+  const tasks = workflowItems.filter(isTask);
+  const rootTasks = tasks.filter((task) => task.groupId === null);
+  const activeTasks = tasks.filter((task) => !task.completed);
+  const completedTasks = tasks.filter((task) => task.completed);
 
   return {
-    tasks: workflowTasks,
-    listingTasks,
+    workflowItems,
+    groups,
+    tasks,
+    rootTasks,
     activeTasks,
     completedTasks,
   };

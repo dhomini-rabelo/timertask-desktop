@@ -1,50 +1,150 @@
 import { useEffect, useRef } from "react";
-import { useTasksState, type Task } from "../states/tasks";
+import { isTask, useTasksState, type Task, type TaskItem, type TaskTimeEvent } from "../states/tasks";
 
 const localStorageKey = "timertasks:tasks";
 
+type LegacyTimeEvent = {
+  type: "start" | "stop" | "complete";
+  createdAt: string | Date;
+};
+
+interface LegacySubTask {
+  id: string;
+  title: string;
+  completed?: boolean;
+  isRunning?: boolean;
+  timeEvents?: LegacyTimeEvent[];
+}
+
+interface LegacyTaskEntry {
+  type?: "task" | "group";
+  id: string;
+  title: string;
+  workflowId?: string | null;
+  note?: string;
+  completed?: boolean;
+  isRunning?: boolean;
+  timeEvents?: LegacyTimeEvent[];
+  groupId?: string | null;
+  collapsed?: boolean;
+  subtasks?: LegacySubTask[];
+}
+
+function reviveEvents(events?: LegacyTimeEvent[]): TaskTimeEvent[] {
+  return (events ?? []).map((event) => ({
+    type: event.type,
+    createdAt: new Date(event.createdAt),
+  }));
+}
+
+function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
+  if (entry?.type === "group") {
+    return [
+      {
+        type: "group",
+        id: entry.id,
+        title: entry.title,
+        workflowId: entry.workflowId ?? null,
+        note: entry.note,
+        collapsed: entry.collapsed ?? false,
+      },
+    ];
+  }
+
+  if (entry?.type === "task") {
+    return [
+      {
+        type: "task",
+        id: entry.id,
+        title: entry.title,
+        workflowId: entry.workflowId ?? null,
+        note: entry.note,
+        groupId: entry.groupId ?? null,
+        completed: !!entry.completed,
+        isRunning: !!entry.isRunning,
+        timeEvents: reviveEvents(entry.timeEvents),
+      },
+    ];
+  }
+
+  const subtasks = entry.subtasks ?? [];
+  if (subtasks.length > 0) {
+    const group: TaskItem = {
+      type: "group",
+      id: entry.id,
+      title: entry.title,
+      workflowId: entry.workflowId ?? null,
+      note: entry.note,
+      collapsed: false,
+    };
+
+    const tasks: Task[] = subtasks.map((sub) => ({
+      type: "task",
+      id: sub.id,
+      title: sub.title,
+      completed: !!sub.completed,
+      isRunning: !!sub.isRunning,
+      timeEvents: reviveEvents(sub.timeEvents),
+      workflowId: entry.workflowId ?? null,
+      groupId: entry.id,
+    }));
+
+    return [group, ...tasks];
+  }
+
+  return [
+    {
+      type: "task",
+      id: entry.id,
+      title: entry.title,
+      completed: !!entry.completed,
+      isRunning: !!entry.isRunning,
+      timeEvents: [],
+      workflowId: entry.workflowId ?? null,
+      groupId: null,
+      note: entry.note,
+    },
+  ];
+}
+
+function migrateStoredItems(parsed: unknown): TaskItem[] {
+  if (!Array.isArray(parsed)) {
+    return [];
+  }
+
+  return (parsed as LegacyTaskEntry[]).flatMap(migrateEntry);
+}
+
 export function useStoredTasks() {
-  const tasks = useTasksState((props) => props.state.tasks);
-  const setTasksState = useTasksState((props) => props.actions.setTasksState);
+  const items = useTasksState((props) => props.state.items);
+  const setItemsState = useTasksState((props) => props.actions.setItemsState);
   const hasHydratedRef = useRef<boolean>(false);
-  const tasksRef = useRef<Task[]>(tasks);
+  const itemsRef = useRef<TaskItem[]>(items);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const storedTasks = localStorage.getItem(localStorageKey);
-    if (!storedTasks) {
-      setTasksState([]);
+    const storedItems = localStorage.getItem(localStorageKey);
+    if (!storedItems) {
+      setItemsState([]);
       hasHydratedRef.current = true;
       return;
     }
 
     try {
-      const parsedTasks = JSON.parse(storedTasks) as Task[];
-      const normalizedTasks = parsedTasks.map((task) => ({
-        ...task,
-        workflowId: task.workflowId ?? null,
-        subtasks:
-          task.subtasks?.map((subtask) => ({
-            ...subtask,
-            timeEvents:
-              subtask.timeEvents?.map((event) => ({
-                ...event,
-                createdAt: new Date(event.createdAt),
-              })) ?? [],
-          })) ?? [],
-      }));
+      const parsed = JSON.parse(storedItems);
+      const migratedItems = migrateStoredItems(parsed);
 
-      setTasksState(normalizedTasks);
+      setItemsState(migratedItems);
       hasHydratedRef.current = true;
     } catch {
-      setTasksState([]);
+      setItemsState([]);
       hasHydratedRef.current = true;
     }
   }, []);
 
   useEffect(() => {
-    tasksRef.current = tasks;
-  }, [tasks]);
+    itemsRef.current = items;
+  }, [items]);
 
   useEffect(() => {
     function handleBeforeUnload() {
@@ -52,42 +152,34 @@ export function useStoredTasks() {
       if (!hasHydratedRef.current) return;
 
       const stopDate = new Date();
-      const tasksWithStoppedSubtasks = tasksRef.current.map((task) => {
-        if (!task.subtasks.some((subtask) => subtask.isRunning)) {
-          return task;
+      const itemsWithStoppedTasks = itemsRef.current.map((item) => {
+        if (!isTask(item)) {
+          return item;
         }
 
-        const updatedSubtasks = task.subtasks.map((subtask) => {
-          const lastEventWasStart =
-            subtask.timeEvents[subtask.timeEvents.length - 1]?.type === "start";
+        const lastEventWasStart =
+          item.timeEvents[item.timeEvents.length - 1]?.type === "start";
 
-          if (!subtask.isRunning || !lastEventWasStart) {
-            return subtask;
-          }
-
-          return {
-            ...subtask,
-            isRunning: true,
-            timeEvents: [
-              ...subtask.timeEvents,
-              {
-                type: "stop",
-                createdAt: stopDate,
-              },
-            ],
-          };
-        });
+        if (!item.isRunning || !lastEventWasStart) {
+          return item;
+        }
 
         return {
-          ...task,
+          ...item,
           isRunning: true,
-          subtasks: updatedSubtasks,
+          timeEvents: [
+            ...item.timeEvents,
+            {
+              type: "stop" as const,
+              createdAt: stopDate,
+            },
+          ],
         };
       });
 
       localStorage.setItem(
         localStorageKey,
-        JSON.stringify(tasksWithStoppedSubtasks),
+        JSON.stringify(itemsWithStoppedTasks),
       );
     }
 
@@ -101,8 +193,8 @@ export function useStoredTasks() {
   useEffect(() => {
     if (!hasHydratedRef.current) return;
     if (typeof window === "undefined") return;
-    localStorage.setItem(localStorageKey, JSON.stringify(tasksRef.current));
-  }, [hasHydratedRef, tasks]);
+    localStorage.setItem(localStorageKey, JSON.stringify(itemsRef.current));
+  }, [hasHydratedRef, items]);
 
-  return tasks;
+  return items;
 }

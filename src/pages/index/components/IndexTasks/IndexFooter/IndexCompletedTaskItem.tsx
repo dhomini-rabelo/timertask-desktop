@@ -1,42 +1,15 @@
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { formatTime } from "../../../../../code/utils/date";
-import type { SubTask, Task } from "../../../states/tasks";
+import type { Task } from "../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
   getTimeRangeFromEvents,
 } from "../../../states/tasks/utils";
 import { IndexTaskNoteDialog } from "../IndexActiveTasksList/IndexTaskNoteDialog";
-import type { ListingTask } from "../utils";
 
 interface IndexCompletedTaskItemProps {
-  task: ListingTask;
-}
-
-function getTotalTimeInSecondsForTask(task: Task | SubTask) {
-  if ("subtasks" in task) {
-    if (task.subtasks && task.subtasks.length > 0) {
-      return task.subtasks.reduce((total, subtask) => {
-        return total + calculateTotalTimeInSeconds(subtask.timeEvents);
-      }, 0);
-    }
-
-    return 0;
-  }
-
-  return calculateTotalTimeInSeconds(task.timeEvents);
-}
-
-function getEventsForTask(task: Task | SubTask) {
-  if ("subtasks" in task) {
-    if (!task.subtasks || task.subtasks.length === 0) {
-      return [];
-    }
-
-    return task.subtasks.flatMap((subtask) => subtask.timeEvents);
-  }
-
-  return task.timeEvents;
+  task: Task;
 }
 
 function formatClockTime(date: Date) {
@@ -55,18 +28,15 @@ function formatClockValue(date: Date | null) {
   return formatClockTime(date);
 }
 
-export function IndexCompletedTaskItem({
-  task: taskItem,
-}: IndexCompletedTaskItemProps) {
-  const task = taskItem as Task | SubTask;
+export function IndexCompletedTaskItem({ task }: IndexCompletedTaskItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const taskEvents = getEventsForTask(task).sort(
+  const taskEvents = task.timeEvents.sort(
     (firstEvent, secondEvent) =>
       new Date(firstEvent.createdAt).getTime() -
       new Date(secondEvent.createdAt).getTime(),
   );
   const taskTimeRange = getTimeRangeFromEvents(taskEvents);
-  const totalTimeInSeconds = getTotalTimeInSecondsForTask(task);
+  const totalTimeInSeconds = calculateTotalTimeInSeconds(task.timeEvents);
   const hasTrackedTime = taskEvents.length > 0;
 
   return (

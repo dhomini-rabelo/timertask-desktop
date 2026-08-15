@@ -1,8 +1,8 @@
 import { differenceInSeconds } from "date-fns";
-import type { SubTaskTimeEvent } from "./index";
+import type { TaskTimeEvent } from "./index";
 
 export function calculateTotalTimeInSeconds(
-  events: SubTaskTimeEvent[],
+  events: TaskTimeEvent[],
 ): number {
   if (!events || events.length === 0) return 0;
 
@@ -34,7 +34,7 @@ export function calculateTotalTimeInSeconds(
   return totalSeconds;
 }
 
-export function getTimeRangeFromEvents(events: SubTaskTimeEvent[]) {
+export function getTimeRangeFromEvents(events: TaskTimeEvent[]) {
   if (!events || events.length === 0) {
     return {
       startTime: null,
@@ -69,7 +69,7 @@ export function getTimeRangeFromEvents(events: SubTaskTimeEvent[]) {
   };
 }
 
-export function shouldAutoStart(timeEvents: SubTaskTimeEvent[]): boolean {
+export function shouldAutoStart(timeEvents: TaskTimeEvent[]): boolean {
   const lastEvent = timeEvents[timeEvents.length - 1];
   return lastEvent?.type === "start";
 }

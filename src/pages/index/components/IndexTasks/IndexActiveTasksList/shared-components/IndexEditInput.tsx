@@ -4,21 +4,14 @@ import { useState } from "react";
 import { Input } from "../../../../../../layout/components/atoms/Input";
 import { useTasksState } from "../../../../states/tasks";
 import { indexTasksPageStateAtom } from "../../shared-state";
-import type { TaskListingMode } from "../../utils";
 
 interface IndexEditInputProps {
   initialValue: string;
-  listingMode: TaskListingMode;
 }
 
-export function IndexEditInput({
-  initialValue,
-  listingMode,
-}: IndexEditInputProps) {
-  const saveEditingTask = useTasksState((props) =>
-    listingMode === "tasks-group"
-      ? props.actions.saveEditingTask
-      : props.actions.saveEditingSubtask,
+export function IndexEditInput({ initialValue }: IndexEditInputProps) {
+  const saveEditingTask = useTasksState(
+    (props) => props.actions.saveEditingItem,
   );
   const [indexTasksPageState, setIndexTasksPageState] = useAtom(
     indexTasksPageStateAtom,

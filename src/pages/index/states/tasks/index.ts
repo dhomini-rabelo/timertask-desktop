@@ -1,57 +1,58 @@
 import { create } from "zustand";
-import { getActiveTask } from "../../components/IndexTasks/utils";
 import { useCountdownTimerState } from "../countdownTimer";
 import { useWorkflowsState } from "../workflows";
 
-export type SubTaskTimeEvent = {
+export type TaskTimeEvent = {
   type: "start" | "stop" | "complete";
   createdAt: Date;
 };
 
-export interface SubTask {
+interface BaseTaskItem {
   id: string;
   title: string;
-  completed: boolean;
-  isRunning: boolean;
-  timeEvents: SubTaskTimeEvent[];
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  completed: boolean;
-  isRunning: boolean;
-  subtasks: SubTask[];
   workflowId: string | null;
   note?: string;
 }
 
+export interface Task extends BaseTaskItem {
+  type: "task";
+  groupId: string | null;
+  completed: boolean;
+  isRunning: boolean;
+  timeEvents: TaskTimeEvent[];
+}
+
+export interface TaskGroup extends BaseTaskItem {
+  type: "group";
+  collapsed: boolean;
+}
+
+export type TaskItem = Task | TaskGroup;
+
+export function isTask(item: TaskItem): item is Task {
+  return item.type === "task";
+}
+
+export function isTaskGroup(item: TaskItem): item is TaskGroup {
+  return item.type === "group";
+}
+
 export interface TasksState {
-  tasks: Task[];
+  items: TaskItem[];
 }
 
 interface TasksActions {
-  setTasksState: (tasks: Task[]) => void;
-  addTask: (title: string) => void;
+  setItemsState: (items: TaskItem[]) => void;
+  addTask: (title: string, groupId?: string | null) => void;
+  addGroup: (title: string) => void;
   toggleTask: (id: string) => void;
-  deleteTask: (id: string) => void;
-  saveEditingTask: (id: string, title: string) => void;
-  saveTaskNote: (id: string, note: string) => void;
-  reorderTasks: (activeId: string, overId: string) => void;
-  clearTasks: () => void;
-
-  addSubtask: (taskId: string, title: string) => void;
-  toggleSubtask: (subtaskId: string) => void;
-  deleteSubtask: (subtaskId: string, taskId?: string) => void;
-  saveEditingSubtask: (
-    subtaskId: string,
-    title: string,
-    taskId?: string,
-  ) => void;
-  reorderSubtasks: (activeId: string, overId: string) => void;
-  executeSubtask: (subtaskId: string) => void;
-  stopSubtask: (subtaskId: string) => void;
-  clearSubtasks: () => void;
+  deleteItem: (id: string) => void;
+  saveEditingItem: (id: string, title: string) => void;
+  saveNote: (id: string, note: string) => void;
+  reorderItems: (activeId: string, overId: string) => void;
+  clearItems: () => void;
+  executeTask: (id: string) => void;
+  stopTask: (id: string) => void;
 }
 
 interface TasksStore {
@@ -64,39 +65,16 @@ export const useTasksState = create<TasksStore>((set, get) => {
     return useWorkflowsState.getState().state.selectedWorkflowId;
   }
 
-  function getWorkflowTasks(tasks: Task[]) {
-    const selectedWorkflowId = getSelectedWorkflowId();
-    if (!selectedWorkflowId) {
-      return [];
-    }
-
-    return tasks.filter((task) => task.workflowId === selectedWorkflowId);
-  }
-
-  function getActiveWorkflowTask(tasks: Task[]) {
-    const workflowTasks = getWorkflowTasks(tasks);
-    return getActiveTask(workflowTasks);
-  }
-
-  function setState(partial: Partial<TasksState>) {
+  function setItemsState(items: TaskItem[]) {
     set((store) => ({
       state: {
-        tasks: partial.tasks ?? store.state.tasks,
+        items,
       },
       actions: store.actions,
     }));
   }
 
-  function setTasksState(tasks: Task[]) {
-    set((store) => ({
-      state: {
-        tasks: tasks,
-      },
-      actions: store.actions,
-    }));
-  }
-
-  function addTask(title: string) {
+  function addTask(title: string, groupId?: string | null) {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       return;
@@ -107,41 +85,134 @@ export const useTasksState = create<TasksStore>((set, get) => {
       return;
     }
 
+    const resolvedGroupId = groupId ?? null;
+
     const newTask: Task = {
+      type: "task",
       id: crypto.randomUUID(),
       title: trimmedTitle,
+      workflowId: selectedWorkflowId,
+      groupId: resolvedGroupId,
       completed: false,
       isRunning: false,
-      subtasks: [],
-      workflowId: selectedWorkflowId,
+      timeEvents: [],
     };
 
-    setState({
-      tasks: [...get().state.tasks, newTask],
+    set((store) => {
+      const items = store.state.items;
+
+      if (!resolvedGroupId) {
+        return {
+          state: {
+            items: [...items, newTask],
+          },
+          actions: store.actions,
+        };
+      }
+
+      let insertIndex = -1;
+      items.forEach((item, index) => {
+        if (
+          item.id === resolvedGroupId ||
+          (isTask(item) && item.groupId === resolvedGroupId)
+        ) {
+          insertIndex = index;
+        }
+      });
+
+      if (insertIndex === -1) {
+        return {
+          state: {
+            items: [...items, newTask],
+          },
+          actions: store.actions,
+        };
+      }
+
+      const newItems = [
+        ...items.slice(0, insertIndex + 1),
+        newTask,
+        ...items.slice(insertIndex + 1),
+      ];
+
+      return {
+        state: {
+          items: newItems,
+        },
+        actions: store.actions,
+      };
     });
+  }
+
+  function addGroup(title: string) {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      return;
+    }
+
+    const selectedWorkflowId = getSelectedWorkflowId();
+    if (!selectedWorkflowId) {
+      return;
+    }
+
+    const newGroup: TaskGroup = {
+      type: "group",
+      id: crypto.randomUUID(),
+      title: trimmedTitle,
+      workflowId: selectedWorkflowId,
+      collapsed: false,
+    };
+
+    setItemsState([...get().state.items, newGroup]);
   }
 
   function toggleTask(id: string) {
     set((store) => ({
       state: {
-        tasks: store.state.tasks.map((task) =>
-          task.id === id ? { ...task, completed: !task.completed } : task,
-        ),
+        items: store.state.items.map((item) => {
+          if (item.id !== id || !isTask(item)) {
+            return item;
+          }
+
+          const isCompleting = !item.completed;
+          const completeEvent: TaskTimeEvent = {
+            type: "complete",
+            createdAt: new Date(),
+          };
+
+          return {
+            ...item,
+            completed: !item.completed,
+            timeEvents: isCompleting
+              ? [...item.timeEvents, completeEvent]
+              : item.timeEvents,
+          };
+        }),
       },
       actions: store.actions,
     }));
   }
 
-  function deleteTask(id: string) {
+  function deleteItem(id: string) {
     set((store) => ({
       state: {
-        tasks: store.state.tasks.filter((task) => task.id !== id),
+        items: store.state.items.filter((item) => {
+          if (item.id === id) {
+            return false;
+          }
+
+          if (isTask(item) && item.groupId === id) {
+            return false;
+          }
+
+          return true;
+        }),
       },
       actions: store.actions,
     }));
   }
 
-  function saveEditingTask(id: string, title: string) {
+  function saveEditingItem(id: string, title: string) {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
       return;
@@ -149,347 +220,79 @@ export const useTasksState = create<TasksStore>((set, get) => {
 
     set((store) => ({
       state: {
-        tasks: store.state.tasks.map((task) =>
-          task.id === id ? { ...task, title: trimmedTitle } : task,
+        items: store.state.items.map((item) =>
+          item.id === id ? { ...item, title: trimmedTitle } : item,
         ),
       },
       actions: store.actions,
     }));
   }
 
-  function saveTaskNote(id: string, note: string) {
+  function saveNote(id: string, note: string) {
     set((store) => ({
       state: {
-        tasks: store.state.tasks.map((task) =>
-          task.id === id ? { ...task, note } : task,
+        items: store.state.items.map((item) =>
+          item.id === id ? { ...item, note } : item,
         ),
       },
       actions: store.actions,
     }));
   }
 
-  function reorderTasks(activeId: string, overId: string) {
+  function reorderItems(activeId: string, overId: string) {
     const selectedWorkflowId = getSelectedWorkflowId();
     if (!selectedWorkflowId) {
       return;
     }
 
     set((store) => {
-      const tasks = store.state.tasks;
-      const workflowTasks: Task[] = [];
-      const workflowTaskIndexes: number[] = [];
+      const items = store.state.items;
+      const workflowItems: TaskItem[] = [];
+      const workflowItemIndexes: number[] = [];
 
-      tasks.forEach((task, index) => {
-        if (task.workflowId === selectedWorkflowId) {
-          workflowTasks.push(task);
-          workflowTaskIndexes.push(index);
+      items.forEach((item, index) => {
+        if (item.workflowId === selectedWorkflowId) {
+          workflowItems.push(item);
+          workflowItemIndexes.push(index);
         }
       });
 
-      const oldIndex = workflowTasks.findIndex((task) => task.id === activeId);
-      const newIndex = workflowTasks.findIndex((task) => task.id === overId);
+      const oldIndex = workflowItems.findIndex((item) => item.id === activeId);
+      const newIndex = workflowItems.findIndex((item) => item.id === overId);
 
       if (oldIndex === -1 || newIndex === -1) {
         return store;
       }
 
+      const activeItem = workflowItems[oldIndex];
+      const overItem = workflowItems[newIndex];
+
       if (
-        workflowTasks[oldIndex].isRunning ||
-        workflowTasks[newIndex].isRunning
+        (isTask(activeItem) && activeItem.isRunning) ||
+        (isTask(overItem) && overItem.isRunning)
       ) {
         return store;
       }
 
-      const reorderedWorkflowTasks = [...workflowTasks];
-      const movedTask = reorderedWorkflowTasks.splice(oldIndex, 1)[0];
-      reorderedWorkflowTasks.splice(newIndex, 0, movedTask);
+      const reorderedWorkflowItems = [...workflowItems];
+      const movedItem = reorderedWorkflowItems.splice(oldIndex, 1)[0];
+      reorderedWorkflowItems.splice(newIndex, 0, movedItem);
 
-      const updatedTasks = [...tasks];
-      workflowTaskIndexes.forEach((index, position) => {
-        updatedTasks[index] = reorderedWorkflowTasks[position];
+      const updatedItems = [...items];
+      workflowItemIndexes.forEach((index, position) => {
+        updatedItems[index] = reorderedWorkflowItems[position];
       });
 
       return {
         state: {
-          tasks: updatedTasks,
+          items: updatedItems,
         },
         actions: store.actions,
       };
     });
   }
 
-  function addSubtask(taskId: string, title: string) {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) {
-      return;
-    }
-
-    set((store) => {
-      const targetTask = store.state.tasks.find((task) => task.id === taskId);
-      if (!targetTask) {
-        return store;
-      }
-
-      const newSubtask: SubTask = {
-        id: crypto.randomUUID(),
-        title: trimmedTitle,
-        completed: false,
-        isRunning: false,
-        timeEvents: [],
-      };
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === targetTask.id
-              ? { ...task, subtasks: [...task.subtasks, newSubtask] }
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function toggleSubtask(subtaskId: string) {
-    set((store) => {
-      const activeTask = getActiveWorkflowTask(store.state.tasks);
-      if (!activeTask) {
-        return store;
-      }
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === activeTask.id
-              ? {
-                  ...task,
-                  subtasks: task.subtasks.map((subtask) =>
-                    subtask.id === subtaskId
-                      ? (() => {
-                          const isCompleting = !subtask.completed;
-                          const completeEvent: SubTaskTimeEvent = {
-                            createdAt: new Date(),
-                            type: "complete",
-                          };
-                          return {
-                            ...subtask,
-                            completed: !subtask.completed,
-                            timeEvents: isCompleting
-                              ? [...subtask.timeEvents, completeEvent]
-                              : subtask.timeEvents,
-                          };
-                        })()
-                      : subtask,
-                  ),
-                }
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function deleteSubtask(subtaskId: string, taskId?: string) {
-    set((store) => {
-      const targetTask = taskId
-        ? store.state.tasks.find((task) => task.id === taskId)
-        : getActiveWorkflowTask(store.state.tasks);
-      if (!targetTask) {
-        return store;
-      }
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === targetTask.id
-              ? {
-                  ...task,
-                  subtasks: task.subtasks.filter(
-                    (subtask) => subtask.id !== subtaskId,
-                  ),
-                }
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function saveEditingSubtask(
-    subtaskId: string,
-    title: string,
-    taskId?: string,
-  ) {
-    const trimmedTitle = title.trim();
-    if (!trimmedTitle) {
-      return;
-    }
-
-    set((store) => {
-      const targetTask = taskId
-        ? store.state.tasks.find((task) => task.id === taskId)
-        : getActiveWorkflowTask(store.state.tasks);
-      if (!targetTask) {
-        return store;
-      }
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === targetTask.id
-              ? {
-                  ...task,
-                  subtasks: task.subtasks.map((subtask) =>
-                    subtask.id === subtaskId
-                      ? { ...subtask, title: trimmedTitle }
-                      : subtask,
-                  ),
-                }
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function reorderSubtasks(activeId: string, overId: string) {
-    set((store) => {
-      const activeTask = getActiveWorkflowTask(store.state.tasks);
-      if (!activeTask) {
-        return store;
-      }
-
-      const taskIndex = store.state.tasks.findIndex(
-        (task) => task.id === activeTask.id,
-      );
-      if (taskIndex === -1) {
-        return store;
-      }
-
-      const task = store.state.tasks[taskIndex];
-      const oldIndex = task.subtasks.findIndex(
-        (subtask) => subtask.id === activeId,
-      );
-      const newIndex = task.subtasks.findIndex(
-        (subtask) => subtask.id === overId,
-      );
-
-      if (oldIndex === -1 || newIndex === -1) {
-        return store;
-      }
-
-      if (
-        task.subtasks[oldIndex].isRunning ||
-        task.subtasks[newIndex].isRunning
-      ) {
-        return store;
-      }
-
-      const newSubtasks = [...task.subtasks];
-      const movedSubtask = newSubtasks.splice(oldIndex, 1)[0];
-      newSubtasks.splice(newIndex, 0, movedSubtask);
-
-      const newTasks = [...store.state.tasks];
-      newTasks[taskIndex] = { ...task, subtasks: newSubtasks };
-
-      return {
-        state: {
-          tasks: newTasks,
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function executeSubtask(subtaskId: string) {
-    if (useCountdownTimerState.getState().state.isResting) {
-      return
-    }
-
-    set((store) => {
-      const activeTask = getActiveWorkflowTask(store.state.tasks);
-      if (!activeTask) {
-        return store;
-      }
-
-      const startDate = new Date();
-      const startEvent: SubTaskTimeEvent = {
-        createdAt: startDate,
-        type: "start",
-      };
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === activeTask.id
-              ? {
-                  ...task,
-                  subtasks: task.subtasks.map((subtask) =>
-                    subtask.id === subtaskId
-                      ? {
-                          ...subtask,
-                          isRunning: true,
-                          timeEvents: [...subtask.timeEvents, startEvent],
-                        }
-                      : { ...subtask, isRunning: false },
-                  ),
-                  isRunning: true,
-                }
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function stopSubtask(subtaskId: string) {
-    set((store) => {
-      const activeTask = getActiveWorkflowTask(store.state.tasks);
-      if (!activeTask) {
-        return store;
-      }
-
-      const stopDate = new Date();
-      const stopEvent: SubTaskTimeEvent = {
-        createdAt: stopDate,
-        type: "stop",
-      };
-
-      return {
-        state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === activeTask.id
-              ? (() => {
-                  const updatedSubtasks = task.subtasks.map((subtask) =>
-                    subtask.id === subtaskId
-                      ? {
-                          ...subtask,
-                          isRunning: false,
-                          timeEvents: [...subtask.timeEvents, stopEvent],
-                        }
-                      : subtask,
-                  );
-
-                  return {
-                    ...task,
-                    subtasks: updatedSubtasks,
-                    isRunning: false,
-                  };
-                })()
-              : task,
-          ),
-        },
-        actions: store.actions,
-      };
-    });
-  }
-
-  function clearTasks() {
+  function clearItems() {
     const selectedWorkflowId = getSelectedWorkflowId();
     if (!selectedWorkflowId) {
       return;
@@ -497,26 +300,66 @@ export const useTasksState = create<TasksStore>((set, get) => {
 
     set((store) => ({
       state: {
-        tasks: store.state.tasks.filter(
-          (task) => task.workflowId !== selectedWorkflowId,
+        items: store.state.items.filter(
+          (item) => item.workflowId !== selectedWorkflowId,
         ),
       },
       actions: store.actions,
     }));
   }
 
-  function clearSubtasks() {
+  function executeTask(id: string) {
+    if (useCountdownTimerState.getState().state.isResting) {
+      return;
+    }
+
     set((store) => {
-      const activeTask = getActiveWorkflowTask(store.state.tasks);
-      if (!activeTask) {
-        return store;
-      }
+      const startDate = new Date();
+      const startEvent: TaskTimeEvent = {
+        type: "start",
+        createdAt: startDate,
+      };
 
       return {
         state: {
-          tasks: store.state.tasks.map((task) =>
-            task.id === activeTask.id ? { ...task, subtasks: [] } : task,
-          ),
+          items: store.state.items.map((item) => {
+            if (item.id !== id || !isTask(item)) {
+              return item;
+            }
+
+            return {
+              ...item,
+              isRunning: true,
+              timeEvents: [...item.timeEvents, startEvent],
+            };
+          }),
+        },
+        actions: store.actions,
+      };
+    });
+  }
+
+  function stopTask(id: string) {
+    set((store) => {
+      const stopDate = new Date();
+      const stopEvent: TaskTimeEvent = {
+        type: "stop",
+        createdAt: stopDate,
+      };
+
+      return {
+        state: {
+          items: store.state.items.map((item) => {
+            if (item.id !== id || !isTask(item)) {
+              return item;
+            }
+
+            return {
+              ...item,
+              isRunning: false,
+              timeEvents: [...item.timeEvents, stopEvent],
+            };
+          }),
         },
         actions: store.actions,
       };
@@ -525,27 +368,21 @@ export const useTasksState = create<TasksStore>((set, get) => {
 
   return {
     state: {
-      tasks: [],
+      items: [],
     },
     actions: {
-      setTasksState,
+      setItemsState,
 
       addTask,
+      addGroup,
       toggleTask,
-      deleteTask,
-      saveEditingTask,
-      saveTaskNote,
-      reorderTasks,
-      clearTasks,
-
-      addSubtask,
-      toggleSubtask,
-      deleteSubtask,
-      saveEditingSubtask,
-      reorderSubtasks,
-      executeSubtask,
-      stopSubtask,
-      clearSubtasks,
+      deleteItem,
+      saveEditingItem,
+      saveNote,
+      reorderItems,
+      clearItems,
+      executeTask,
+      stopTask,
     },
   };
 });

@@ -26,11 +26,11 @@ export function IndexScore() {
   const totalCycles = useCountdownTimerState(
     (store) => store.state.totalCycles,
   );
-  const tasks = useTasksState((store) => store.state.tasks);
+  const items = useTasksState((store) => store.state.items);
 
-  const totalFocusedTime = calculateTotalFocusedTime(tasks);
-  const currentStreak = calculateCurrentStreak(tasks);
-  const tasksCompleted = calculateTasksCompleted(tasks);
+  const totalFocusedTime = calculateTotalFocusedTime(items);
+  const currentStreak = calculateCurrentStreak(items);
+  const tasksCompleted = calculateTasksCompleted(items);
 
   const scoreItems = [
     {

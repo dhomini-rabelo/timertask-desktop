@@ -1,66 +1,32 @@
-import { Check, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../../layout/components/atoms/Button";
 import { ProgressBar } from "../../../../../layout/components/atoms/ProgressBar";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { useTasksState } from "../../../states/tasks";
-import { getTaskListingMode } from "../utils";
 import { IndexCompletedTaskItem } from "./IndexCompletedTaskItem";
-import { IndexTaskNote } from "./IndexTaskNote";
-
-interface IndexFooterProps {
-  inExecutionTaskId: string | null;
-  onFinishTask: () => void;
-}
 
 interface IndexTasksState {
   showCompleted: boolean;
 }
 
-export function IndexFooter({
-  inExecutionTaskId,
-  onFinishTask,
-}: IndexFooterProps) {
+export function IndexFooter() {
   const [state, setState] = useState<IndexTasksState>({
     showCompleted: false,
   });
-  const toggleTask = useTasksState((props) => props.actions.toggleTask);
-  const clearTasks = useTasksState((props) => props.actions.clearTasks);
-  const clearSubtasks = useTasksState((props) => props.actions.clearSubtasks);
+  const clearItems = useTasksState((props) => props.actions.clearItems);
 
-  const { listingTasks, completedTasks } = useListingTasks({
-    inExecutionTaskId,
-  });
-  const listingMode = getTaskListingMode(inExecutionTaskId);
+  const { tasks, completedTasks } = useListingTasks();
 
-  const totalTasksCount = listingTasks.length;
+  const totalTasksCount = tasks.length;
   const completedTasksCount = completedTasks.length;
   const progressPercentage = totalTasksCount
     ? Math.round((completedTasksCount / totalTasksCount) * 100)
     : 0;
 
-  const canFinishTask =
-    inExecutionTaskId &&
-    listingTasks.length > 0 &&
-    listingTasks.every((task) => task.completed);
-
-  function handleFinishTask() {
-    if (!inExecutionTaskId) return;
-
-    toggleTask(inExecutionTaskId);
-
-    if (onFinishTask) {
-      onFinishTask();
-    }
-  }
-
   function handleReset() {
-    if (listingMode === "subtasks") {
-      clearSubtasks();
-    } else {
-      clearTasks();
-    }
+    clearItems();
   }
 
   function handleToggleShowCompleted() {
@@ -85,7 +51,7 @@ export function IndexFooter({
           }
         >
           <span className="text-sm font-medium">
-            {completedTasks.length} of {listingTasks.length} completed
+            {completedTasks.length} of {tasks.length} completed
           </span>
           {completedTasks.length > 0 &&
             (state.showCompleted ? (
@@ -95,7 +61,7 @@ export function IndexFooter({
             ))}
         </div>
         <div className="flex items-center gap-2">
-          {listingTasks.length > 0 && (
+          {tasks.length > 0 && (
             <Button
               variant="secondary"
               onClick={handleReset}
@@ -103,16 +69,6 @@ export function IndexFooter({
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Reset
-            </Button>
-          )}
-          {canFinishTask && (
-            <Button
-              variant="primary"
-              onClick={handleFinishTask}
-              className="text-xs px-3 py-1.5 h-auto flex items-center gap-1.5 text-white border-transparent"
-            >
-              <Check className="w-3.5 h-3.5" />
-              Finish
             </Button>
           )}
         </div>
@@ -127,10 +83,6 @@ export function IndexFooter({
       )}
 
       <ProgressBar percentage={progressPercentage} />
-
-      {listingMode === "subtasks" && inExecutionTaskId && (
-        <IndexTaskNote taskId={inExecutionTaskId} />
-      )}
     </div>
   );
 }
