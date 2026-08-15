@@ -99,7 +99,7 @@ function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
       title: entry.title,
       completed: !!entry.completed,
       isRunning: !!entry.isRunning,
-      timeEvents: [],
+      timeEvents: reviveEvents(entry.timeEvents),
       workflowId: entry.workflowId ?? null,
       groupId: null,
       note: entry.note,
