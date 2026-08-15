@@ -292,6 +292,31 @@ Novas desta task:
   (patch some) e hidrata do fixture intocado. Mais confiável que só torcer para o `beforeunload`
   não disparar antes do reload.
 
+## Padrões capturados no step 02
+
+- **`height: 100%` vira `min-height: 100%`, nunca é apagado** nas regras de shell
+  (`html, body, #root` e `.body-df` em `global.css`) — preserva o piso de altura para o fundo pintar
+  a viewport, remove só o teto que travava o scroll. Molde para qualquer trava de altura fixa futura
+  neste app.
+- **`min-h-screen` de `page.tsx:54` ficou CONFIRMADAMENTE INERTE** por interação de cascata: a regra
+  `.body-df { min-height: 100% }` (não-layered) resolve contra `#root` de altura `auto` e sobrepõe a
+  utility Tailwind layered `min-h-screen` no mesmo elemento. Medido em runtime (case 2 do tests-01):
+  com 0 tasks, viewport 925px vs. altura real de `.body-df` 677px. **Sem efeito visível hoje** porque
+  `html`/`body`/`#root` pintam o fundo correto de forma independente — mas é uma dívida real, não
+  suposição. Se uma task futura mexer no shell/CSS global de novo, ou se algum dia o fundo parar de
+  ser pintado por um ancestral independente, isto vira bug visível. Não foi corrigido nesta task por
+  estar fora do escopo (P3 pedia só destravar o scroll, não reforçar o piso).
+- **Molde "container com altura máxima + scroll interno" replicado com sucesso**: a mesma classe
+  (`max-h-[calc(100vh-400px)] overflow-y-auto`) que saiu de `IndexTasks.tsx:30` entrou tal e qual em
+  `IndexFooter.tsx:81`, confirmando que P2 era literal, não aproximação. O `overflow-y-auto` novo ali
+  não clipa nada porque o único elemento flutuante do accordion (`IndexTaskNoteDialog`, via
+  `IndexCompletedTaskItem.tsx:83`) usa `RadixDialog.Portal` e renderiza fora da árvore do container.
+- **BUG C confirmado como não afetado pela mudança de altura/scroll vertical** (regressão testada,
+  case 6 do tests-01): colapsar/expandir grupo ativo com child rodando continuou funcionando após a
+  remoção do container com scroll interno. Fecha em definitivo a dúvida que o step 01 tinha deixado
+  em aberto sobre BUG C — não há mais nenhuma forma de scroll (nem horizontal nem vertical) que
+  afete a alcançabilidade do chevron do grupo.
+
 ## 7. Medição de janela do meta-planner
 
 Nonce `meta-correcao-layout-tasks`. Registro do último checkpoint em `steps.md`. Comando:
