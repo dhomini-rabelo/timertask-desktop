@@ -203,3 +203,37 @@ e `src/layout/components/common/Timer` (+ `hooks/useCountUpTimer.ts`).
   em produção (o print mostra 151 tasks concluídas e 46h de foco). A migração tem de ser **idempotente**
   (rodar de novo sobre dados já migrados não pode duplicar nem apagar nada) e tolerante ao formato antigo.
 - **T11 — `eslint.config.js` existe** mas não há script `lint` no `package.json`. Não é gate obrigatório.
+
+---
+
+## Padrões capturados no step 01
+
+- **Contrato do store fechado de vez** (tipos `Task`/`TaskGroup`/`TaskItem`, type guards `isTask`/
+  `isTaskGroup`, ações `setItemsState addTask(title, groupId?) addGroup toggleTask deleteItem
+  saveEditingItem saveNote reorderItems clearItems executeTask stopTask`). Steps 02-04 IMPLEMENTAM sobre
+  esse contrato, não o reabrem.
+- **`migrateEntry()` em `useStoredTasks.ts` tem 3 ramos que produzem `Task`** (`type==="task"` linha 65,
+  subtask-para-task dentro do ramo "grupo com subtasks" linha 87, fallback "task legada solta" linha
+  102): os 3 SEMPRE chamam `reviveEvents(entry.timeEvents)`, nunca hardcoding de `timeEvents: []`. Isso
+  já foi violado uma vez (bug do tests-01) e corrigido — qualquer novo ramo de migração que alguém
+  precisar adicionar nos steps seguintes deve seguir o mesmo padrão.
+- **`TaskGroup` não tem UI própria ainda** (nem cabeçalho/card, nem "Add Group") — os dados sobrevivem
+  intactos no store/localStorage, só não há nada que renderize `type === "group"` nem chame `addGroup`.
+  Isso é escopo do **step 03**, confirmado como gap aceito (não regressão) tanto em `validation-r1.md`
+  quanto nos dois verdicts de teste.
+- **Drag-and-drop (dnd-kit) não é testável por automação de browser neste ambiente**: nem
+  `browser_drag` do Playwright MCP (timeout de "stable" nos cronômetros re-renderizando) nem uma
+  sequência sintética de `PointerEvent` (dnd-kit exige pointer-capture real de SO) funcionam. Steps
+  seguintes que tocarem em DnD devem registrar essa mesma limitação como "Not run" no teste de sistema,
+  não tentar forçar uma automação nova.
+- **Tela de permissão de notificação Tauri bloqueia tudo em teste de browser puro** (sem bridge Tauri,
+  a permissão sempre nega). Contorno já validado 2x: sobrescrever `window.Notification.permission`
+  (getter → `'granted'`) e `.requestPermission` (→ resolve `'granted'`) via `browser_evaluate` antes de
+  clicar "Allow notifications", refazendo a cada reload (contexto JS novo). Reutilizar esse contorno
+  em qualquer teste de browser dos steps seguintes.
+- **`useStoredTasks.ts` grava no `localStorage` no `beforeunload`** — ao plantar um fixture de teste,
+  plantar ANTES da hidratação rodar (ex.: enquanto a tela de permissão ainda bloqueia), senão o próximo
+  `beforeunload` sobrescreve o fixture com o estado em memória (vazio).
+- **Cliques via Playwright MCP (`browser_click`) dão timeout de "stable"** neste app por causa dos
+  cronômetros re-renderizando continuamente; usar `click()` real via DOM (`browser_evaluate`) em vez
+  disso é o contorno validado.

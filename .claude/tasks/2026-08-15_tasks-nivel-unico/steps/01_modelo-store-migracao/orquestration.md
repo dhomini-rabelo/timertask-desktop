@@ -45,3 +45,11 @@
   (achatamento, sem accordion, idempotência, 2 tasks rodando ao mesmo tempo, CRUD/nota) passou. Drag
   reorder não verificável neste ambiente (limitação de pointer-capture do Playwright com dnd-kit,
   não é defeito do app). Ver `tests-01/verdict.md`.
+- **Fix** (`83722bb`): `useStoredTasks.ts:102` — `timeEvents: []` → `timeEvents: reviveEvents(entry.timeEvents)`
+  no fallback de task legada sem subtasks, igual aos outros dois ramos. `tsc --noEmit` limpo.
+- **tests-02: PASS.** Reproduz o caso exato do bug (task legada solta com `timeEvents` próprios) e
+  confirma correção: `timeEventsCount` bate com o fixture, Focused Time e Tasks Completed corretos e
+  sem divergência com o rodapé. Resto do roteiro (achatamento, idempotência, 2 tasks em paralelo, CRUD
+  completo incl. criar/editar/concluir/apagar/nota) passou de novo. Drag continua "Not run" (limitação
+  de ferramenta, não do app); "Add Group" sem UI confirmado como fora de escopo deste step (dado do
+  grupo íntegro no store). Ver `tests-02/verdict.md`.
