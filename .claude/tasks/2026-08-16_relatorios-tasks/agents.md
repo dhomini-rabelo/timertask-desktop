@@ -16,6 +16,10 @@ Skill: claude-step-loop
 | When | Role | Step | Nonce (`description`) | Agent id | Model | subagent_type | janela | Return |
 |------|------|------|----------------------|----------|-------|---------------|--------|--------|
 | 2026-08-16 | meta-planner | — | meta-relatorios-tasks | ae8a78e0e5900e595 | opus | general-purpose | 102k | 4 steps, 0 perguntas |
+| 2026-08-16 | stage orchestrator | 01 | S01-relatorios-tasks | a4301560f75493e24 | sonnet | general-purpose | 86k | step-fechado |
+| 2026-08-16 | stage orchestrator | 02 | S02-relatorios-tasks | a991cd1668315df29 | sonnet | general-purpose | 86k | step-fechado |
+| 2026-08-16 | stage orchestrator | 03 | S03-relatorios-tasks | afab8a4a80a55f8e9 | sonnet | general-purpose | 78k | step-fechado (1 retomada por SendMessage) |
+| 2026-08-16 | stage orchestrator | 04 | S04-relatorios-tasks | ada3023670604753d | sonnet | general-purpose | 85k | step-fechado |
 
 ## Ledger (what level 0 keeps in context — ≤5 lines per step)
 
