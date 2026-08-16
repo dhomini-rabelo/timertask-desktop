@@ -1,0 +1,25 @@
+Case 5 - corrupt-JSON fallback: browser_console_messages output after reload
+(localStorage["timertasks:reports"] set to "{{{not valid json" before reload)
+
+Total messages: 2 (Errors: 0, Warnings: 0)
+Returning 7 messages for level "info"
+
+[LOG] [vite] server connection lost. Polling for restart... @ http://localhost:1420/@vite/client:864
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+
+Notes:
+- Errors: 0 (no uncaught errors from the app's JSON.parse/try-catch fallback path).
+- The "server connection lost. Polling for restart..." line is Vite's HMR websocket client;
+  a curl check right after confirmed http://localhost:1420 still returns 200 and the dev
+  server log shows no restart/crash. This is Windows-host Playwright <-> WSL Vite dev
+  server websocket noise, unrelated to the app code under test.
+- The "listener indicated an asynchronous response..." lines are a known Chrome-extension
+  message-channel warning (also seen before any app code ran, e.g. right after
+  localStorage.clear() in Case 1), not related to this app.
+- After this reload, localStorage.getItem("timertasks:reports") read back as "{}",
+  confirming the corrupt-JSON catch branch in useStoredReports.ts fired correctly.
