@@ -389,3 +389,46 @@ task usam `break-all`. Qualquer coisa nova no header precisa de `shrink-0` para 
   quem efetivamente fechou o step, e por coincidência os dois chegaram a escrever no mesmo
   `tests-01/screenshots/` ao mesmo tempo. Testers deste loop sempre em foreground, uma tentativa por
   vez.
+
+---
+
+## Padrões capturados no step 04 (FECHADO — commits `c64d98d`, `e33d7de`)
+
+- **A decisão "3ª aba vs seção" que o `plan-simplified.md` deixava aberta foi fechada por 3ª aba**
+  (`Today | Week | History`), pelo mesmo padrão de `IndexReportsTabs.tsx`. Justificativa que vale para
+  qualquer view futura deste dialog: o conteúdo já vive num scroll interno único (`max-h-[60vh]`); uma
+  seção empilhada sob Week traria histórico sem limite de dias para dentro do MESMO scroll da semana e
+  tornaria a fronteira "sem sobreposição, sem buraco" (P5) invisível ao usuário. Abas mutuamente
+  exclusivas custam 1 linha no tipo (`IndexReportsTab`) + 1 item no array `TABS` — é o caminho de menor
+  fricção sempre que o molde de abas já existir.
+- **`IndexReportsDaySection` já cobria o caso de retenção SEM qualquer edição.** O ramo `namesPurged`
+  (implementado no step 03 para o caso de fronteira "dia purgado dentro da própria janela") é
+  EXATAMENTE o que uma linha de History precisa — nenhum componente novo, nenhuma prop nova, só
+  `showWorkflowBadge={false}`/`isToday={false}` fixos (dias fora da janela nunca têm badge nem são
+  hoje). Regra geral para o próximo view que precisar exibir dias-sem-nome: procurar primeiro se o
+  step anterior já deixou esse ramo coberto antes de escrever renderização nova.
+- **Função "espelho invertido" de uma já existente**: `getEntriesOutsideWindow` foi escrita ao lado de
+  `getEntriesInWindow` (`states/reports/utils.ts`), reusando a MESMA `getRetentionWindowStartKey` e o
+  MESMO comparador de string `yyyy-MM-dd` (T8) — nunca uma segunda fórmula de corte de data. Isso é o
+  que garante, por construção, que o corte de History é bit-a-bit o corte de `applyRetention` e da
+  Week: nenhuma sobreposição, nenhum buraco, sem precisar de teste de fronteira dedicado.
+- **Totais de uma seção que agrega MUITOS dias (sem paginação) somam sempre os 3 campos persistidos**
+  (`focusedSeconds`/`cycles`/`completedCount`) via `reduce`, nunca `.length` de listas — o mesmo padrão
+  do step 03 (`weekTotals`), agora extraído para `sumEntryTotals` em `reportsViewUtils.ts` e reusado
+  só pela seção nova. `weekTotals` do step 03 foi deixado INTACTO de propósito (duplicação aceita) —
+  refatorar código de um step já fechado para "economizar" uma função é fora de escopo mesmo quando o
+  padrão é idêntico.
+- **Ternário de 2 vias em JSX que precisa virar 3 (ou mais) vias**: trocar por blocos irmãos
+  `{activeTab === "x" && (<>...</>)}` um por valor, preservando byte-a-byte o JSX dos ramos existentes
+  — nunca aninhar um segundo ternário dentro do primeiro. É o padrão que este step deixa para qualquer
+  4ª aba futura neste dialog.
+- **Teste de sistema deste tipo de step (retenção de verdade, não só leitura de UI já povoada) exige
+  semear e RE-hidratar, não só semear.** Sem reload após o `browser_evaluate` que escreve dias antigos
+  no `localStorage`, a purga (que roda só na hidratação, step 01) nunca dispara e o teste provaria
+  apenas que a UI reflete o que foi escrito — não que a retenção funciona. O roteiro correto é:
+  semear com `namesPurged: false` e tasks nomeadas → reload → reler o `localStorage` e confirmar que
+  virou `tasks: []`/`namesPurged: true` com os números preservados → só então ler a tela e comparar.
+  Semear datas bem afastadas da fronteira (-20/-40 dias, não -8 dia) evita qualquer ambiguidade de
+  fuso/virada de dia (T8) no seed do teste.
+- Validação passou de primeira (0 rodadas de fix) e o teste de sistema passou na tentativa 01 — nenhum
+  padrão de erro novo a registrar além dos já cobertos acima.
