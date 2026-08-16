@@ -60,3 +60,17 @@
   fracionário no modal (N9 pré-existente, não corrigir); `store` sombreado em `countdownTimer.ts:116`
   e wrapper redundante em `IndexTimer.tsx:128` (cosmético)
 - Next: commit
+
+## 2026-08-16 — commit (implement + validate)
+
+- Commit `39f893b` — 3 arquivos de produto + docs do step
+
+## 2026-08-16 — tests-01 (S01-test-docker-browser-r01-tempo-extra-descanso)
+
+- Mode: Docker+browser only | Result: PASS | Pointer: `tests-01/verdict.md`
+- 9/9 casos confirmados; critério numérico validado por comparação same-tick (drift de tempo real por
+  latência de round-trip do MCP, não defeito de lógica; o regression real que o critério guarda —
+  trap N6, congelar/não reiniciar — não reproduziu)
+- 2 não-regressões aceitas confirmadas e corretamente NÃO tratadas como falha: arco fantasma do anel,
+  sem cor vermelha (ambas deferidas ao step 02)
+- Next: close

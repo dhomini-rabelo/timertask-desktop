@@ -14,8 +14,8 @@ Git: branch main | commit-base 47278d8
 - [x] 3. Implement (Sonnet), one agent per scope — both scopes confirmed on disk, tsc=0
 - [x] 4. Lint + type-check (once, output to a file) — exit=0, no errors
 - [x] 5. Validate (fresh Opus) — APPROVED_WITH_RESALVAS, 1 round, no fix needed  ← measured (2/4)
-- [ ] 6. Commit: implement + validate
-- [ ] 7. System test — mode + tests-{MM} until PASS  ← measure (3/4)
+- [x] 6. Commit: implement + validate — commit 39f893b
+- [x] 7. System test — Docker+browser, tests-01, PASS on first attempt  ← measured (3/4)
 - [ ] 8. Commit: fixes + each test attempt
 - [ ] 9. Step docs + "Padrões capturados" appended to memoria-da-task.md
 - [ ] 10. Close  ← measure (4/4, mandatory)
@@ -24,6 +24,7 @@ Git: branch main | commit-base 47278d8
 
 | Run | Result | Notes |
 |-----|--------|-------|
+| tests-01 | PASS | 9/9 deep cases confirmed; acceptance formula verified same-tick (real-time drift from MCP round-trip latency, not a logic defect); 2 accepted non-regressions (phantom ring arc, no red color) explicitly deferred to step 02 |
 
 ## Notes
 
