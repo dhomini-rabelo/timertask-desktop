@@ -2,7 +2,11 @@ import { BarChart3 } from "lucide-react";
 import { useState } from "react";
 import { Dialog } from "../../../../../layout/components/atoms/Dialog";
 import { useReportsState } from "../../../states/reports";
-import { getDayKey, getEntriesInWindow } from "../../../states/reports/utils";
+import {
+  getDayKey,
+  getEntriesInWindow,
+  getEntriesOutsideWindow,
+} from "../../../states/reports/utils";
 import { IndexReportsDaySection } from "./IndexReportsDaySection";
 import { IndexReportTaskRow } from "./IndexReportTaskRow";
 import { IndexReportsEmptyState } from "./IndexReportsEmptyState";
@@ -12,6 +16,7 @@ import { IndexReportsTotals } from "./IndexReportsTotals";
 import {
   getCompletedTasks,
   shouldShowWorkflowBadge,
+  sumEntryTotals,
 } from "./reportsViewUtils";
 
 export function IndexReportsDialog() {
@@ -48,6 +53,9 @@ export function IndexReportsDialog() {
     { focusedSeconds: 0, cycles: 0, completedCount: 0 },
   );
 
+  const historyEntries = getEntriesOutsideWindow(entriesByDate, now);
+  const historyTotals = sumEntryTotals(historyEntries);
+
   return (
     <Dialog.Root isOpen={isOpen} onOpenChange={handleOpenChange}>
       <Dialog.Trigger>
@@ -68,7 +76,7 @@ export function IndexReportsDialog() {
           <IndexReportsTabs activeTab={activeTab} onChange={setActiveTab} />
 
           <div className="flex flex-col gap-3 max-h-[60vh] overflow-auto pr-1">
-            {activeTab === "today" ? (
+            {activeTab === "today" && (
               <>
                 <IndexReportsTotals
                   focusedSeconds={todayEntry?.focusedSeconds ?? 0}
@@ -87,7 +95,9 @@ export function IndexReportsDialog() {
                   <IndexReportsEmptyState text="No tasks completed today yet." />
                 )}
               </>
-            ) : (
+            )}
+
+            {activeTab === "week" && (
               <>
                 <IndexReportsTotals
                   focusedSeconds={weekTotals.focusedSeconds}
@@ -105,6 +115,32 @@ export function IndexReportsDialog() {
                   ))
                 ) : (
                   <IndexReportsEmptyState text="No activity in the last 7 days." />
+                )}
+              </>
+            )}
+
+            {activeTab === "history" && (
+              <>
+                <p className="text-sm text-Black-300 dark:text-Black-400">
+                  Task names are kept for 7 days. After that, only cycles,
+                  focused time and the completed count remain.
+                </p>
+                <IndexReportsTotals
+                  focusedSeconds={historyTotals.focusedSeconds}
+                  cycles={historyTotals.cycles}
+                  completedCount={historyTotals.completedCount}
+                />
+                {historyEntries.length > 0 ? (
+                  historyEntries.map((entry) => (
+                    <IndexReportsDaySection
+                      key={entry.date}
+                      entry={entry}
+                      showWorkflowBadge={false}
+                      isToday={false}
+                    />
+                  ))
+                ) : (
+                  <IndexReportsEmptyState text="No history yet. Days older than 7 days will appear here." />
                 )}
               </>
             )}

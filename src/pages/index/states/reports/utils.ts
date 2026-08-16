@@ -123,3 +123,14 @@ export function getEntriesInWindow(
     .filter((entry) => entry.date >= startKey && entry.date <= todayKey)
     .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 }
+
+export function getEntriesOutsideWindow(
+  entriesByDate: Record<string, DailyReportEntry>,
+  today: Date,
+): DailyReportEntry[] {
+  const windowStartKey = getRetentionWindowStartKey(today);
+
+  return Object.values(entriesByDate)
+    .filter((entry) => entry.date < windowStartKey)
+    .sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+}

@@ -52,3 +52,18 @@ export function hasAnyActivity(entry: DailyReportEntry): boolean {
 export function shouldShowWorkflowBadge(tasks: DailyReportTask[]): boolean {
   return new Set(tasks.map((task) => task.workflowId ?? "__none__")).size > 1;
 }
+
+export function sumEntryTotals(entries: DailyReportEntry[]): {
+  focusedSeconds: number;
+  cycles: number;
+  completedCount: number;
+} {
+  return entries.reduce(
+    (totals, entry) => ({
+      focusedSeconds: totals.focusedSeconds + entry.focusedSeconds,
+      cycles: totals.cycles + entry.cycles,
+      completedCount: totals.completedCount + entry.completedCount,
+    }),
+    { focusedSeconds: 0, cycles: 0, completedCount: 0 },
+  );
+}

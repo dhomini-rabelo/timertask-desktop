@@ -1,4 +1,4 @@
-export type IndexReportsTab = "today" | "week";
+export type IndexReportsTab = "today" | "week" | "history";
 
 interface IndexReportsTabsProps {
   activeTab: IndexReportsTab;
@@ -8,6 +8,7 @@ interface IndexReportsTabsProps {
 const TABS: { key: IndexReportsTab; label: string }[] = [
   { key: "today", label: "Today" },
   { key: "week", label: "Week" },
+  { key: "history", label: "History" },
 ];
 
 export function IndexReportsTabs({
