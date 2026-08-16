@@ -6,11 +6,14 @@ interface TimerProps {
   initialTimeInMinutes: number;
   lastExtraAddedMinutes?: number;
   strokeColor?: string;
+  isOvertime?: boolean;
 }
 
 function getPercentage(totalSeconds: number, currentSeconds: number) {
-  if (totalSeconds === 0) {
+  if (totalSeconds <= 0) {
     return 0;
+  } else if (currentSeconds <= 0) {
+    return Math.min(-currentSeconds / totalSeconds, 1);
   } else if (currentSeconds < totalSeconds) {
     return currentSeconds / totalSeconds;
   } else if (currentSeconds === totalSeconds) {
@@ -49,6 +52,7 @@ export function Timer({
   initialTimeInMinutes,
   lastExtraAddedMinutes,
   strokeColor,
+  isOvertime,
 }: TimerProps) {
   const totalSeconds = Number(timerDisplayInSeconds);
   const isNegative = totalSeconds < 0;
@@ -88,7 +92,12 @@ export function Timer({
           className="transition-all duration-1000 ease-linear"
         />
       </svg>
-      <span className="z-10 tabular-nums">{`${isNegative ? "-" : ""}${minutesLeft}:${secondsLeft}`}</span>
+      <span
+        className={twMerge(
+          "z-10 tabular-nums",
+          isOvertime ? "text-Red-500 dark:text-Red-400" : undefined,
+        )}
+      >{`${isNegative ? "-" : ""}${minutesLeft}:${secondsLeft}`}</span>
     </div>
   );
 }

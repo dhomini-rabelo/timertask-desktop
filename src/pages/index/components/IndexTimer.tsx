@@ -49,8 +49,13 @@ export function IndexTimer() {
           extraAddedMinutes > 0 ? lastExtraAddedMinutes : undefined
         }
         strokeColor={
-          isResting ? "var(--color-Blue-400)" : "var(--color-Green-400)"
+          isOvertime
+            ? "var(--color-Red-400)"
+            : isResting
+              ? "var(--color-Blue-400)"
+              : "var(--color-Green-400)"
         }
+        isOvertime={isOvertime}
       />
       <div className="pt-4 flex flex-col gap-4 px-8">
         {isOvertime ? (
