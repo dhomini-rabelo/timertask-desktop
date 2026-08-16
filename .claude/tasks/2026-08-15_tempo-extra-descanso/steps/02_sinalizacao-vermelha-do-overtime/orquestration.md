@@ -41,3 +41,22 @@
 
 - Pointers: `plan.md`, `prompts/sinalizacao-vermelha-do-overtime.md` ×1
 - Next: implement
+
+## {ts} — implementer (S02-impl-sinalizacao-vermelha-do-overtime-tempo-extra-descanso)
+
+- Files changed: 2 (`Timer/index.tsx`, `IndexTimer.tsx`) | Type-check: exit=0
+
+## {ts} — validator (S02-validate-tempo-extra-descanso-r1)
+
+- Verdict: APPROVED_WITH_RESALVAS | Pointer: `review-r1.md` | Findings: `Timer/index.tsx:98` —
+  `: undefined` vs `: ""` no twMerge (estilo, sem correção); `IndexTaskItem.tsx:180-184` — mini-timer
+  herda o clamp de `getPercentage` (efeito colateral positivo, sem correção)
+- Commit: `7997ddc` (implement + validate)
+
+## {ts} — tests-01
+
+- Mode: Docker+browser only | Result: PASS (7/7 casos) | Pointer: `tests-01/verdict.md`
+- Caso 7 (regressão numérica) com ressalva honesta: drift de round-trip do MCP impediu cravar o
+  segundo exato, mas a fórmula proporcional do step 01 foi confirmada, nunca o valor fixo antigo
+- Commit: `f42dedd` (teste)
+- Next: close step

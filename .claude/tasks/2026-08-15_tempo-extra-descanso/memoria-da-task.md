@@ -314,6 +314,36 @@ Não faça disso o caminho principal.
   segundos entre a leitura e o clique, que não é coberto pelo offset do relógio (que desloca
   apenas o `now()` computado, não acelera o `setInterval` real).
 
+## 9.1 Padrões capturados no step 02
+
+- **Clamp de `getPercentage` em ponto único resolve os dois caminhos de total.**
+  `getCircleDashoffset` já resolvia `totalSeconds` (via `initialTimeInMinutes` OU
+  `lastExtraAddedMinutes`) ANTES de chamar `getPercentage`; colocar o clamp `Math.min(-cur/total, 1)`
+  só dentro de `getPercentage` cobriu a trap N10 de graça, sem duplicar lógica em
+  `getCircleDashoffset`. Qualquer geometria nova neste componente deve manter esse único ponto de
+  clamp, não espalhar.
+- **A cor de estado do texto entra sempre no elemento FILHO mais interno, nunca no container com
+  `twMerge`.** Confirmado de novo (já valia para `correcao-layout-tasks`): o container de
+  `Timer/index.tsx` tem `dark:text-White` fixo que sobrevive ao `twMerge` de uma nova cor no
+  `className` do container; o par `text-Red-500 dark:text-Red-400` só vence de forma confiável
+  aplicado no `<span>` que renderiza o texto.
+- **Tokens de cor deste projeto (`--color-Red/Green/Blue-400/500`) não têm override `.dark` em
+  `global.css`** — um valor usado via CSS var (como `stroke`) é correto nos dois temas sem par
+  `dark:`; só quando a cor é aplicada via utility Tailwind (`text-*`) é que o par claro/escuro é
+  necessário, por causa de outras classes Tailwind que MUDAM entre temas (`dark:text-White`).
+- **Geometria e cor podem ser propriedades independentes na mesma condição de estado.** A prop
+  `isOvertime` mudou só a cor (`strokeColor`, `text-Red-*`); a geometria (`getCircleDashoffset`)
+  ficou intocada porque o recarregamento proporcional já é função pura do sinal de
+  `currentSeconds`, sem precisar saber que está em overtime. Nem toda prop de estado precisa
+  atravessar todas as funções — só as que realmente mudam de comportamento nela.
+- **Teste "same-tick" via `browser_evaluate` único (leitura + clique atômicos) é o único jeito
+  confiável de validar fórmulas por segundo neste app com Playwright MCP** — duas chamadas MCP
+  separadas (ler, depois clicar) sempre têm drift de alguns segundos porque o countdown real
+  continua rodando entre elas. Uma tentativa de leitura via duplo `requestAnimationFrame` dentro da
+  mesma chamada estourou o timeout de 300s do MCP nesta configuração — não vale a pena tentar de
+  novo, o same-tick simples (ler texto + calcular + clicar, tudo num único `browser_evaluate`) já é
+  suficiente para confirmar a fórmula sem cravar o segundo exato.
+
 ## 10. Medição de janela do meta-planner
 
 Nonce `meta-tempo-extra-descanso`. Comando:
