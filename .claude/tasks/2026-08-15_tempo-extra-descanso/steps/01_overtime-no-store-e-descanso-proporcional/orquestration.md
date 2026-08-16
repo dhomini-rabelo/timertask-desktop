@@ -74,3 +74,15 @@
 - 2 não-regressões aceitas confirmadas e corretamente NÃO tratadas como falha: arco fantasma do anel,
   sem cor vermelha (ambas deferidas ao step 02)
 - Next: close
+
+## 2026-08-16 — close (S01-tempo-extra-descanso-r2)
+
+- Return: step-fechado
+- Recon: julgamento confirmado (reused from predecessor) → planner em opus
+- Validation: APPROVED_WITH_RESALVAS, 1 round
+- Test: Docker+browser, PASS na tests-01 → `tests-01/verdict.md`
+- Commits: 39f893b (implement+validate), 9f1b029 (tests-01)
+- Window at close: 119023 (pct=79, proj=149103) → reuse para step 02: não (perto do teto)
+- Padrões apendados em memoria-da-task.md §9: contrato isOvertime/isRunning/isResting confirmado,
+  molde hasAlertedRef, obrigatoriedade de stop() antes de start(), ressalva Math.floor vs ceil para
+  o step 02, arco fantasma/sem cor confirmados como esperado, técnica de teste same-tick

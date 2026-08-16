@@ -16,9 +16,9 @@ Git: branch main | commit-base 47278d8
 - [x] 5. Validate (fresh Opus) — APPROVED_WITH_RESALVAS, 1 round, no fix needed  ← measured (2/4)
 - [x] 6. Commit: implement + validate — commit 39f893b
 - [x] 7. System test — Docker+browser, tests-01, PASS on first attempt  ← measured (3/4)
-- [ ] 8. Commit: fixes + each test attempt
-- [ ] 9. Step docs + "Padrões capturados" appended to memoria-da-task.md
-- [ ] 10. Close  ← measure (4/4, mandatory)
+- [x] 8. Commit: fixes + each test attempt — commit 9f1b029 (no fixes needed, PASS on first attempt)
+- [x] 9. Step docs + "Padrões capturados" appended to memoria-da-task.md
+- [x] 10. Close  ← measured (4/4, mandatory)
 
 ## Test attempts
 

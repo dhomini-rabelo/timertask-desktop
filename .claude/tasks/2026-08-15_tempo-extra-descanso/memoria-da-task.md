@@ -283,7 +283,38 @@ Não faça disso o caminho principal.
 
 ---
 
-## 9. Medição de janela do meta-planner
+## 9. Padrões capturados no step 01
+
+- **Contrato store→UI confirmado em produção**: durante overtime o store mantém
+  `isRunning: true`, `isResting: false`, `currentTimeInSeconds < 0`. `IndexTimer.tsx` deriva
+  `isOvertime = !isResting && currentTimeInSeconds <= 0` e o checa **primeiro** na cadeia de
+  ramos (antes de `isRunning`/`isFinished`) — é isso que resolve N4. Step 02 deve ler esse
+  derivado ao decidir a cor do anel/número, não reinventar a condição.
+- **`hasAlertedRef` (ref de módulo) é o padrão para "estado de UI que não é de render" neste
+  projeto** — reseta nas ações que trocam de fase (`reset`, `goBackToWork`, `goToRest`,
+  `updateActivityMinutes`, `addExtraTime`), nunca em `stop`/`start`. Qualquer nova flag desse
+  tipo deve seguir o mesmo molde, não um campo no zustand (trap N1).
+- **`stop()` antes de `start()` é obrigatório em qualquer ação que precise recalcular
+  `endTimeRef` enquanto o intervalo pode estar vivo** (trap N6, confirmado como o bug mais
+  provável e agora corrigido em `goToRest`/`addExtraTime`). Step 02 não mexe nisso, mas
+  qualquer novo caller de `start()` deve checar essa mesma armadilha.
+- **Ressalva do validador, herdada para o step 02**: o tick usa `Math.floor` no ramo negativo
+  (per plano/memória §3.4), mas o validador (review-r1.md) argumenta que isso deixa o overtime
+  1s adiantado e pula `00:00` — sugestão registrada (não aplicada neste step) de trocar para
+  `Math.ceil` quando o step 02 mexer no mesmo tick para o clamp do anel. Reavaliar lá, não
+  aqui — não é regressão deste step (aceito com ressalva).
+- **Arco fantasma do anel e ausência de cor vermelha durante overtime são comportamento atual
+  aceito e confirmado por teste** — é exatamente o que o step 02 resolve (clamp de
+  `getPercentage` em `[0,1]` + cor vermelha no `<span>` via `text-Red-500 dark:text-Red-400`,
+  não no container, por causa do `twMerge` — trap N3).
+- **Técnica de teste validada de novo**: deslocamento de `window.Date` funciona tanto antes
+  quanto depois do Start; para o critério numérico exato, prefira comparar a fórmula
+  "same-tick" (ler `currentTimeInSeconds` e clicar Rest no mesmo instante) em vez de tentar
+  acertar um valor de overtime exato — o round-trip do Playwright MCP introduz drift real de
+  segundos entre a leitura e o clique, que não é coberto pelo offset do relógio (que desloca
+  apenas o `now()` computado, não acelera o `setInterval` real).
+
+## 10. Medição de janela do meta-planner
 
 Nonce `meta-tempo-extra-descanso`. Comando:
 `TETO=150000 PASSO=20 .claude/skills/claude-step-loop/scripts/medir-janela.sh "meta-tempo-extra-descanso"`

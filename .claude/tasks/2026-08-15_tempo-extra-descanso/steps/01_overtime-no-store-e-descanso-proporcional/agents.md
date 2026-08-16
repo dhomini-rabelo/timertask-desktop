@@ -18,7 +18,7 @@ Written by this step's orchestrator. Every launch carries an explicit `model` an
 
 | Checkpoint | turns | janela | proj | status |
 |---|---|---|---|---|
-| 1/4 end of plan | | | | |
-| 2/4 validation approved | | | | |
-| 3/4 test closed | | | | |
-| 4/4 close (mandatory) | | | | |
+| 1/4 end of plan | 23 | 64305 | 107865 | ok |
+| 2/4 validation approved | 75 | 98765 | 122125 | ok |
+| 3/4 test closed | — | not measured (observable criterion: 1 clean PASS round) | | ok |
+| 4/4 close (mandatory) | 103 | 119023 | 149103 | ok (near ceiling) |
