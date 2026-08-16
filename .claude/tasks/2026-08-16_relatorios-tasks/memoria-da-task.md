@@ -342,3 +342,50 @@ task usam `break-all`. Qualquer coisa nova no header precisa de `shrink-0` para 
   workaround usado.
 - **`npx tsc --noEmit` é o único gate de qualidade automatizado do repo** (sem lint script, sem
   runner) — confirma T9: `package.json` só tem `dev/build/preview/tauri`.
+
+---
+
+## Padrões capturados no step 03 (FECHADO — commits `9e40c3a`, `c8b0a4a`)
+
+- **Badge de workflow é decidido por-ABA, não por-dia.** `showWorkflowBadge` é calculado uma vez sobre
+  o pool de tasks visível na aba inteira (Today = as concluídas hoje; Week = `flatMap` de todos os dias
+  da janela) e o mesmo booleano é repassado a todas as seções de dia dentro daquela aba — nunca
+  recalculado por dia individual. Fórmula: `new Set(tasks.map(t => t.workflowId ?? "__none__")).size > 1`.
+  Qualquer view futura que leia o relatório e precise decidir "mostrar badge de workflow" segue este
+  mesmo escopo (por-view-inteira, não por-subseção).
+- **`formatDuration` não foi exportado de `IndexScore.tsx` — foi COPIADO** para um util próprio da
+  nova pasta (`reportsViewUtils.ts`). Padrão do repo confirmado: view nova que precisa de uma função
+  "privada ao arquivo" de outra view copia, não refatora a origem para exportar (evita acoplar duas
+  telas por um util incidental). Vale para o step 04 se precisar da mesma formatação.
+  `formatCompletedAt`/tempo "Done HH:MM" (sem segundos, `"--:--"` quando `null`) segue o mesmo molde de
+  cópia, espelhando `IndexCompletedTaskItem.tsx`.
+- **Totais de cabeçalho (Today/Week/por-dia) são SEMPRE os campos persistidos do contrato**
+  (`focusedSeconds`/`cycles`/`completedCount`), nunca recomputados a partir das linhas de task
+  filtradas/visíveis. Isso é o que faz o cabeçalho continuar correto mesmo quando `tasks` já foi
+  purgado pela retenção (`namesPurged: true`, `tasks: []`) — um dia purgado ainda mostra números certos
+  no cabeçalho e só perde as linhas. Qualquer seção nova (step 04) que agregue por período deve somar
+  estes três campos de cada `DailyReportEntry`, nunca `.length` de uma lista já filtrada.
+  Ordenação: a ordem de `getEntriesInWindow` (mais-recente-primeiro) NUNCA é re-ordenada; dentro de um
+  dia, as tasks são copiadas (`[...entry.tasks]`, trap T13) antes de `.sort()` por `completedAt` ASC.
+- **`<button>` cru dentro de `Dialog.Trigger asChild`, nunca o atom `Button`**, para gatilhos pequenos
+  com ícone — confirma T10 na prática: nenhum uso pequeno de botão neste repo usa o atom `Button` sem
+  overrides pesados de `className`; o molde `IndexWorkflowDialog.tsx` é o caminho de menor fricção.
+- **Estado vazio de relatório tem 4 ramos, não 2**: (1) tem tasks concluídas → linhas; (2)
+  `namesPurged === true` → texto "nomes não retidos" MAS ainda mostra os totais do cabeçalho; (3) tem
+  atividade (cycles/focusedSeconds > 0) mas 0 concluídas → "No tasks completed on this day."; (4)
+  nenhuma atividade → "No activity on this day." O erro fácil é colapsar (2) e (3)/(4) num só "vazio"
+  — são estados semanticamente diferentes e o teste de sistema deste step provou que (3) ocorre na
+  prática (dia com ciclos rodados mas nenhuma task concluída).
+- **Teste de sistema deste tipo de step (UI de leitura sobre um store já povoado) prova corretude por
+  DIFF contra `localStorage`, não só lendo a tela**: ler `localStorage.getItem("timertasks:reports")`
+  via `browser_evaluate` nos mesmos instantes em que a UI é lida, e comparar campo a campo — nunca só
+  "a tela parece certa". O caso de aceite mais importante de todos é sempre o mesmo desta task inteira:
+  disparar o Reset (que apaga o board de tasks) e confirmar que a entrada do dia no relatório
+  (horas/ciclos/concluídas/linhas) sobrevive inalterada — não é opcional, é o motivo de existir do
+  store separado (memória §1).
+- **Cuidado operacional para o step 04 (ou qualquer step futuro deste loop): nunca lançar o tester em
+  `run_in_background: true`.** Neste step um tester em background ficou "solto" sem produzir
+  `verdict.md` de forma tempestiva; um segundo tester em foreground (`run_in_background: false`) foi
+  quem efetivamente fechou o step, e por coincidência os dois chegaram a escrever no mesmo
+  `tests-01/screenshots/` ao mesmo tempo. Testers deste loop sempre em foreground, uma tentativa por
+  vez.
