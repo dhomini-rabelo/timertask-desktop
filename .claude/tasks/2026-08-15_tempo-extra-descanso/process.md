@@ -10,16 +10,16 @@ Git: branch main | commit-base a8f2b56
 - [x] Meta-plan (Opus) — clarifying questions batch: ZERO perguntas (13 premissas travadas)
 - [x] Meta-plan — steps.md + answers.md + memoria-da-task.md + plan-simplified.md per step
 - [x] Commit: meta-plan
-- [ ] Step 01 — overtime-no-store-e-descanso-proporcional
-- [ ] Step 02 — sinalizacao-vermelha-do-overtime
-- [ ] Close task + user summary
+- [x] Step 01 — overtime-no-store-e-descanso-proporcional (PASS tests-01, commits 39f893b/9f1b029/5c1282d)
+- [x] Step 02 — sinalizacao-vermelha-do-overtime (PASS tests-01, commits 7997ddc/f42dedd/2ac212c)
+- [x] Close task + user summary
 
 ## Steps status
 
 | Step | Slug | Class | Stage orchestrator | Status | Last test |
 |------|------|-------|--------------------|--------|-----------|
-| 01 | overtime-no-store-e-descanso-proporcional | julgamento | S01-tempo-extra-descanso | pending | — |
-| 02 | sinalizacao-vermelha-do-overtime | julgamento | S02-tempo-extra-descanso | pending | — |
+| 01 | overtime-no-store-e-descanso-proporcional | julgamento | S01-tempo-extra-descanso-r2 | done | tests-01 PASS |
+| 02 | sinalizacao-vermelha-do-overtime | julgamento | S02-tempo-extra-descanso | done | tests-01 PASS |
 
 ## Notes
 
