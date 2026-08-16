@@ -7,6 +7,7 @@ import { IndexActiveTasksList } from "./IndexActiveTasksList/IndexActiveTasksLis
 import { IndexAddInput } from "./IndexAddInput";
 import { IndexErrorMessage } from "./IndexErrorMessage";
 import { IndexFooter } from "./IndexFooter/IndexFooter";
+import { IndexReportsDialog } from "./IndexReportsDialog/IndexReportsDialog";
 
 export function IndexTasks() {
   useStoredTasks();
@@ -17,14 +18,17 @@ export function IndexTasks() {
 
   return (
     <Box className="w-full max-w-[600px] ml-auto p-6 flex flex-col gap-8">
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold text-Black-700 dark:text-White flex items-center gap-1.5">
-          Tasks
-        </h2>
-        <p className="text-Black-300 dark:text-Black-400 text-sm">
-          Manage your daily tasks efficiently, keep track of debugging time, and
-          avoid wasting time on easy tasks.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-bold text-Black-700 dark:text-White flex items-center gap-1.5">
+            Tasks
+          </h2>
+          <p className="text-Black-300 dark:text-Black-400 text-sm">
+            Manage your daily tasks efficiently, keep track of debugging time,
+            and avoid wasting time on easy tasks.
+          </p>
+        </div>
+        <IndexReportsDialog />
       </div>
 
       <div className="flex flex-col gap-4">
