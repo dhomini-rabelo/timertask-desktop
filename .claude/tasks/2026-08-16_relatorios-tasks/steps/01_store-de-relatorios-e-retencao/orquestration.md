@@ -18,3 +18,12 @@ Recon: veredito **complexa** (lógica de retenção é nova). Planner: **Opus**,
 **Verificação local do implementador**: `npm run build` (tsc + vite build) — não há lint nem test script.
 
 **Teste de sistema**: Docker+browser only (`npm run dev` + Playwright MCP + `.claude/docs/browser-instructions.md`). Roteiro: seed via `browser_evaluate` de 2 dias (hoje + ~30d atrás) → reload → reler chave → validar purga seletiva + idempotência + fallback de JSON inválido + não-toque em `timertasks:tasks`/`timertasks:workflows`.
+
+## Fechamento
+
+- Validate r1 (Opus): `APPROVED_WITH_RESALVAS` (4 ressalvas não-bloqueantes, `review-r1.md`). Ship sem fix round.
+- Commit implementação+validação: `a9817e6`.
+- Teste `tests-01/`: **PASS** de primeira, sem fix round (`tests-01/verdict.md`).
+- Commit teste: `e292440`.
+- Step **FECHADO**.
+

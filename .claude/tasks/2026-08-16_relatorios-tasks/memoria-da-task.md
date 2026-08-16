@@ -267,3 +267,35 @@ task usam `break-all`. Qualquer coisa nova no header precisa de `shrink-0` para 
   step 02 quiser um "flush" no unload, seguir esse mesmo molde — e lembrar que a ordem entre os dois
   handlers não é garantida, então o sync de reports não pode depender do que o handler de tasks
   gravou.
+
+---
+
+## Padrões capturados no step 01 (FECHADO — commits `a9817e6`, `e292440`)
+
+- **Contrato final, sem mudanças em relação à memória §3.** `src/pages/index/states/reports/index.ts`
+  exporta `DailyReportTask`, `DailyReportEntry`, `ReportsState` exatamente como especificado, mais o
+  store `useReportsState` com `actions.setEntriesState(entriesByDate)` e
+  `actions.upsertDailyEntry(date, entry)`. `upsertDailyEntry` **substitui o dia inteiro** (não faz
+  merge por `id` de task) — a mesclagem por `id` (P11) é 100% responsabilidade do step 02.
+- **`states/reports/utils.ts` pronto para uso pelo step 02**: `getDayKey(date: Date): string`,
+  `RETENTION_DAYS = 7` (exportada), `getRetentionWindowStartKey(today)`, `getEntriesInWindow(entriesByDate,
+  today, days = RETENTION_DAYS)` (só dias presentes no mapa, mais recente primeiro). Todas usam
+  comparação de STRING `yyyy-MM-dd`, nunca `Date`/`parseISO` no meio.
+- **Hook `useStoredReports()` já está montado** em `IndexTasks.tsx` ao lado de `useStoredTasks()` e
+  hidrata/persiste `timertasks:reports` sozinho. O step 02 **não precisa (e não deve) criar outro
+  hook de persistência** — ele só chama as actions do store já existente para gravar o dia corrente;
+  a gravação em disco já acontece via este hook.
+- **Ressalva conhecida, não-bloqueante (`review-r1.md`)**: em `useStoredReports.ts` o efeito-espelho
+  (linhas 40-42) roda DEPOIS do efeito de hidratação no mesmo commit de mount e sobrescreve
+  `entriesRef.current` com o valor stale (`{}`) antes do efeito de gravação rodar — o valor correto só
+  vai para o disco no commit seguinte (mesmo comportamento do molde `useStoredWorkflows.ts`, não é
+  regressão deste step). Resultado final no disco está correto (comprovado no teste), mas se o step 02
+  precisar depurar por que o primeiro `setItem` grava `{}`, a causa é essa, não um bug novo.
+- **`applyRetention` é idempotente e devolve a MESMA referência quando nada muda** — o step 02 pode
+  chamar `applyRetention` de novo sem medo de disparar re-render/gravação à toa (React Compiler, trap
+  T13), desde que compare por `changed`.
+- **Teste de sistema deste tipo de step (data-layer sem UI) usa `browser_evaluate` sobre
+  `localStorage`, não cliques.** Vite roda em `http://localhost:1420` neste projeto (não 5173 — Tauri
+  usa porta fixa, ver `vite.config.ts` se precisar confirmar de novo). O gate de permissão de
+  notificação (trap T5) às vezes já vem `granted` no contexto do Playwright entre execuções — não
+  assumir que vai sempre aparecer o prompt.
