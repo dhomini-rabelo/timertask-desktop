@@ -1,5 +1,6 @@
 import { Box } from "../../../../layout/components/atoms/Box";
 import { useListingTasks } from "../../hooks/useListingTasks";
+import { useStoredReports } from "../../hooks/useStoredReports";
 import { useStoredTasks } from "../../hooks/useStoredTasks";
 import { IndexActiveTasksList } from "./IndexActiveTasksList/IndexActiveTasksList";
 import { IndexAddInput } from "./IndexAddInput";
@@ -8,6 +9,7 @@ import { IndexFooter } from "./IndexFooter/IndexFooter";
 
 export function IndexTasks() {
   useStoredTasks();
+  useStoredReports();
   const { activeListItems, tasks } = useListingTasks();
 
   return (
