@@ -45,6 +45,7 @@ const intervalRef: { current: ReturnType<typeof setInterval> | null } = {
   current: null,
 };
 const endTimeRef: { current: Date | null } = { current: null };
+const hasAlertedRef: { current: boolean } = { current: false };
 
 function playAlertSound() {
   const alarmAudio = new Audio("/car-alarm.mp3");
@@ -89,7 +90,7 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
       if (intervalRef.current) {
         return;
       }
-      if (store.state.currentTimeInSeconds <= 0) {
+      if (store.state.isResting && store.state.currentTimeInSeconds <= 0) {
         return;
       }
 
@@ -112,12 +113,26 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
           new Date(),
         );
 
+        const store = get();
+
         if (millisecondsLeft <= 0) {
-          stop();
-          playAlertSound();
+          if (!hasAlertedRef.current) {
+            hasAlertedRef.current = true;
+            playAlertSound();
+          }
+
+          if (store.state.isResting) {
+            stop();
+            setState({
+              currentTimeInSeconds: 0,
+            });
+            return;
+          }
 
           setState({
-            currentTimeInSeconds: 0,
+            currentTimeInSeconds: Math.floor(
+              millisecondsLeft / millisecondsPerSecond,
+            ),
           });
           return;
         }
@@ -156,6 +171,7 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
       }
 
       endTimeRef.current = null;
+      hasAlertedRef.current = false;
 
       const initialSeconds = store.state.activityMinutes * secondsPerMinute;
 
@@ -176,6 +192,7 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
       }
 
       endTimeRef.current = null;
+      hasAlertedRef.current = false;
 
       const initialSeconds = store.state.activityMinutes * secondsPerMinute;
 
@@ -199,6 +216,7 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
       }
 
       endTimeRef.current = null;
+      hasAlertedRef.current = false;
 
       const restMinutes = getRestMinutes(activityMinutes, store.state.percentageOfRestingTime);
       const initialSeconds = activityMinutes * secondsPerMinute;
@@ -226,17 +244,21 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
     }
 
     function goToRest() {
+      stop();
+      hasAlertedRef.current = false;
+
       const store = get();
       const percentage = store.state.percentageOfRestingTime;
 
-      const baseRest = getRestMinutes(store.state.activityMinutes, percentage);
-      const extraRest = store.state.extraAddedMinutes * (percentage / 100);
-      const restMinutes = baseRest + extraRest;
+      const workedSeconds =
+        store.state.initialMinutes * secondsPerMinute -
+        store.state.currentTimeInSeconds;
+      const restSeconds = Math.round(workedSeconds * (percentage / 100));
 
       setState({
-        restMinutes,
-        initialMinutes: restMinutes,
-        currentTimeInSeconds: restMinutes * secondsPerMinute,
+        restMinutes: restSeconds / secondsPerMinute,
+        initialMinutes: restSeconds / secondsPerMinute,
+        currentTimeInSeconds: restSeconds,
         isResting: true,
         extraAddedMinutes: 0,
       });
@@ -245,6 +267,9 @@ export const useCountdownTimerState = create<CountdownTimerStore>(
     }
 
     function addExtraTime(minutes: number) {
+      stop();
+      hasAlertedRef.current = false;
+
       const store = get();
       const newExtra = store.state.extraAddedMinutes + minutes;
       const newInitial = store.state.initialMinutes + minutes;

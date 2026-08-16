@@ -37,6 +37,7 @@ export function IndexTimer() {
   const isFinished = currentTimeInSeconds === 0 && !isRunning;
   const shouldShowSettingsButton =
     !isRunning && !isResting && !hasTimerStarted && !isFinished;
+  const isOvertime = !isResting && currentTimeInSeconds <= 0;
 
   return (
     <div className="w-64">
@@ -52,7 +53,70 @@ export function IndexTimer() {
         }
       />
       <div className="pt-4 flex flex-col gap-4 px-8">
-        {isRunning ? (
+        {isOvertime ? (
+          <div className="flex flex-col gap-2 w-full">
+            {isRunning ? (
+              <Button
+                className="w-full py-2 text-base font-medium"
+                variant="danger"
+                onClick={stop}
+              >
+                Stop
+              </Button>
+            ) : (
+              <Button
+                className="w-full py-2 text-base font-medium"
+                variant="primary"
+                onClick={start}
+              >
+                Resume
+              </Button>
+            )}
+            <Button
+              className="w-full py-2 text-base font-medium"
+              variant="secondary"
+              onClick={goToRest}
+            >
+              Rest
+            </Button>
+            <Button
+              className="w-full py-2 text-base font-medium"
+              variant="primary"
+              onClick={() => {
+                addExtraTime(5);
+                setLastExtraAddedMinutes(5);
+              }}
+            >
+              +5 min
+            </Button>
+            <Button
+              className="w-full py-2 text-base font-medium"
+              variant="primary"
+              onClick={() => {
+                addExtraTime(10);
+                setLastExtraAddedMinutes(10);
+              }}
+            >
+              +10 min
+            </Button>
+            <div className="flex gap-2 w-full">
+              <Button
+                className="w-full py-2 text-base font-medium"
+                variant="primary"
+                onClick={goBackToWork}
+              >
+                Skip <ArrowRight size={20} />
+              </Button>
+              <Button
+                className="px-3 py-2 text-base font-medium"
+                variant="secondary"
+                onClick={() => setIsSettingsOpen(true)}
+              >
+                <Settings size={20} />
+              </Button>
+            </div>
+          </div>
+        ) : isRunning ? (
           <Button
             className="w-full py-2 text-base font-medium"
             variant="danger"
@@ -62,72 +126,22 @@ export function IndexTimer() {
           </Button>
         ) : isFinished ? (
           <div className="flex flex-col gap-2 w-full">
-            {isResting ? (
-              <div className="flex gap-2 w-full align-center items-center">
-                <Button
-                  className="flex-1 py-2 text-sm font-medium"
-                  variant="primary"
-                  onClick={goBackToWork}
-                >
-                  Back to Work
-                </Button>
-                <Button
-                  className="px-3 py-2 text-base font-medium"
-                  variant="secondary"
-                  onClick={() => setIsSettingsOpen(true)}
-                >
-                  <Settings size={20} />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <div className="flex flex-col gap-2 w-full">
-                  <Button
-                    className="w-full py-2 text-base font-medium"
-                    variant="secondary"
-                    onClick={goToRest}
-                  >
-                    Rest
-                  </Button>
-                  <Button
-                    className="w-full py-2 text-base font-medium"
-                    variant="primary"
-                    onClick={() => {
-                      addExtraTime(5);
-                      setLastExtraAddedMinutes(5);
-                    }}
-                  >
-                    +5 min
-                  </Button>
-                  <Button
-                    className="w-full py-2 text-base font-medium"
-                    variant="primary"
-                    onClick={() => {
-                      addExtraTime(10);
-                      setLastExtraAddedMinutes(10);
-                    }}
-                  >
-                    +10 min
-                  </Button>
-                  <div className="flex gap-2 w-full">
-                    <Button
-                      className="w-full py-2 text-base font-medium"
-                      variant="primary"
-                      onClick={goBackToWork}
-                    >
-                      Skip <ArrowRight size={20} />
-                    </Button>
-                    <Button
-                      className="px-3 py-2 text-base font-medium"
-                      variant="secondary"
-                      onClick={() => setIsSettingsOpen(true)}
-                    >
-                      <Settings size={20} />
-                    </Button>
-                  </div>
-                </div>
-              </>
-            )}
+            <div className="flex gap-2 w-full align-center items-center">
+              <Button
+                className="flex-1 py-2 text-sm font-medium"
+                variant="primary"
+                onClick={goBackToWork}
+              >
+                Back to Work
+              </Button>
+              <Button
+                className="px-3 py-2 text-base font-medium"
+                variant="secondary"
+                onClick={() => setIsSettingsOpen(true)}
+              >
+                <Settings size={20} />
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="flex gap-2 w-full">

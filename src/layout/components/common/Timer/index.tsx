@@ -50,12 +50,13 @@ export function Timer({
   lastExtraAddedMinutes,
   strokeColor,
 }: TimerProps) {
-  const minutesLeft = Math.floor(Number(timerDisplayInSeconds) / 60)
+  const totalSeconds = Number(timerDisplayInSeconds);
+  const isNegative = totalSeconds < 0;
+  const absoluteSeconds = Math.abs(totalSeconds);
+  const minutesLeft = Math.floor(absoluteSeconds / 60)
     .toString()
     .padStart(2, "0");
-  const secondsLeft = (Number(timerDisplayInSeconds) % 60)
-    .toString()
-    .padStart(2, "0");
+  const secondsLeft = (absoluteSeconds % 60).toString().padStart(2, "0");
   const { radius, circumference, strokeDashoffset } = getCircleDashoffset(
     initialTimeInMinutes,
     timerDisplayInSeconds,
@@ -87,7 +88,7 @@ export function Timer({
           className="transition-all duration-1000 ease-linear"
         />
       </svg>
-      <span className="z-10 tabular-nums">{`${minutesLeft}:${secondsLeft}`}</span>
+      <span className="z-10 tabular-nums">{`${isNegative ? "-" : ""}${minutesLeft}:${secondsLeft}`}</span>
     </div>
   );
 }
