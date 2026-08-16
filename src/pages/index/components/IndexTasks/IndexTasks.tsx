@@ -1,5 +1,6 @@
 import { Box } from "../../../../layout/components/atoms/Box";
 import { useListingTasks } from "../../hooks/useListingTasks";
+import { useReportsSync } from "../../hooks/useReportsSync";
 import { useStoredReports } from "../../hooks/useStoredReports";
 import { useStoredTasks } from "../../hooks/useStoredTasks";
 import { IndexActiveTasksList } from "./IndexActiveTasksList/IndexActiveTasksList";
@@ -10,6 +11,8 @@ import { IndexFooter } from "./IndexFooter/IndexFooter";
 export function IndexTasks() {
   useStoredTasks();
   useStoredReports();
+  // Order load-bearing: sync reads the store via getState(), already hydrated by useStoredTasks/useStoredReports in this same mount commit.
+  useReportsSync();
   const { activeListItems, tasks } = useListingTasks();
 
   return (
