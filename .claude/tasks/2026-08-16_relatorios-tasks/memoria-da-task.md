@@ -299,3 +299,46 @@ task usam `break-all`. Qualquer coisa nova no header precisa de `shrink-0` para 
   usa porta fixa, ver `vite.config.ts` se precisar confirmar de novo). O gate de permissão de
   notificação (trap T5) às vezes já vem `granted` no contexto do Playwright entre execuções — não
   assumir que vai sempre aparecer o prompt.
+
+---
+
+## Padrões capturados no step 02 (FECHADO — commits `7359665`, `f415558`)
+
+- **`timertasks:reports` no disco é `entriesByDate` DIRETO, sem wrapper.** `useStoredReports.ts`
+  persiste `JSON.stringify(entriesRef.current)` onde `entriesRef` é o `Record<string, DailyReportEntry>`
+  já — a chave `"entriesByDate"` só existe no tipo `ReportsState` em memória (zustand), não no JSON.
+  Ao ler no browser: `JSON.parse(localStorage.getItem("timertasks:reports"))["yyyy-MM-dd"]`, e não
+  `...["entriesByDate"]["yyyy-MM-dd"]`. Steps 03/04, ao ler o store React normalmente
+  (`useReportsState((s) => s.state.entriesByDate)`), não são afetados — isso só importa para quem lê o
+  `localStorage` cru (testes de browser).
+- **Gate de hidratação = ORDEM de hooks, não um `hasHydrated` exposto.** `useReportsSync()` é montado
+  DEPOIS de `useStoredTasks()`/`useStoredReports()` em `IndexTasks.tsx` e lê o estado de forma
+  IMPERATIVA (`useXState.getState()`, nunca um seletor reativo) no mesmo commit de mount — não depende
+  de re-render. Qualquer novo hook que precise ler "o disco já hidratado" segue o mesmo molde: ordem de
+  declaração + leitura imperativa, em vez de inventar uma flag de hidratação cruzando hooks.
+- **Guarda anti-loop para efeitos que escrevem no PRÓPRIO domínio que outro pedaço do app lê**: nunca
+  assinar reativamente o slice que a escrita target atualiza (aqui, `entriesByDate` dentro de
+  `useReportsSync`) — ler esse slice só via `getState()` — E comparar o próximo valor por CONTEÚDO
+  (campo a campo, nunca `JSON.stringify` como comparador nem comparação por referência) antes de
+  chamar a action de escrita. As duas metades são obrigatórias sempre que a action de escrita retorna
+  objeto novo por spread (padrão de todo store deste repo — T2).
+- **Delta de um contador que zera sozinho** (aqui `totalCycles`, 100% em memória): usar 3 refs —
+  "último valor visto", "acumulado persistido" e "chave do período corrente" (aqui, o dia). Somar ao
+  acumulado só quando o valor vivo CRESCE; ao cair, apenas realinhar (`Math.max(acumulado, disco)`),
+  nunca subtrair/zerar. Vira o dia (ou o período): reseedar as refs a partir do que já está gravado no
+  novo período, não a partir de zero puro — protege contra o efeito rodar de novo com o dia trocado
+  antes do reseed. Esse molde serve para qualquer contador futuro que só existe em memória.
+- **Mesclagem "hoje" que sobrevive a uma ação destrutiva no store de origem** (aqui, Reset/`clearItems`
+  apagando tasks): a base da mesclagem é sempre o que já está no disco, iterado na SUA própria ordem;
+  ids ausentes no snapshot vivo são mantidos INTACTOS (nunca removidos); ids presentes recebem os
+  campos do vivo exceto os que são monotônicos por natureza (aqui `secondsToday`/`completedAt`, via
+  `Math.max`/`?? `) — isso garante que nenhuma leitura do sync possa fazer o dado persistido regredir.
+  O teste que prova esse padrão é sempre "disparar a ação destrutiva e reler a chave persistida".
+- **Testando um contador de ciclos que depende de tempo real de UI (Pomodoro) sem mexer no código**:
+  Playwright tem relógio virtual (`page.clock.install()` + `fastForward()` via
+  `browser_run_code_unsafe`) que avança o timer do app sem esperar minutos reais e sem precisar de
+  nenhum hook de "modo debug/rápido" no app (não existe um, e não deve ser criado só para teste — T9).
+  Cliques reais de mouse do Playwright travaram neste ambiente; `element.click()` via JS foi o
+  workaround usado.
+- **`npx tsc --noEmit` é o único gate de qualidade automatizado do repo** (sem lint script, sem
+  runner) — confirma T9: `package.json` só tem `dev/build/preview/tauri`.

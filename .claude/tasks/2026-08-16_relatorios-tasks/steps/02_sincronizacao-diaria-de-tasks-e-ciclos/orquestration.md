@@ -39,3 +39,17 @@ critério que prova o step), T7 (proibido `calculateTasksCompleted`), T8 (`getDa
 T9 (sem runner, não criar `*.test.ts`), T13 (só objetos/arrays novos, nunca mutar).
 
 **Deliverables do plan**: `plan.md`, `prompts/sincronizacao-diaria.md` (prompt do implementador único).
+
+## Execução
+
+- Recon (`recon.md`): veredito `complexa`, escopo único, 4 perguntas concretas respondidas.
+- Plan (`plan.md`, planner Opus): 8 premissas assumidas registradas, roteiro de teste em 5 passos.
+- Implement (escopo único, Sonnet): 3 arquivos, `tsc --noEmit` limpo, diff só nos 3 arquivos OWN.
+- Validate r1 (Opus, `validate-r1.md`): **APPROVED_WITH_RESALVAS** — sem findings bloqueantes; ressalvas
+  não-acionáveis (cast `as Date`, 1 ciclo perdido só se o 1º evento do dia novo já for `goBackToWork`,
+  nota para steps 03/04 sobre `focusedSeconds`/`completedCount` recomputados do zero se `tasks` for
+  purgado). Sem rodada de fix.
+- Commit impl+validação: `7359665`.
+- Teste de sistema (`tests-01/verdict.md`): Docker+browser only, **PASS 5/5** na 1ª tentativa (projeção
+  do dia, Reset íntegro, reload sem duplicar, ciclos 1→2 via relógio virtual do Playwright, console
+  limpo). Commit do teste: `f415558`.
