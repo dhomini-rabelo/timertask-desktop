@@ -31,3 +31,4 @@ Skill: claude-simple-loop
 | 2026-08-23 | implementer (fix1) | impl-grupo-done-task-grupo-done | a624eb064058fc1a6 | sonnet | general-purpose | 72k | reuse, 2 ressalvas |
 | 2026-08-23 | tester | test-task-grupo-done-browser-r01 | a491e7188d88920b5 | sonnet | browser-tester | 64k | FAIL blocker-infra |
 | 2026-08-23 | tester | test-task-grupo-done-browser-r02 | aa9b73cbefcdc3555 | sonnet | browser-tester | 52k | FAIL blocker-infra |
+| 2026-08-23 | tester | test-task-grupo-done-browser-r04 | ac5eeb8d158d87ec8 | sonnet | browser-tester | 66k | FAIL blocker-infra (causa-raiz achada: `.mcp.json` inexistente) |

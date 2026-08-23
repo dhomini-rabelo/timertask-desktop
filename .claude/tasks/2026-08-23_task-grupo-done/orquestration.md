@@ -79,3 +79,22 @@ Skill: claude-simple-loop
 - Entregue e verificado: implementacao (tsc exit=0) + review Opus r1 APPROVED_WITH_RESALVAS + fix curto de alinhamento.
 - Nao entregue: prova de runtime no browser (tests-01/02/03 = blocker-infra, sem PASS).
 - Loop de dialogo da Playwright Extension: nao vem desta sessao (0 conexoes desta WSL para :8932); suspeito = cally/cally-fix apontando playwright para sse :8931 inexistente (nao alterado, decisao do usuario foi so fechar).
+
+## 2026-08-23 — tests-04 (browser) + causa-raiz da infra
+
+- Result: FAIL blocker-infra (4a vez), agora com **causa-raiz identificada**.
+- Tester `test-task-grupo-done-browser-r04` (ac5eeb8d158d87ec8, sonnet, 66k): sessao NOVA, `mcpServers` do
+  agent file ja em forma de mapa, e ainda assim `ListMcpResourcesTool(server:"playwright")` →
+  `Server "playwright" not found`. Prova de que `mcpServers` no `.claude/agents/*.agent.md` **nao e honrado
+  por subagentes neste runtime (VSCode/SDK)** — a correcao lista→mapa era necessaria mas nao suficiente.
+- Causa-raiz: **`.mcp.json` nao existia no repo**. O servidor `playwright` nunca esteve declarado em escopo
+  de projeto, que e o lugar que o runtime carrega no start da sessao.
+- Fix aplicado: criado `.mcp.json` com `playwright` = `{type: http, url: http://localhost:8932/mcp}`.
+  Carrega no **start da proxima sessao** — nao vale para esta.
+- Medido pelo orquestrador nesta sessao (servidor saudavel, sem defeito de produto a vista):
+  `initialize` OK (Playwright 1.63.0-alpha), `tools/list` = 24 tools `browser_*`,
+  `browser_tabs list` = aba real `Timertasks` em :1420, `browser_find` respondendo.
+  Schema desta versao: `target` (nao `ref`) e `scale` obrigatorio em `browser_take_screenshot`.
+- Estado do app observado: grupo residual `Grupo Vazio` com 2 subtasks 0/2; 3 erros de console = ruido da
+  extensao Playwright, nao do app.
+- Round de browser continua **PENDENTE** (sem PASS). Pointer: `tests-04/verdict.md`.
