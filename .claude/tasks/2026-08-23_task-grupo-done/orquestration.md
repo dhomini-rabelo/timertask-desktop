@@ -46,3 +46,16 @@ Skill: claude-simple-loop
 - Files changed: 6 edits + 1 novo (IndexCompletedTaskGroup.tsx); helpers em states/tasks/utils.ts
 - Type-check (orquestrador, 1x): exit=0
 - Next: validate (fresh opus)
+
+## 2026-08-23 — validator (validate-task-grupo-done-r1)
+
+- Verdict: APPROVED_WITH_RESALVAS (5 ressalvas, nenhuma bloqueante)
+- Pointer: `review-r1.md`
+- Fix round curto no implementer (reuse, 71k): espacador de alinhamento em IndexCompletedTaskGroup + condicao redundante em useStoredTasks; tsc exit=0
+- Sem re-validate: fix de 2 linhas, verdict nao era CHANGES_REQUIRED
+- Next: system test
+
+## 2026-08-23 — system test mode
+
+- Mode: Docker+browser (aqui: `npm run dev` no browser) only
+- Reason: sinal de teste do planner/recon — nao existe cobertura automatizada para states/tasks, useListingTasks e componentes Index*

@@ -77,7 +77,7 @@ function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
       workflowId: entry.workflowId ?? null,
       note: entry.note,
       collapsed: false,
-      completed: subtasks.length > 0 && subtasks.every((sub) => !!sub.completed),
+      completed: subtasks.every((sub) => !!sub.completed),
     };
 
     const tasks: Task[] = subtasks.map((sub) => ({

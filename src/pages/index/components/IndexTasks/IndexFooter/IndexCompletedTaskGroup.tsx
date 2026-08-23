@@ -23,6 +23,7 @@ export function IndexCompletedTaskGroup({
     <div className="group flex flex-col p-4 rounded-xl bg-white border border-Black-100/30 opacity-95 dark:bg-Black-700 dark:border-Black-600">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
+          <div className="w-5 h-5" />
           <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center border-Green-400 bg-Green-400 shrink-0">
             <Check className="w-4 h-4 text-White" strokeWidth={3} />
           </div>

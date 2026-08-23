@@ -17,11 +17,11 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 - [x] Implement (Sonnet) — escopo grupo-done, 6 edits + 1 novo
 - [x] Lint + type-check — tsc exit=0 (nao ha script de lint no package.json)
 - [ ] Commit: implement
-- [ ] Validate + code-pattern review (fresh Opus)
-- [ ] Fix round (Sonnet) — only if CHANGES_REQUIRED
-- [ ] Re-validate (fresh, -r2) — only if there was a fix round
+- [x] Validate r1 (opus) — APPROVED_WITH_RESALVAS
+- [x] Fix round curto (2 ressalvas cosmeticas), tsc exit=0
+- [x] Re-validate — dispensado (fix de 2 linhas, sem CHANGES_REQUIRED)
 - [ ] Commit: validate
-- [ ] Decide system test mode
+- [x] Decide system test mode — browser (`npm run dev`)
 - [ ] tests-01 — run + verdict.md (PASS required)
 - [ ] Commit: system-test (per attempt)
 - [ ] Close + user summary
