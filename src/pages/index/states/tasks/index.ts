@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useCountdownTimerState } from "../countdownTimer";
 import { useWorkflowsState } from "../workflows";
+import { canCompleteGroup, getGroupChildren } from "./utils";
 
 export type TaskTimeEvent = {
   type: "start" | "stop" | "complete";
@@ -25,6 +26,7 @@ export interface Task extends BaseTaskItem {
 export interface TaskGroup extends BaseTaskItem {
   type: "group";
   collapsed: boolean;
+  completed: boolean;
 }
 
 export type TaskItem = Task | TaskGroup;
@@ -46,6 +48,7 @@ interface TasksActions {
   addTask: (title: string, groupId?: string | null) => void;
   addGroup: (title: string) => void;
   toggleTask: (id: string) => void;
+  toggleGroup: (id: string) => void;
   deleteItem: (id: string) => void;
   saveEditingItem: (id: string, title: string) => void;
   saveNote: (id: string, note: string) => void;
@@ -161,6 +164,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
       title: trimmedTitle,
       workflowId: selectedWorkflowId,
       collapsed: false,
+      completed: false,
     };
 
     setItemsState([...get().state.items, newGroup]);
@@ -187,6 +191,30 @@ export const useTasksState = create<TasksStore>((set, get) => {
               ? [...item.timeEvents, completeEvent]
               : item.timeEvents,
           };
+        }),
+      },
+      actions: store.actions,
+    }));
+  }
+
+  function toggleGroup(id: string) {
+    set((store) => ({
+      state: {
+        items: store.state.items.map((item) => {
+          if (item.id !== id || !isTaskGroup(item)) {
+            return item;
+          }
+
+          if (item.completed) {
+            return { ...item, completed: false };
+          }
+
+          const children = getGroupChildren(store.state.items, id);
+          if (!canCompleteGroup(children)) {
+            return item;
+          }
+
+          return { ...item, completed: true };
         }),
       },
       actions: store.actions,
@@ -376,6 +404,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
       addTask,
       addGroup,
       toggleTask,
+      toggleGroup,
       deleteItem,
       saveEditingItem,
       saveNote,

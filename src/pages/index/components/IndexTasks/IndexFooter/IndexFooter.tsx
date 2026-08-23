@@ -5,6 +5,7 @@ import { Button } from "../../../../../layout/components/atoms/Button";
 import { ProgressBar } from "../../../../../layout/components/atoms/ProgressBar";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { useTasksState } from "../../../states/tasks";
+import { IndexCompletedTaskGroup } from "./IndexCompletedTaskGroup";
 import { IndexCompletedTaskItem } from "./IndexCompletedTaskItem";
 
 interface IndexTasksState {
@@ -17,7 +18,8 @@ export function IndexFooter() {
   });
   const clearItems = useTasksState((props) => props.actions.clearItems);
 
-  const { tasks, completedTasks, groups } = useListingTasks();
+  const { tasks, completedTasks, groups, completedGroups } =
+    useListingTasks();
 
   const totalTasksCount = tasks.length;
   const completedTasksCount = completedTasks.length;
@@ -27,6 +29,8 @@ export function IndexFooter() {
   const groupTitleById = new Map(
     groups.map((group) => [group.id, group.title]),
   );
+  const hasCompletedItems =
+    completedTasks.length > 0 || completedGroups.length > 0;
 
   function handleReset() {
     clearItems();
@@ -45,18 +49,14 @@ export function IndexFooter() {
         <div
           className={twMerge(
             "flex items-center gap-1 transition-colors text-Black-450 dark:text-Black-400",
-            completedTasks.length > 0
-              ? "cursor-pointer hover:text-Black-300"
-              : "",
+            hasCompletedItems ? "cursor-pointer hover:text-Black-300" : "",
           )}
-          onClick={
-            completedTasks.length > 0 ? handleToggleShowCompleted : undefined
-          }
+          onClick={hasCompletedItems ? handleToggleShowCompleted : undefined}
         >
           <span className="text-sm font-medium">
             {completedTasks.length} of {tasks.length} completed
           </span>
-          {completedTasks.length > 0 &&
+          {hasCompletedItems &&
             (state.showCompleted ? (
               <ChevronUp className="w-3.5 h-3.5" />
             ) : (
@@ -77,8 +77,11 @@ export function IndexFooter() {
         </div>
       </div>
 
-      {state.showCompleted && completedTasks.length > 0 && (
+      {state.showCompleted && hasCompletedItems && (
         <div className="flex flex-col gap-3 max-h-[calc(100vh-400px)] overflow-y-auto">
+          {completedGroups.map((group) => (
+            <IndexCompletedTaskGroup key={group.id} group={group} />
+          ))}
           {completedTasks.map((task) => (
             <IndexCompletedTaskItem
               key={task.id}

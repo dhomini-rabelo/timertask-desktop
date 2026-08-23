@@ -26,3 +26,4 @@ Skill: claude-simple-loop
 |---|---|---|
 | 2026-08-23 | recon | recon-task-grupo-done | ab73c939cf9fb22f5 | sonnet | general-purpose | 60k | veredito: complexa |
 | 2026-08-23 | planner | plan-task-grupo-done | a8d737505b0748091 | opus | general-purpose | 67k | 1 escopo, nao paralelizar |
+| 2026-08-23 | implementer | impl-grupo-done-task-grupo-done | a624eb064058fc1a6 | sonnet | general-purpose | 71k | escopo: grupo-done |

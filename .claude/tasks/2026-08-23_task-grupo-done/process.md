@@ -14,8 +14,8 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 - [x] Plan — plan.md + prompts/grupo-done.md (1 escopo)
 - [x] Extract block written in orquestration.md
 - [ ] Commit: plan
-- [ ] Implement (Sonnet) — one agent per scope
-- [ ] Lint + type-check (once, orchestrator)
+- [x] Implement (Sonnet) — escopo grupo-done, 6 edits + 1 novo
+- [x] Lint + type-check — tsc exit=0 (nao ha script de lint no package.json)
 - [ ] Commit: implement
 - [ ] Validate + code-pattern review (fresh Opus)
 - [ ] Fix round (Sonnet) — only if CHANGES_REQUIRED

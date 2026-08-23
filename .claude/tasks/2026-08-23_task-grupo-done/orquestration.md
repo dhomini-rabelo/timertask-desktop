@@ -40,3 +40,9 @@ Skill: claude-simple-loop
 - Escopos: 1 (`grupo-done`) — footprints NAO disjuntos, nao paralelizar
 - Sinal de teste: browser (`npm run dev`); sem cobertura automatizada nessa area
 - Next: implement (sonnet)
+
+## 2026-08-23 — implementer (impl-grupo-done-task-grupo-done)
+
+- Files changed: 6 edits + 1 novo (IndexCompletedTaskGroup.tsx); helpers em states/tasks/utils.ts
+- Type-check (orquestrador, 1x): exit=0
+- Next: validate (fresh opus)

@@ -1,5 +1,6 @@
 import { useAtom } from "jotai";
 import {
+  Check,
   ChevronDown,
   ChevronUp,
   GripVertical,
@@ -7,6 +8,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { Button } from "../../../../../../layout/components/atoms/Button";
 import { Input } from "../../../../../../layout/components/atoms/Input";
 import { ProgressBar } from "../../../../../../layout/components/atoms/ProgressBar";
@@ -16,6 +18,11 @@ import {
   useTasksState,
   type TaskGroup,
 } from "../../../../states/tasks";
+import {
+  canCompleteGroup,
+  getGroupChildren,
+  getGroupProgress,
+} from "../../../../states/tasks/utils";
 import { indexTasksPageStateAtom } from "../../shared-state";
 import { IndexEditInput } from "../shared-components/IndexEditInput";
 import { IndexGroupTasksList } from "./IndexGroupTasksList";
@@ -32,14 +39,13 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
   const isEditing = indexTasksPageState.editingTaskId === group.id;
   const deleteItem = useTasksState((props) => props.actions.deleteItem);
   const addTask = useTasksState((props) => props.actions.addTask);
+  const toggleGroup = useTasksState((props) => props.actions.toggleGroup);
   const { tasks } = useListingTasks();
   const [childTitle, setChildTitle] = useState("");
 
-  const children = tasks.filter((task) => task.groupId === group.id);
-  const completedCount = children.filter((task) => task.completed).length;
-  const percentage = children.length
-    ? Math.round((completedCount / children.length) * 100)
-    : 0;
+  const children = getGroupChildren(tasks, group.id);
+  const { completedCount, total, percentage } = getGroupProgress(children);
+  const canComplete = canCompleteGroup(children);
 
   function handleEditGroup() {
     setIndexTasksPageState((prev) => ({
@@ -102,6 +108,23 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
             <div className="flex items-center gap-1">
               <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
                 <button
+                  onClick={() => toggleGroup(group.id)}
+                  disabled={!canComplete}
+                  title={
+                    canComplete
+                      ? "Mark group as complete"
+                      : children.length === 0
+                        ? "Add at least one task first"
+                        : "Complete all tasks first"
+                  }
+                  className={twMerge(
+                    "text-Green-400 hover:text-Green-500 transition-all p-2",
+                    !canComplete && "opacity-40 cursor-not-allowed",
+                  )}
+                >
+                  <Check className="w-5 h-5" />
+                </button>
+                <button
                   onClick={handleEditGroup}
                   className="text-Yellow-400 hover:text-Yellow-500 transition-all p-2"
                 >
@@ -133,7 +156,7 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
       {!isEditing && (
         <div className="px-4 pb-3">
           <span className="text-sm font-medium text-Black-450 dark:text-Black-400">
-            {completedCount} of {children.length} completed
+            {completedCount} of {total} completed
           </span>
           <ProgressBar percentage={percentage} />
         </div>

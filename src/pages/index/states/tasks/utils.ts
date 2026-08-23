@@ -1,5 +1,5 @@
 import { differenceInSeconds } from "date-fns";
-import type { TaskTimeEvent } from "./index";
+import type { Task, TaskItem, TaskTimeEvent } from "./index";
 
 export function calculateTotalTimeInSeconds(
   events: TaskTimeEvent[],
@@ -72,4 +72,31 @@ export function getTimeRangeFromEvents(events: TaskTimeEvent[]) {
 export function shouldAutoStart(timeEvents: TaskTimeEvent[]): boolean {
   const lastEvent = timeEvents[timeEvents.length - 1];
   return lastEvent?.type === "start";
+}
+
+export function getGroupChildren(
+  items: TaskItem[],
+  groupId: string,
+): Task[] {
+  return items.filter(
+    (item): item is Task => item.type === "task" && item.groupId === groupId,
+  );
+}
+
+export function getGroupProgress(children: Task[]): {
+  completedCount: number;
+  total: number;
+  percentage: number;
+} {
+  const completedCount = children.filter((task) => task.completed).length;
+  const total = children.length;
+  const percentage = total
+    ? Math.round((completedCount / total) * 100)
+    : 0;
+
+  return { completedCount, total, percentage };
+}
+
+export function canCompleteGroup(children: Task[]): boolean {
+  return children.length > 0 && children.every((task) => task.completed);
 }
