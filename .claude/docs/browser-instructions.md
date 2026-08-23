@@ -2,7 +2,7 @@
 
 How to drive the **Playwright MCP** browser, save screenshots into task folders, and run **deep** UI system tests for `claude-simple-loop` / `claude-step-loop`.
 
-Environment notes assume Claude Code with the repo in WSL2 and the Playwright MCP server reachable at `http://localhost:8932/mcp` (see [.claude/agents/browser-tester.agent.md](../agents/browser-tester.agent.md)).
+Environment notes assume Claude Code with the repo in WSL2 and the Playwright MCP server reachable at `http://localhost:8932/mcp` (see [.claude/agents/browser-tester.md](../agents/browser-tester.md)).
 
 ## When this applies
 

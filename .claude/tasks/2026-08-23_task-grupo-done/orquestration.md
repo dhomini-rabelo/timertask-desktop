@@ -98,3 +98,36 @@ Skill: claude-simple-loop
 - Estado do app observado: grupo residual `Grupo Vazio` com 2 subtasks 0/2; 3 erros de console = ruido da
   extensao Playwright, nao do app.
 - Round de browser continua **PENDENTE** (sem PASS). Pointer: `tests-04/verdict.md`.
+
+## 2026-08-23 — causa-raiz REAL do blocker MCP (revisao do diagnostico de tests-04)
+
+Consulta a doc oficial (`claude-code-guide`, agent a808ba9b5575abcc8, sonnet, 55k) sobre
+`code.claude.com/docs/en/sub-agents.md`. O diagnostico anterior (".mcp.json faltando") estava ERRADO:
+`mcpServers` no frontmatter do subagente **e** suportado e **e** o mecanismo certo — a doc e explicita que
+servidor inline fica escopado ao subagente e NAO entra na conversa principal ("The subagent gets the tools;
+the parent conversation doesn't"). Logo o `.mcp.json` que eu criei foi **revertido**: escopo de projeto daria
+o playwright para a sessao toda, contrariando o desenho.
+
+Duas causas reais, ambas presentes:
+
+1. **Schema do `mcpServers` invertido pela propria rodada 03.** A doc pede **lista YAML**
+   (`- playwright:` com a config indentada abaixo), nao mapa. Historico do arquivo:
+   - `c400af7` / `d4204d3`: forma de LISTA (correta) — `d4204d3` ja com a porta 8932 certa
+   - `99ddb2a` (tests-03): "corrigido" de lista para MAPA = quebrou o que funcionava
+   Restaurada a forma de lista.
+2. **`hasTrustDialogAccepted = false`** para `/home/fael/so/code/saas/timertask-desktop` em `~/.claude.json`.
+   A partir da **v2.1.238** (CLI local = **2.1.239**) servidores MCP inline declarados em `.claude/agents/`
+   so carregam depois que a pasta e confiada; sem isso o servidor e pulado **em silencio** (motivo so no
+   debug log). Isso explica tests-01 e tests-02, que rodaram com o YAML CORRETO e ainda assim falharam —
+   e derruba a teoria de tests-03 de que "mcpServers por agente nao e suportado neste runtime".
+
+Fixes aplicados nesta sessao:
+
+- `mcpServers` de volta para lista YAML.
+- Arquivo renomeado `browser-tester.agent.md` → **`browser-tester.md`**: a doc so reconhece
+  `.claude/agents/<name>.md`; `.agent.md` nao e convencao documentada (carregava name/description, mas era
+  variavel a eliminar). Referencia em `.claude/docs/browser-instructions.md` atualizada.
+- `.mcp.json` removido (nao e o mecanismo desejado).
+
+Pendente e BLOQUEANTE para o tests-05: aceitar o trust da pasta (`hasTrustDialogAccepted`) e abrir sessao
+nova. Sem isso o quinto tester falha igual aos quatro anteriores.
