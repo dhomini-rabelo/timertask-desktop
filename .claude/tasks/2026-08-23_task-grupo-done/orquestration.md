@@ -72,3 +72,10 @@ Skill: claude-simple-loop
 - Medido: servidor MCP saudavel (24 tools, aba Timertasks conectada); 0 conexoes desta WSL para :8932
 - Causa provavel do loop de dialogo do usuario: outras sessoes (cally, cally-fix) apontam playwright para sse :8931 inexistente
 - Pointer: `tests-03/verdict.md` — round de browser PENDENTE, sem PASS
+
+## 2026-08-23 — close
+
+- Decisao do usuario: fechar a task com o round de browser PENDENTE; teste sera rodado em sessao nova (frontmatter corrigido carrega no start).
+- Entregue e verificado: implementacao (tsc exit=0) + review Opus r1 APPROVED_WITH_RESALVAS + fix curto de alinhamento.
+- Nao entregue: prova de runtime no browser (tests-01/02/03 = blocker-infra, sem PASS).
+- Loop de dialogo da Playwright Extension: nao vem desta sessao (0 conexoes desta WSL para :8932); suspeito = cally/cally-fix apontando playwright para sse :8931 inexistente (nao alterado, decisao do usuario foi so fechar).

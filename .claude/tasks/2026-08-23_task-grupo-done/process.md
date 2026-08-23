@@ -23,8 +23,8 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 - [ ] Commit: validate
 - [x] Decide system test mode — browser (`npm run dev`)
 - [ ] tests-01 — run + verdict.md (PASS required)
-- [ ] Commit: system-test (per attempt)
-- [ ] Close + user summary
+- [x] Commit: system-test (per attempt)
+- [x] Close + user summary — fechado com round de browser PENDENTE (decisao do usuario, 2026-08-23)
 
 ## Test attempts
 
