@@ -59,3 +59,16 @@ Skill: claude-simple-loop
 
 - Mode: Docker+browser (aqui: `npm run dev` no browser) only
 - Reason: sinal de teste do planner/recon — nao existe cobertura automatizada para states/tasks, useListingTasks e componentes Index*
+
+## 2026-08-23 — tests-01 / tests-02 (browser)
+
+- Result: FAIL blocker-infra nos dois: tools `browser_*` nao chegam a subagentes desta sessao
+- Correcoes de infra feitas: `browser-tester.agent.md` mcpServers lista → mapa; browser-instructions.md porta 8931 → 8932 + secao "Connection hygiene (extension mode)"
+- Pointers: `tests-01/verdict.md`, `tests-02/verdict.md`
+
+## 2026-08-23 — tests-03 (browser)
+
+- Result: FAIL blocker-infra (nao lancado; diagnostico consolidado pelo orquestrador via HTTP)
+- Medido: servidor MCP saudavel (24 tools, aba Timertasks conectada); 0 conexoes desta WSL para :8932
+- Causa provavel do loop de dialogo do usuario: outras sessoes (cally, cally-fix) apontam playwright para sse :8931 inexistente
+- Pointer: `tests-03/verdict.md` — round de browser PENDENTE, sem PASS

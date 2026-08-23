@@ -30,7 +30,9 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 
 | Run | Result | Notes |
 |-----|--------|-------|
-| tests-01 | pending | |
+| tests-01 | FAIL | blocker-infra: tools browser_* ausentes na sessao |
+| tests-02 | FAIL | idem, apos corrigir frontmatter (so vale em sessao nova) |
+| tests-03 | FAIL | blocker-infra consolidado; servidor MCP saudavel, round pendente |
 
 ## Notes
 

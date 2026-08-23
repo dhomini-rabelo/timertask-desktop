@@ -3,9 +3,9 @@ name: browser-tester
 description: >-
   This agent runs browser and tests the system using the Playwright MCP tools. It is responsible for driving the browser, performing actions, and reporting outcomes.
 mcpServers:
-  - playwright:
-      type: http
-      url: "http://localhost:8932/mcp"
+  playwright:
+    type: http
+    url: "http://localhost:8932/mcp"
 ---
 
 # Browser Tester
@@ -34,3 +34,20 @@ Notes:
   it instead of starting a second instance (`strictPort` makes a second one fail
   anyway).
 - Stop the process you started once the test run is finished.
+- Before starting it, probe the port:
+  `timeout 5 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:1420/`. On `200` the server
+  is already up — reuse it and do **not** start or stop it (stopping a server you did not start
+  breaks the user's session).
+
+## Connection hygiene (the server runs in `--extension` mode)
+
+The Playwright MCP server is on the Windows host and drives the user's real Chrome through the
+Playwright Extension, so **every new MCP client session pops an approval dialog** in the browser.
+
+- Never call `browser_close` or `browser_install` — closing ends the extension session and the next
+  call has to reconnect (another dialog).
+- `browser_tabs` (`action: "list"`) first and reuse the existing `Timertasks` tab; do not open one
+  tab per case.
+- On a connection error: retry **once**, then report the blocker in `verdict.md` and return. Never
+  loop on reconnects.
+- Full rules: `.claude/docs/browser-instructions.md` → "Connection hygiene (extension mode)".

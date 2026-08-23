@@ -2,7 +2,7 @@
 
 How to drive the **Playwright MCP** browser, save screenshots into task folders, and run **deep** UI system tests for `claude-simple-loop` / `claude-step-loop`.
 
-Environment notes assume Claude Code with the repo in WSL2 and the Playwright MCP server reachable at `http://localhost:8931/mcp` (see [.claude/agents/browser-tester.agent.md](../agents/browser-tester.agent.md)).
+Environment notes assume Claude Code with the repo in WSL2 and the Playwright MCP server reachable at `http://localhost:8932/mcp` (see [.claude/agents/browser-tester.agent.md](../agents/browser-tester.agent.md)).
 
 ## When this applies
 
@@ -17,6 +17,33 @@ Orchestrators must point the browser tester at **this file** in the Agent prompt
 - Use `subagent_type: browser-tester` (model `sonnet` for loop test stages). That agent definition carries the Playwright MCP server config **and** the app credentials — the main session does not have those MCP tools.
 - Do not try to drive the browser from level-0 chat; launch the subagent.
 - If the MCP server is unreachable, report a blocker with the connection error instead of faking a verdict.
+
+## Connection hygiene (extension mode)
+
+The MCP server runs **on the Windows host**, started manually with
+`npx @playwright/mcp@latest --port 8932 --host 0.0.0.0 --extension`, and drives the user's real
+Chrome through the Playwright Extension. In that mode **every new MCP client session pops an
+approval dialog** in the browser (`"…" is trying to connect to the Playwright Extension`). Churn
+there is the single most disruptive failure mode of a test run — the user sees a dialog storm and
+stray `Welcome` tabs.
+
+Rules:
+
+- **One `browser-tester` per test run.** Do not launch a second one "to retry"; continue the live one
+  with `SendMessage`. A respawn = a new client session = a new dialog.
+- **Never call `browser_close`** (nor `browser_install`). Closing ends the extension session, so the
+  next tool call reconnects and asks for approval again. Leave the tab open at the end of the run —
+  the "clean state" rule below means *navigate back / clear what you created*, not close the browser.
+- **Reuse the tab that is already there.** `browser_tabs` (`action: "list"`) first; the app tab
+  (`Timertasks`, http://localhost:1420) is usually already open. Do not open a tab per case.
+- **Do not restart the app server.** Probe it first —
+  `timeout 5 curl -s -o /dev/null -w "%{http_code}\n" http://localhost:1420/` — and reuse it on
+  `200`. `strictPort: true` makes a second `npm run dev` fail anyway.
+- **One retry, then stop.** If a `browser_*` call returns a connection error, retry **once**; if it
+  fails again, write the blocker into `verdict.md` and return. Never loop on reconnects.
+- Human-side bypass (ask the user once, do not try to do it from WSL): restart the server with
+  `PLAYWRIGHT_MCP_EXTENSION_TOKEN=<token from the dialog>` set, so the approval dialog stops
+  appearing.
 
 ## MCP capture flow
 
