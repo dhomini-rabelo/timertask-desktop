@@ -4,8 +4,12 @@ description: >-
   This agent runs browser and tests the system using the Playwright MCP tools. It is responsible for driving the browser, performing actions, and reporting outcomes.
 mcpServers:
   - playwright:
-      type: http
-      url: "http://localhost:8932/mcp"
+      command: npx
+      args:
+        - "@playwright/mcp@latest"
+        - "--browser"
+        - "chromium"
+        - "--headless"
 ---
 
 # Browser Tester
