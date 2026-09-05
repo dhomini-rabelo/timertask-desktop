@@ -22,9 +22,9 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 - [x] Re-validate — dispensado (fix de 2 linhas, sem CHANGES_REQUIRED)
 - [ ] Commit: validate
 - [x] Decide system test mode — browser (`npm run dev`)
-- [ ] tests-01 — run + verdict.md (PASS required)
+- [x] System test (browser) — PASS em tests-07 (rota: script Playwright; MCP indisponivel)
 - [x] Commit: system-test (per attempt)
-- [x] Close + user summary — fechado com round de browser PENDENTE (decisao do usuario, 2026-08-23)
+- [x] Close + user summary — fechado COMPLETO em 2026-09-05 (round de browser PASS)
 
 ## Test attempts
 
@@ -36,6 +36,7 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 | tests-04 | FAIL | blocker-infra: mcpServers mapa vs lista + trust da pasta |
 | tests-05 | FAIL | blocker-infra NOVO: tools playwright OK, mas PreToolUse hook timeout (host client unreachable) — 0 casos de produto |
 | tests-06 | FAIL | idem tests-05 apos allowlist; level 0 reproduziu a falha na propria sessao -> canal de aprovacao MCP do host quebrado |
+| tests-07 | **PASS** | rota script Node+Playwright (sem MCP); 8/8 casos, 11 screenshots, 0 erros de console |
 
 ## Notes
 

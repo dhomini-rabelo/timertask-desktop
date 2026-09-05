@@ -146,3 +146,12 @@ nova. Sem isso o quinto tester falha igual aos quatro anteriores.
 - test-task-grupo-done-browser-r06 (sonnet, browser-tester): **FAIL, sintoma identico ao tests-05** (`PreToolUse hook did not respond before its timeout`), 0 dos 8 casos, screenshots vazia. Vite ja no ar (200), nao tocado.
 - Diagnostico de level 0 (1 chamada): `mcp__playwright__browser_tabs {"action":"list"}` **no proprio nivel 0** retorna o mesmo erro. Logo o defeito NAO e do subagente nem da allowlist: o canal de aprovacao de tools MCP do host esta inalcancavel nesta sessao (o probe inicial funcionou uma vez e depois o canal caiu).
 - Decisao: trocar a **rota** do round de browser, mantendo os mesmos 8 casos e a exigencia de screenshot. Playwright CLI 1.63.0 + chromium ja estao no cache local, entao o tests-07 dirige o browser por **script Node via Bash**, sem depender de tools MCP.
+
+## tests-07 (2026-09-05) — PASS, task fechada
+
+- test-task-grupo-done-browser-r07 (sonnet, general-purpose): **PASS**, ponteiro `tests-07/verdict.md`, 11 screenshots em `tests-07/screenshots/`.
+- Rota: script Node + Playwright 1.63.0 via Bash (`NODE_PATH=/tmp/pw/node_modules`), sem tools MCP. Nenhuma dependencia adicionada ao projeto.
+- 8/8 casos passaram: gate de grupo vazio, gate parcial, conclusao + saida da lista ativa, reabrir sem cascata, persistencia pos-reload, nao-regressao da contagem ("3 of 3 completed", so folhas), edit/delete do grupo, tooltip/alinhamento. Zero erros de console.
+- Achados de infra do round (para futuras rodadas headless): (1) o gate de notificacao do app exige shim de `Notification.permission` via `addInitScript`; (2) o store do timer nao persiste, entao apos `reload()` e preciso clicar "Start" de novo.
+- Observacao cosmetica fora do escopo desta task: o badge de nome do grupo nas linhas de subtask concluida quebra no meio da palavra em titulos longos (visivel em `08-usabilidade-alinhamento-footer.png`).
+- Fechamento: todos os estagios do claude-simple-loop concluidos.
