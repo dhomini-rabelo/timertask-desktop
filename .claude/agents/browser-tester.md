@@ -10,6 +10,7 @@ mcpServers:
         - "--browser"
         - "chromium"
         - "--headless"
+        - "--isolated"
 ---
 
 # Browser Tester
@@ -23,7 +24,7 @@ A single process is needed. Start it in the background (it is a long-running
 server) and wait until it is listening.
 
 ```bash
-cd /home/fael/so/code/saas/timertask-desktop && npm run dev
+cd /root/so/repos/timertasks/timertask-desktop-tree-1 && npm run dev
 ```
 
 This is the Vite dev server, fixed to port `1420` (`strictPort: true`). Ready

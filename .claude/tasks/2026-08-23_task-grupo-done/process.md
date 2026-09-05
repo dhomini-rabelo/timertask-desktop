@@ -33,6 +33,8 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 | tests-01 | FAIL | blocker-infra: tools browser_* ausentes na sessao |
 | tests-02 | FAIL | idem, apos corrigir frontmatter (so vale em sessao nova) |
 | tests-03 | FAIL | blocker-infra consolidado; servidor MCP saudavel, round pendente |
+| tests-04 | FAIL | blocker-infra: mcpServers mapa vs lista + trust da pasta |
+| tests-05 | FAIL | blocker-infra NOVO: tools playwright OK, mas PreToolUse hook timeout (host client unreachable) — 0 casos de produto |
 
 ## Notes
 
