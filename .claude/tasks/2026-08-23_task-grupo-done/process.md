@@ -35,6 +35,7 @@ Bug: com tasks em grupo, nao ha como marcar a task em grupo como done.
 | tests-03 | FAIL | blocker-infra consolidado; servidor MCP saudavel, round pendente |
 | tests-04 | FAIL | blocker-infra: mcpServers mapa vs lista + trust da pasta |
 | tests-05 | FAIL | blocker-infra NOVO: tools playwright OK, mas PreToolUse hook timeout (host client unreachable) — 0 casos de produto |
+| tests-06 | FAIL | idem tests-05 apos allowlist; level 0 reproduziu a falha na propria sessao -> canal de aprovacao MCP do host quebrado |
 
 ## Notes
 

@@ -139,3 +139,10 @@ nova. Sem isso o quinto tester falha igual aos quatro anteriores.
 - Causa provavel medida por level 0: nao existe allowlist de permissoes no projeto (`.claude/settings*.json` inexistente, `allowedTools: []`), entao cada tool `mcp__playwright__*` do subagente depende de aprovacao interativa do host; o round ficou 21 min sem resposta.
 - Escrita de `.claude/settings.local.json` com `permissions.allow: ["mcp__playwright"]` foi **negada pelo classificador** — decisao pendente do usuario.
 - Vite subido pelo tester e deixado rodando (log em /tmp/dev.log).
+
+## tests-06 (2026-09-05)
+
+- Usuario autorizou o allowlist: `.claude/settings.local.json` -> `permissions.allow: ["mcp__playwright"]`.
+- test-task-grupo-done-browser-r06 (sonnet, browser-tester): **FAIL, sintoma identico ao tests-05** (`PreToolUse hook did not respond before its timeout`), 0 dos 8 casos, screenshots vazia. Vite ja no ar (200), nao tocado.
+- Diagnostico de level 0 (1 chamada): `mcp__playwright__browser_tabs {"action":"list"}` **no proprio nivel 0** retorna o mesmo erro. Logo o defeito NAO e do subagente nem da allowlist: o canal de aprovacao de tools MCP do host esta inalcancavel nesta sessao (o probe inicial funcionou uma vez e depois o canal caiu).
+- Decisao: trocar a **rota** do round de browser, mantendo os mesmos 8 casos e a exigencia de screenshot. Playwright CLI 1.63.0 + chromium ja estao no cache local, entao o tests-07 dirige o browser por **script Node via Bash**, sem depender de tools MCP.
