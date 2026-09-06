@@ -74,3 +74,8 @@ Date: 2026-09-06
   - IndexReportTaskRow.tsx:16-18 — break-all -> truncate min-w-0 + title={task.title} + min-w-0 no pai
   - ATENCAO para o teste: os dois dark:border-* tem especificidade 0, entao quem ganha depende da ordem de emissao do CSS. A prova empirica e o screenshot de dark + task ativa; o tester recebe assercao explicita de computed border-color.
   - decisao: NAO re-validar (fix de 2 linhas, dentro do que o validador ja sancionou) — a verificacao vai para o teste de browser
+- test 01 | test-layout-melhorias-ui-browser-r01 | sonnet browser-tester | janela 203k | FAIL | ponteiro: tests-01/verdict.md + 34 screenshots
+  - PASSA: as 7 assercoes de DOM dos itens; 16/16 auditContrast() = [] sem throw; borda do card ativo em dark = Green-400 rgb(16,185,129) (o fix do bloqueante esta PROVADO); J1..J7 todas PASS contra as imagens de referencia
+  - FALHA 1 (real): item 6 em 320px — IndexCompletedTaskItem.tsx:37-70, linha titulo+badge e linha Start/End/Duration transbordam 9-13px sem ellipsis (390/768/1100 limpos)
+  - FALHA 2 (provavel lacuna de criterio): regra formal do item 3 acusou 3 violacoes, todas no trigger dos atoms Select/Button (border border-Black-100 bg-White), nao costura de card-dentro-de-card
+  - FALHA 3 (provavel folga de criterio): secao Meia coluna crit. 5 em 1100px — card de grupo mede 503px contra teto de 440-500px do plano (3px acima)

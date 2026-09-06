@@ -28,7 +28,7 @@ Git: branch feat/layout-task-card | commit-base bd5df02
 
 | Run | Result | Notes |
 |-----|--------|-------|
-| tests-01 | pending | |
+| tests-01 | FAIL | 1 overflow real em 320px + 2 lacunas de criterio (a julgar) |
 
 ## Notes
 
