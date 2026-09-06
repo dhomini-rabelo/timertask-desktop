@@ -17,7 +17,7 @@ Git: branch main | commit-base 4ed315b
 - [x] Commit: implement
 - [ ] Validate (fresh Opus)
 - [ ] Commit: validate
-- [ ] Decidir modo de teste
+- [x] Modo de teste: browser only (script Node+Playwright)
 - [ ] tests-01 — verdict.md (PASS obrigatório; limite: 20 rodadas)
 - [ ] Commit: system-test
 - [ ] Close

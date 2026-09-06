@@ -23,7 +23,7 @@ import {
 import { errorMessageAtom, indexTasksPageStateAtom } from "../../shared-state";
 import { IndexEditInput } from "../shared-components/IndexEditInput";
 import { IndexTaskNoteDialog } from "../IndexTaskNoteDialog";
-import { GroupTitleContext } from "../IndexTaskGroup/IndexGroupTasksList";
+import { GroupTitleContext } from "../IndexTaskGroup/GroupTitleContext";
 import { IndexAlertSelect } from "./IndexAlertSelect";
 import { IndexDebugTimer, type IndexDebugTimerHandle } from "./IndexDebugTimer";
 

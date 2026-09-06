@@ -42,9 +42,8 @@ export function IndexScore() {
   const todayFocusedTime = calculateTodayFocusedTime(items);
   const totalFocusedTime = calculateTotalFocusedTime(items);
   const totalSessions = calculateTotalSessions(items);
-  // Derived from the two values above instead of calling
-  // calculateAverageSessionTime(items), which would re-scan items to
-  // recompute the same totalFocusedTime/totalSessions.
+  // Derived from the two values above instead of a separate helper, to
+  // avoid re-scanning items to recompute totalFocusedTime/totalSessions.
   const averageSessionTime =
     totalSessions === 0 ? 0 : Math.round(totalFocusedTime / totalSessions);
   const tasksInProgress = calculateTasksInProgress(items);
@@ -67,14 +66,14 @@ export function IndexScore() {
       bg: "bg-Blue-100",
     },
     {
-      label: "Sessions",
+      label: "Tasks Started",
       value: totalSessions,
       icon: Hourglass,
       color: "text-Blue-400",
       bg: "bg-Blue-100",
     },
     {
-      label: "Avg / session",
+      label: "Avg / task",
       value: formatDuration(averageSessionTime),
       icon: Repeat,
       color: "text-Green-400",

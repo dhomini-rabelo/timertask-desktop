@@ -98,13 +98,6 @@ export function calculateTotalSessions(items: TaskItem[]): number {
     .length;
 }
 
-export function calculateAverageSessionTime(items: TaskItem[]): number {
-  const sessions = calculateTotalSessions(items);
-  if (sessions === 0) return 0;
-
-  return Math.round(calculateTotalFocusedTime(items) / sessions);
-}
-
 export function calculateTasksInProgress(items: TaskItem[]): number {
   let count = 0;
 

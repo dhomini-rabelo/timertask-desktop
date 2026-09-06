@@ -73,3 +73,14 @@ Skill: claude-simple-loop
 - Fix round (reuso dos implementadores A e B): A → GroupTitleContext elimina O(N²) em IndexTaskItem + a11y no scroll de subtasks. B → header persiste no boot, `calculateTotalSessions` conta 1 sessão por task (não por resume), IndexScore sem varredura extra, label "Active" fora do scroll + a11y, `Section` → `TaskActivityStatus`.
 - Fora do fix (aceito): DragOverlay e feedback de drop entre seções — opcionais, custo/risco.
 - tsc exit=0. Next: validate r2 (fresh Opus, só o delta do fix).
+
+## 2026-09-06 — validate r2 + fix final
+
+- Veredito: APPROVED_WITH_RESALVAS | pointer `review-r2.md` | todas as ressalvas de risco da r1 confirmadas resolvidas, sem regressão no delta.
+- Fix final: A → `role="region"` + `GroupTitleContext.ts` como módulo folha (quebra import circular). B → remove `calculateAverageSessionTime` morta; rótulos passam a "Tasks Started" / "Avg / task" (decisão do orquestrador: "Sessions" era ambíguo frente a "In Progress").
+- tsc exit=0. Sem r3: fixes mecânicos de 2 linhas.
+
+## 2026-09-06 — modo de teste
+
+- Modo: **browser only** (sem cobertura automatizada no repo; mudança é 100% de UI/layout).
+- Rota: script Node+Playwright (MCP do host quebrado, mesmo diagnóstico de 2026-08-23_task-grupo-done/tests-07).
