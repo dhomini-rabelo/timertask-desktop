@@ -28,7 +28,8 @@ Git: branch feat/layout-task-card | commit-base bd5df02
 
 | Run | Result | Notes |
 |-----|--------|-------|
-| tests-01 | FAIL | 1 overflow real em 320px + 2 lacunas de criterio (a julgar) |
+| tests-01 | FAIL | 1 overflow real em 320px + 3 lacunas de criterio (emendadas) |
+| tests-02 | PASS | 36 screenshots, 36 md5 distintos; 7 itens + 16/16 contraste + borda dark re-confirmados |
 
 ## Notes
 

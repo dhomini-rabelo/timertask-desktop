@@ -88,3 +88,10 @@ Date: 2026-09-06
 - fix-320 | impl-fix-320-layout-melhorias-ui | sonnet | janela 38k | tsc exit=0 | IndexCompletedTaskItem.tsx: gap-2 sm:gap-4 (l.37), hidden sm:block (l.38), shrink-0 (l.78)
 - emenda-criterios | plan-notes-emenda-criterios-layout-melhorias-ui | sonnet | janela 55k | 3 criterios emendados no plan.md + bloco "Notes apos tests-01 (FAIL)" | nenhum codigo tocado
 - test 02 | test-layout-melhorias-ui-browser-r02 | sonnet browser-tester FRESCO | lancado (re-teste focado: 320px + criterio 3 em 1440/1100 + J3 + criterios emendados)
+- test 02 | test-layout-melhorias-ui-browser-r02 | sonnet browser-tester | janela 234k | **PASS** | ponteiro: tests-02/verdict.md + 36 screenshots (36 md5 distintos)
+  - 320px consertado: overlapsActions=false, scrollWidth==clientWidth nas duas linhas; achado sub-pixel honesto mantido (QA-100-A trunca ~0.3px com ellipsis real + title=)
+  - zero regressao de 390 a 1280 (overflowElsCount:0)
+  - 3 lacunas de rigor fechadas: crit. 3 medido em 1280/1440/1100 (overlapPairsInActionRow=0); J3 julgada de fato contra os screenshots de estado vazio; 3 criterios emendados re-medidos e passando
+  - 7 itens + 16/16 auditContrast()=[] + borda verde em dark re-confirmados NESTA rodada (nao herdados)
+  - honestidade de screenshot corrigida: 36 arquivos, 36 md5 distintos, por crop de regiao real do DOM
+- juiz-teste r02 | juiz-layout-melhorias-ui-test-r02 | opus FRESCO | lancado (aprovacao final da evidencia, exigencia do usuario)
