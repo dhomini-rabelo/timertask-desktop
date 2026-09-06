@@ -114,3 +114,7 @@ Date: 2026-09-06
   - 1280/1440/1100: fileira em linha unica (height=61px), overlapPairs=0, overflowOffenders=0, gap Debug<->tempo = 24px, pill compacto (ratio 0,355-0,387)
   - 390/320: sem regressao — Debug em linha propria (height=141px, ownLine=true), docScrollWidth==docClientWidth
   - Notes: 3 botoes com aria-label="Notes" e textContent vazio (lista ativa/inativa + footer) | consoleErrors=0
+- juiz-teste r03 | juiz-layout-melhorias-ui-test-r03 | opus | janela 69k | **APROVADO_COM_RESSALVAS** | ponteiro: tests-03/juizo-evidencia.md
+  - mediu os pixels ele mesmo (decodificou os PNGs): pill 176px vs 178px da referencia, vao Debug->tempo 40px identico ao debug.png
+  - as 2 melhorias ATENDIDAS; a11y do Notes ficou melhor que antes (o footer estava sem nome acessivel)
+  - folga real em 1100px = 74px (nao esta no limite); ressalva: 1024px e o caso mais apertado (~36px), e a variante de 3 botoes zera a folga la -> pill quebra para linha propria (degradacao benigna, sem overflow)
