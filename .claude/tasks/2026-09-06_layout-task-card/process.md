@@ -16,9 +16,9 @@ Git: branch main | commit-base 4ed315b
 - [x] Type-check exit=0 (sem lint script)
 - [x] Commit: implement
 - [ ] Validate (fresh Opus)
-- [ ] Commit: validate
+- [x] Commit: validate
 - [x] Modo de teste: browser only (script Node+Playwright)
-- [ ] tests-01 — verdict.md (PASS obrigatório; limite: 20 rodadas)
+- [x] tests-01 — PASS
 - [ ] Commit: system-test
 - [ ] Close
 
@@ -26,7 +26,7 @@ Git: branch main | commit-base 4ed315b
 
 | Run | Result | Notes |
 |-----|--------|-------|
-| tests-01 | pending | |
+| tests-01 | PASS | 23 screenshots, 14+ casos profundos, zero erro de console |
 
 ## Notes
 

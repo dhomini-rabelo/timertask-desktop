@@ -84,3 +84,14 @@ Skill: claude-simple-loop
 
 - Modo: **browser only** (sem cobertura automatizada no repo; mudança é 100% de UI/layout).
 - Rota: script Node+Playwright (MCP do host quebrado, mesmo diagnóstico de 2026-08-23_task-grupo-done/tests-07).
+
+## 2026-09-06 — tests-01 (test-layout-task-card-browser-r01)
+
+- Result: **PASS** | pointer `tests-01/verdict.md` + `tests-01/screenshots/` (23 capturas)
+- Provado: card full-width sem sidebar, 4 métricas nomeadas, badge "paused" removido em todos os casos, start/end/duration + nome do grupo nos filhos de grupo, não-regressão standalone, grupo 100%, scroll duplo com 8 subtasks + foco por Tab, CRUD + validação, start/pause/resume, persistência em reload, responsivo 420px. Zero erro de console.
+- Rota: script Node+Playwright (`tests-01/run.js`); MCP do host confirmado quebrado de novo.
+- Next: close.
+
+## 2026-09-06 — close
+
+- 5 pedidos entregues. 2 rodadas de review (Opus) + 2 fix rounds. 1 rodada de teste (limite era 20).
