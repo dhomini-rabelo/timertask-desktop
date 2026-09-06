@@ -12,7 +12,6 @@ import { twMerge } from "tailwind-merge";
 import { useCountdownTimerState } from "../states/countdownTimer";
 import { useTasksState } from "../states/tasks";
 import {
-  calculateAverageSessionTime,
   calculateCurrentStreak,
   calculateTasksCompleted,
   calculateTasksInProgress,
@@ -43,7 +42,11 @@ export function IndexScore() {
   const todayFocusedTime = calculateTodayFocusedTime(items);
   const totalFocusedTime = calculateTotalFocusedTime(items);
   const totalSessions = calculateTotalSessions(items);
-  const averageSessionTime = calculateAverageSessionTime(items);
+  // Derived from the two values above instead of calling
+  // calculateAverageSessionTime(items), which would re-scan items to
+  // recompute the same totalFocusedTime/totalSessions.
+  const averageSessionTime =
+    totalSessions === 0 ? 0 : Math.round(totalFocusedTime / totalSessions);
   const tasksInProgress = calculateTasksInProgress(items);
   const currentStreak = calculateCurrentStreak(items);
   const tasksCompleted = calculateTasksCompleted(items);

@@ -20,3 +20,6 @@ Skill: claude-simple-loop
 | 2026-09-06 | planner-fix | plan-layout-task-card-p2 | done | sonnet | general-purpose | 87k | corrigiu item 4 (full-width) |
 | 2026-09-06 | implementer | impl-card-task-itens-1-2-3-layout-task-card | done | sonnet | general-purpose | 58k | escopo A, tsc 0 |
 | 2026-09-06 | implementer | impl-layout-pagina-e-stats-4-5-layout-task-card | done | sonnet | general-purpose | 71k | escopo B, tsc 0 |
+| 2026-09-06 | validator | validate-layout-task-card-r1 | done | opus | general-purpose | 67k | APPROVED_WITH_RESALVAS |
+| 2026-09-06 | impl-fix A | impl-card-task-itens-1-2-3-layout-task-card | done | sonnet | general-purpose | 77k | reuso, tsc 0 |
+| 2026-09-06 | impl-fix B | impl-layout-pagina-e-stats-4-5-layout-task-card | done | sonnet | general-purpose | 103k | reuso, tsc 0 |

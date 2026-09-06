@@ -87,14 +87,15 @@ export function calculateTasksCompleted(items: TaskItem[]): number {
   return count;
 }
 
+// A "session" is one work cycle on a task, not each individual pause/resume:
+// stopping a task and starting it again later resumes the SAME session, it
+// does not start a new one. So a task counts as at most one session here,
+// regardless of how many `start`/`stop` pairs it went through.
 export function calculateTotalSessions(items: TaskItem[]): number {
-  let count = 0;
-
-  items.filter(isTask).forEach((task) => {
-    count += task.timeEvents.filter((event) => event.type === "start").length;
-  });
-
-  return count;
+  return items
+    .filter(isTask)
+    .filter((task) => task.timeEvents.some((event) => event.type === "start"))
+    .length;
 }
 
 export function calculateAverageSessionTime(items: TaskItem[]): number {

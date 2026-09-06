@@ -14,10 +14,9 @@ import {
 } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { isTaskGroup, type TaskItem, useTasksState } from "../../../states/tasks";
+import type { TaskActivityStatus } from "../../../states/tasks/utils";
 import { IndexSortableTaskGroup } from "./IndexSortableTaskGroup";
 import { IndexSortableTaskItem } from "./IndexSortableTaskItem";
-
-type Section = "active" | "paused" | "pending";
 
 function renderSectionItems(items: TaskItem[]) {
   return items.map((item) =>
@@ -40,7 +39,7 @@ export function IndexActiveTasksList() {
     })
   );
 
-  const sectionByItemId = new Map<string, Section>();
+  const sectionByItemId = new Map<string, TaskActivityStatus>();
   activeSectionItems.forEach((item) => sectionByItemId.set(item.id, "active"));
   pausedSectionItems.forEach((item) => sectionByItemId.set(item.id, "paused"));
   pendingSectionItems.forEach((item) =>
@@ -71,16 +70,23 @@ export function IndexActiveTasksList() {
       onDragEnd={handleDragEnd}
     >
       {activeSectionItems.length > 0 && (
-        <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-3">
           <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
             Active
           </span>
-          <SortableContext
-            items={activeSectionItems.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
+          <div
+            className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1"
+            tabIndex={0}
+            role="region"
+            aria-label="Active tasks"
           >
-            {renderSectionItems(activeSectionItems)}
-          </SortableContext>
+            <SortableContext
+              items={activeSectionItems.map((item) => item.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {renderSectionItems(activeSectionItems)}
+            </SortableContext>
+          </div>
         </div>
       )}
 

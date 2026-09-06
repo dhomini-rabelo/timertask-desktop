@@ -66,3 +66,10 @@ Skill: claude-simple-loop
 - B `impl-layout-pagina-e-stats-4-5-layout-task-card`: 8 arquivos (page.tsx, IndexTimer, IndexScore, scoreUtils, utils, useListingTasks, IndexTasks, IndexActiveTasksList) | tsc exit=0
 - Orquestrador: `npx tsc --noEmit` exit=0. Sem script de lint no package.json.
 - Next: validate (fresh Opus, r1).
+
+## 2026-09-06 — validate r1 + fix
+
+- Veredito: APPROVED_WITH_RESALVAS | pointer `review-r1.md` | 8 ressalvas, nenhuma bloqueante.
+- Fix round (reuso dos implementadores A e B): A → GroupTitleContext elimina O(N²) em IndexTaskItem + a11y no scroll de subtasks. B → header persiste no boot, `calculateTotalSessions` conta 1 sessão por task (não por resume), IndexScore sem varredura extra, label "Active" fora do scroll + a11y, `Section` → `TaskActivityStatus`.
+- Fora do fix (aceito): DragOverlay e feedback de drop entre seções — opcionais, custo/risco.
+- tsc exit=0. Next: validate r2 (fresh Opus, só o delta do fix).

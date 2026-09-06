@@ -8,12 +8,11 @@ import {
   Square,
   Trash2,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { formatClockValue, formatTime } from "../../../../../../code/utils/date";
 import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
-import { useListingTasks } from "../../../../hooks/useListingTasks";
 import { useCountdownTimerState } from "../../../../states/countdownTimer";
 import { useTasksState, type Task } from "../../../../states/tasks";
 import {
@@ -24,6 +23,7 @@ import {
 import { errorMessageAtom, indexTasksPageStateAtom } from "../../shared-state";
 import { IndexEditInput } from "../shared-components/IndexEditInput";
 import { IndexTaskNoteDialog } from "../IndexTaskNoteDialog";
+import { GroupTitleContext } from "../IndexTaskGroup/IndexGroupTasksList";
 import { IndexAlertSelect } from "./IndexAlertSelect";
 import { IndexDebugTimer, type IndexDebugTimerHandle } from "./IndexDebugTimer";
 
@@ -62,7 +62,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   });
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
-  const { groups } = useListingTasks();
+  const groupTitle = useContext(GroupTitleContext);
 
   const isTimerActive = timerState.isRunning;
   const hasBeenStarted = task.timeEvents.some(
@@ -70,9 +70,6 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   );
   const isGlobalActive = isGlobalTimerRunning && !isResting;
   const wasAutoPausedRef = useRef(false);
-  const groupTitle = task.groupId
-    ? groups.find((group) => group.id === task.groupId)?.title
-    : undefined;
   const taskTimeRange = getTimeRangeFromEvents(task.timeEvents);
   const totalTimeInSeconds = calculateTotalTimeInSeconds(task.timeEvents);
 

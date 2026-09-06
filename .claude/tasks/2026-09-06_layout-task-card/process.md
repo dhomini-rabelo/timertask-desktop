@@ -14,7 +14,7 @@ Git: branch main | commit-base 4ed315b
 - [x] Commit: plan
 - [x] Implement (Sonnet) — A e B em paralelo
 - [x] Type-check exit=0 (sem lint script)
-- [ ] Commit: implement
+- [x] Commit: implement
 - [ ] Validate (fresh Opus)
 - [ ] Commit: validate
 - [ ] Decidir modo de teste

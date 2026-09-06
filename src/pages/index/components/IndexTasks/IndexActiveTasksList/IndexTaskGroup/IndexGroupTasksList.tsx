@@ -12,9 +12,12 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { createContext } from "react";
 import { useListingTasks } from "../../../../hooks/useListingTasks";
 import { useTasksState, type TaskGroup } from "../../../../states/tasks";
 import { IndexSortableTaskItem } from "../IndexSortableTaskItem";
+
+export const GroupTitleContext = createContext<string | undefined>(undefined);
 
 interface IndexGroupTasksListProps {
   group: TaskGroup;
@@ -47,21 +50,28 @@ export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={visibleChildren.map((task) => task.id)}
-        strategy={verticalListSortingStrategy}
+    <GroupTitleContext.Provider value={group.title}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
-          {visibleChildren.map((task) => (
-            <IndexSortableTaskItem key={task.id} task={task} />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+        <SortableContext
+          items={visibleChildren.map((task) => task.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div
+            className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1"
+            tabIndex={0}
+            role="list"
+            aria-label={`${group.title} subtasks`}
+          >
+            {visibleChildren.map((task) => (
+              <IndexSortableTaskItem key={task.id} task={task} />
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </GroupTitleContext.Provider>
   );
 }
