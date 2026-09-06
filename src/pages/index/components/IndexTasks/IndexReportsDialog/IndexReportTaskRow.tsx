@@ -12,8 +12,11 @@ export function IndexReportTaskRow({
   showWorkflowBadge,
 }: IndexReportTaskRowProps) {
   return (
-    <div className="flex flex-col gap-1 p-4 rounded-xl bg-white border border-Black-100/30 dark:bg-Black-700 dark:border-Black-600">
-      <span className="text-sm font-medium text-Black-450 dark:text-Black-400 break-all">
+    <div className="flex flex-col gap-1 min-w-0 p-4 rounded-xl bg-white border border-Black-100/30 dark:bg-Black-700 dark:border-Black-600">
+      <span
+        className="text-sm font-medium text-Black-450 dark:text-Black-400 truncate min-w-0"
+        title={task.title}
+      >
         {task.title}
       </span>
       <div className="flex items-center flex-wrap gap-2 text-xs text-Black-450 dark:text-Black-400">

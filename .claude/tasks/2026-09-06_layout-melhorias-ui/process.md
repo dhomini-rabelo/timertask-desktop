@@ -16,9 +16,9 @@ Git: branch feat/layout-task-card | commit-base bd5df02
 - [x] Implement (Sonnet) — escopos A e B em paralelo, tsc exit=0
 - [x] Type-check (tsc exit=0) — projeto nao tem script de lint
 - [x] Commit: implement
-- [ ] Validate (fresh Opus)
-- [ ] Fix round / re-validate if needed
-- [ ] Commit: validate
+- [x] Validate (fresh Opus) — r1 CHANGES_REQUIRED (1 bloqueante + 1 deveria)
+- [x] Fix round aplicado (tsc exit=0); re-validate dispensado (fix de 2 linhas) — prova vai para o browser
+- [x] Commit: validate
 - [ ] tests-01 — browser, screenshot of EVERY task/item (user requirement)
 - [ ] Test-return QUALITY JUDGE (subagente reusado julga o retorno)
 - [ ] Commit: system-test

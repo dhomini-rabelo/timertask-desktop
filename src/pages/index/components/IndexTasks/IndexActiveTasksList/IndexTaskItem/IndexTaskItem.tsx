@@ -154,7 +154,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
     <div
       className={`group rounded-xl border bg-White shadow-sm hover:shadow-md transition-all overflow-hidden dark:bg-Black-700 dark:border-Black-600 ${
         isTimerActive
-          ? "border-Green-400"
+          ? "border-Green-400 dark:border-Green-400"
           : "border-Black-100 hover:border-Green-400/50"
       }`}
     >

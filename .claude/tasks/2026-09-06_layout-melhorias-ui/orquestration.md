@@ -62,3 +62,15 @@ Date: 2026-09-06
 - impl escopo B | impl-escopo-b-layout-melhorias-ui | sonnet | janela 134k | tsc exit=0 | ~20 arquivos (global.css, 5 atoms, IndexTasks/**, GroupTitleContext.ts apagado)
   - 2 ressalvas cosmeticas nos proprios greps de auto-checagem (falsos positivos por substring: dark:hover:bg-Green-400 e hover:text-Blue-500), a confirmar no validate
 - type-check global: tsc exit=0 | NAO existe script de lint no projeto (npm error Missing script: "lint")
+- validate r1 | validate-layout-melhorias-ui-r1 | opus | janela 90k | CHANGES_REQUIRED | ponteiro: review-r1.md
+  - BLOQUEANTE: IndexTaskItem.tsx:152-158 — dark:border-Black-600 foi para a parte estatica e clobbera o border-Green-400 do branch ativo (dark usa :where(), especificidade 0, mas emitido depois da base) => dark + timer rodando = card ativo sem borda verde
+  - deveria corrigir: IndexReportTaskRow.tsx:16 ainda com break-all (viola decisao 6)
+  - OK confirmados: 9 botoes do IndexTimer com text-sm font-bold (o 5o ponto foi coberto); zero text-Black-450 sem par dark: no src/; itens 2,3,4,5,7 sem regressao; GroupTitleContext = zero ocorrencias
+  - as 2 ressalvas do implementador B foram julgadas inofensivas, mas ambas "pelo motivo errado" — registradas, nao consertadas
+  - nota: a base de diff que passei (4b6e0f6) estava errada; o validador identificou e usou e49f580..a986406
+- fix r1 | impl-escopo-b-layout-melhorias-ui-fix1 | sonnet FRESCO | lancado (2 achados, escopo cirurgico)
+- fix r1 | impl-escopo-b-layout-melhorias-ui-fix1 | sonnet | janela 49k | tsc exit=0
+  - IndexTaskItem.tsx:157 — dark:border-Green-400 adicionado ao branch ativo (dark:border-Black-600 estatico mantido para o inativo)
+  - IndexReportTaskRow.tsx:16-18 — break-all -> truncate min-w-0 + title={task.title} + min-w-0 no pai
+  - ATENCAO para o teste: os dois dark:border-* tem especificidade 0, entao quem ganha depende da ordem de emissao do CSS. A prova empirica e o screenshot de dark + task ativa; o tester recebe assercao explicita de computed border-color.
+  - decisao: NAO re-validar (fix de 2 linhas, dentro do que o validador ja sancionou) — a verificacao vai para o teste de browser
