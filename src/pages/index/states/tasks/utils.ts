@@ -100,3 +100,35 @@ export function getGroupProgress(children: Task[]): {
 export function canCompleteGroup(children: Task[]): boolean {
   return children.length > 0 && children.every((task) => task.completed);
 }
+
+export type TaskActivityStatus = "active" | "paused" | "pending";
+
+export function getTaskActivityStatus(task: Task): TaskActivityStatus {
+  if (task.isRunning) {
+    return "active";
+  }
+
+  const hasStartEvent = task.timeEvents.some(
+    (event) => event.type === "start",
+  );
+
+  return hasStartEvent ? "paused" : "pending";
+}
+
+export function getGroupActivityStatus(
+  children: Task[],
+): TaskActivityStatus {
+  const incompleteChildren = children.filter((task) => !task.completed);
+
+  if (incompleteChildren.some((task) => getTaskActivityStatus(task) === "active")) {
+    return "active";
+  }
+
+  if (
+    incompleteChildren.some((task) => getTaskActivityStatus(task) === "paused")
+  ) {
+    return "paused";
+  }
+
+  return "pending";
+}

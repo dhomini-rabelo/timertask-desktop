@@ -1,12 +1,24 @@
-import { Award, CheckCircle2, Clock, Zap } from "lucide-react";
+import {
+  Award,
+  CheckCircle2,
+  Clock,
+  Hourglass,
+  PlayCircle,
+  Repeat,
+  Sun,
+  Zap,
+} from "lucide-react";
 import { twMerge } from "tailwind-merge";
-import { Box } from "../../../layout/components/atoms/Box";
 import { useCountdownTimerState } from "../states/countdownTimer";
 import { useTasksState } from "../states/tasks";
 import {
+  calculateAverageSessionTime,
   calculateCurrentStreak,
   calculateTasksCompleted,
+  calculateTasksInProgress,
+  calculateTodayFocusedTime,
   calculateTotalFocusedTime,
+  calculateTotalSessions,
 } from "../states/tasks/scoreUtils";
 
 function formatDuration(seconds: number): string {
@@ -28,17 +40,49 @@ export function IndexScore() {
   );
   const items = useTasksState((store) => store.state.items);
 
+  const todayFocusedTime = calculateTodayFocusedTime(items);
   const totalFocusedTime = calculateTotalFocusedTime(items);
+  const totalSessions = calculateTotalSessions(items);
+  const averageSessionTime = calculateAverageSessionTime(items);
+  const tasksInProgress = calculateTasksInProgress(items);
   const currentStreak = calculateCurrentStreak(items);
   const tasksCompleted = calculateTasksCompleted(items);
 
   const scoreItems = [
     {
-      label: "Total cycles",
-      value: totalCycles,
-      icon: Award,
+      label: "Today's Focus",
+      value: formatDuration(todayFocusedTime),
+      icon: Sun,
+      color: "text-Yellow-400",
+      bg: "bg-Yellow-100",
+    },
+    {
+      label: "Focused Time",
+      value: formatDuration(totalFocusedTime),
+      icon: Clock,
+      color: "text-Blue-400",
+      bg: "bg-Blue-100",
+    },
+    {
+      label: "Sessions",
+      value: totalSessions,
+      icon: Hourglass,
+      color: "text-Blue-400",
+      bg: "bg-Blue-100",
+    },
+    {
+      label: "Avg / session",
+      value: formatDuration(averageSessionTime),
+      icon: Repeat,
       color: "text-Green-400",
       bg: "bg-Green-100",
+    },
+    {
+      label: "In Progress",
+      value: tasksInProgress,
+      icon: PlayCircle,
+      color: "text-Yellow-400",
+      bg: "bg-Yellow-100",
     },
     {
       label: "Tasks Completed",
@@ -48,11 +92,11 @@ export function IndexScore() {
       bg: "bg-Green-100",
     },
     {
-      label: "Focused Time",
-      value: formatDuration(totalFocusedTime),
-      icon: Clock,
-      color: "text-Blue-400",
-      bg: "bg-Blue-100",
+      label: "Total cycles",
+      value: totalCycles,
+      icon: Award,
+      color: "text-Green-400",
+      bg: "bg-Green-100",
     },
     {
       label: "Current Streak",
@@ -64,8 +108,8 @@ export function IndexScore() {
   ];
 
   return (
-    <Box className="w-96 px-6 py-6">
-      <div className="grid grid-cols-2 gap-x-6 gap-y-8">
+    <div className="w-full">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
         {scoreItems.map((item) => (
           <div key={item.label} className="flex flex-col gap-2 items-start">
             <div className="flex items-center gap-2">
@@ -91,6 +135,6 @@ export function IndexScore() {
           </div>
         ))}
       </div>
-    </Box>
+    </div>
   );
 }

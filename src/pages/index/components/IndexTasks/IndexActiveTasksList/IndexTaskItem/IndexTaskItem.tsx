@@ -9,14 +9,16 @@ import {
   Trash2,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { formatTime } from "../../../../../../code/utils/date";
+import { formatClockValue, formatTime } from "../../../../../../code/utils/date";
 import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
+import { useListingTasks } from "../../../../hooks/useListingTasks";
 import { useCountdownTimerState } from "../../../../states/countdownTimer";
 import { useTasksState, type Task } from "../../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
+  getTimeRangeFromEvents,
   shouldAutoStart,
 } from "../../../../states/tasks/utils";
 import { errorMessageAtom, indexTasksPageStateAtom } from "../../shared-state";
@@ -60,6 +62,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   });
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
+  const { groups } = useListingTasks();
 
   const isTimerActive = timerState.isRunning;
   const hasBeenStarted = task.timeEvents.some(
@@ -67,6 +70,11 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   );
   const isGlobalActive = isGlobalTimerRunning && !isResting;
   const wasAutoPausedRef = useRef(false);
+  const groupTitle = task.groupId
+    ? groups.find((group) => group.id === task.groupId)?.title
+    : undefined;
+  const taskTimeRange = getTimeRangeFromEvents(task.timeEvents);
+  const totalTimeInSeconds = calculateTotalTimeInSeconds(task.timeEvents);
 
   function handleToggleTaskTimer(isGlobalTimerRunning: boolean) {
     wasAutoPausedRef.current = false;
@@ -198,6 +206,11 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
               >
                 {task.title}
               </span>
+              {groupTitle && (
+                <span className="px-2 py-0.5 rounded-full font-medium bg-Black-100/50 text-Black-450 dark:bg-Black-600 dark:text-Black-400 break-all text-xs">
+                  {groupTitle}
+                </span>
+              )}
             </div>
             <div className="flex items-center">
               <button
@@ -226,18 +239,16 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
       </div>
 
       {!isEditing && hasBeenStarted && (
-        <div className="flex items-center justify-end">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-white border border-Black-100/20 rounded-lg shadow-sm text-sm font-medium text-Black-700 transition-all hover:border-Green-400 hover:text-Green-500 dark:bg-Black-700 dark:border-Black-600 dark:text-White">
-            {isTimerActive ? (
-              <div className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-Green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-Green-500"></span>
-              </div>
-            ) : (
-              <div className="h-2 w-2 rounded-full bg-Red-400"></div>
-            )}
-            <span className="tabular-nums tracking-wider font-mono">
-              {isTimerActive ? "Running" : "Paused"}
+        <div className="flex items-center px-3 py-1.5">
+          <div className="flex items-center gap-2 text-xs text-Black-400">
+            <span className="font-medium">
+              Start {formatClockValue(taskTimeRange.startTime)}
+            </span>
+            <span className="font-medium">
+              End {formatClockValue(taskTimeRange.endTime)}
+            </span>
+            <span className="font-medium">
+              Duration {formatTime(totalTimeInSeconds)}
             </span>
           </div>
         </div>

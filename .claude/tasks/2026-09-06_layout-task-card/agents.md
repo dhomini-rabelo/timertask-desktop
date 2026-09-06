@@ -18,3 +18,5 @@ Skill: claude-simple-loop
 ## Ledger
 | 2026-09-06 | planner | plan-layout-task-card | done | opus | general-purpose | 92k | 2 escopos, 13 premissas |
 | 2026-09-06 | planner-fix | plan-layout-task-card-p2 | done | sonnet | general-purpose | 87k | corrigiu item 4 (full-width) |
+| 2026-09-06 | implementer | impl-card-task-itens-1-2-3-layout-task-card | done | sonnet | general-purpose | 58k | escopo A, tsc 0 |
+| 2026-09-06 | implementer | impl-layout-pagina-e-stats-4-5-layout-task-card | done | sonnet | general-purpose | 71k | escopo B, tsc 0 |

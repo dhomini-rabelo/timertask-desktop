@@ -87,6 +87,38 @@ export function calculateTasksCompleted(items: TaskItem[]): number {
   return count;
 }
 
+export function calculateTotalSessions(items: TaskItem[]): number {
+  let count = 0;
+
+  items.filter(isTask).forEach((task) => {
+    count += task.timeEvents.filter((event) => event.type === "start").length;
+  });
+
+  return count;
+}
+
+export function calculateAverageSessionTime(items: TaskItem[]): number {
+  const sessions = calculateTotalSessions(items);
+  if (sessions === 0) return 0;
+
+  return Math.round(calculateTotalFocusedTime(items) / sessions);
+}
+
+export function calculateTasksInProgress(items: TaskItem[]): number {
+  let count = 0;
+
+  items.filter(isTask).forEach((task) => {
+    const hasStartEvent = task.timeEvents.some(
+      (event) => event.type === "start",
+    );
+    if (!task.completed && hasStartEvent) {
+      count++;
+    }
+  });
+
+  return count;
+}
+
 export function calculateCurrentStreak(items: TaskItem[]): number {
   const activeDays = new Set<string>();
 

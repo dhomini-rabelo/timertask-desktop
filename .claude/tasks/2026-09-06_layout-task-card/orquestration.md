@@ -59,3 +59,10 @@ Skill: claude-simple-loop
 
 - Limite de rodadas de teste desta task: **20** (tests-01 … tests-20). Só paro o loop de teste ao atingir PASS ou esgotar tests-20.
 - Mantida a regra do skill: 3 FAILs consecutivos no mesmo caso → re-design (planner fresh lendo plan.md + todos os verdicts), sem consumir o limite indevidamente.
+
+## 2026-09-06 — implement (A e B em paralelo)
+
+- A `impl-card-task-itens-1-2-3-layout-task-card`: 5 arquivos (date.ts, IndexCompletedTaskItem, IndexTaskGroup, IndexGroupTasksList, IndexTaskItem) | tsc exit=0
+- B `impl-layout-pagina-e-stats-4-5-layout-task-card`: 8 arquivos (page.tsx, IndexTimer, IndexScore, scoreUtils, utils, useListingTasks, IndexTasks, IndexActiveTasksList) | tsc exit=0
+- Orquestrador: `npx tsc --noEmit` exit=0. Sem script de lint no package.json.
+- Next: validate (fresh Opus, r1).

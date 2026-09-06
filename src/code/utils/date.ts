@@ -10,3 +10,19 @@ export function formatTime(seconds: number): string {
   }
   return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
+
+export function formatClockTime(date: Date) {
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+}
+
+export function formatClockValue(date: Date | null) {
+  if (!date) {
+    return "--:--";
+  }
+
+  return formatClockTime(date);
+}

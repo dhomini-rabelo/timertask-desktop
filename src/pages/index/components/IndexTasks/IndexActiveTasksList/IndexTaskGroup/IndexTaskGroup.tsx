@@ -154,7 +154,7 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
       </div>
 
       {!isEditing && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pt-3 pb-3 flex flex-col gap-2">
           <span className="text-sm font-medium text-Black-450 dark:text-Black-400">
             {completedCount} of {total} completed
           </span>

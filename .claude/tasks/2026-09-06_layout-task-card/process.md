@@ -11,9 +11,9 @@ Git: branch main | commit-base 4ed315b
 - [x] Recon (Sonnet) — complexa
 - [x] Plan — plan.md + 2 prompts de escopo (p2 corrigiu item 4)
 - [x] Extract block em orquestration.md
-- [ ] Commit: plan
-- [ ] Implement (Sonnet)
-- [ ] Lint + type-check
+- [x] Commit: plan
+- [x] Implement (Sonnet) — A e B em paralelo
+- [x] Type-check exit=0 (sem lint script)
 - [ ] Commit: implement
 - [ ] Validate (fresh Opus)
 - [ ] Commit: validate

@@ -1,6 +1,7 @@
 import { isPermissionGranted } from "@tauri-apps/plugin-notification";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
+import { Box } from "../../layout/components/atoms/Box";
 import { IndexHeader } from "./components/IndexHeader/IndexHeader";
 import { IndexNotificationRequest } from "./components/IndexNotificationRequest";
 import { IndexScore } from "./components/IndexScore";
@@ -55,7 +56,9 @@ export function IndexPage() {
       <div className="flex w-full flex-1 flex-col p-4">
         <div className="flex w-full flex-col items-center">
           <div className="flex w-full max-w-6xl flex-col items-center">
-            <IndexHeader showOnlyLogo={shouldBlockContent} />
+            {shouldBlockContent && (
+              <IndexHeader showOnlyLogo={shouldBlockContent} />
+            )}
             {hasInitializedPermissionStatus && (
               <>
                 {shouldBlockContent ? (
@@ -63,14 +66,13 @@ export function IndexPage() {
                     <IndexNotificationRequest />
                   </div>
                 ) : (
-                  <div className="flex w-full flex-col items-center justify-center gap-24 md:flex-row md:items-start">
-                    <div className="flex shrink-0 flex-col items-center gap-8 pt-4 md:self-start">
+                  <div className="flex w-full flex-col gap-6">
+                    <Box className="w-full flex flex-col gap-6 p-6">
+                      <IndexHeader />
                       <IndexTimer />
                       <IndexScore />
-                    </div>
-                    <div className="w-full max-w-2xl flex-1">
-                      <IndexTasks />
-                    </div>
+                    </Box>
+                    <IndexTasks />
                   </div>
                 )}
               </>

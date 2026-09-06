@@ -1,4 +1,9 @@
-import { isTask, isTaskGroup, useTasksState } from "../states/tasks";
+import { isTask, isTaskGroup, type TaskItem, useTasksState } from "../states/tasks";
+import {
+  getGroupActivityStatus,
+  getGroupChildren,
+  getTaskActivityStatus,
+} from "../states/tasks/utils";
 import { useWorkflowsState } from "../states/workflows";
 
 export function useListingTasks() {
@@ -24,6 +29,24 @@ export function useListingTasks() {
       (isTask(item) && item.groupId === null && !item.completed),
   );
 
+  const activeSectionItems: TaskItem[] = [];
+  const pausedSectionItems: TaskItem[] = [];
+  const pendingSectionItems: TaskItem[] = [];
+
+  activeListItems.forEach((item) => {
+    const status = isTask(item)
+      ? getTaskActivityStatus(item)
+      : getGroupActivityStatus(getGroupChildren(tasks, item.id));
+
+    if (status === "active") {
+      activeSectionItems.push(item);
+    } else if (status === "paused") {
+      pausedSectionItems.push(item);
+    } else {
+      pendingSectionItems.push(item);
+    }
+  });
+
   return {
     workflowItems,
     groups,
@@ -35,5 +58,8 @@ export function useListingTasks() {
     completedTasks,
     activeRootTasks,
     activeListItems,
+    activeSectionItems,
+    pausedSectionItems,
+    pendingSectionItems,
   };
 }

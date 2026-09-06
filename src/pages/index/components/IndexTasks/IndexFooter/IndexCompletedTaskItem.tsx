@@ -1,6 +1,10 @@
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
-import { formatTime } from "../../../../../code/utils/date";
+import {
+  formatClockTime,
+  formatClockValue,
+  formatTime,
+} from "../../../../../code/utils/date";
 import type { Task } from "../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
@@ -11,22 +15,6 @@ import { IndexTaskNoteDialog } from "../IndexActiveTasksList/IndexTaskNoteDialog
 interface IndexCompletedTaskItemProps {
   task: Task;
   groupTitle?: string;
-}
-
-function formatClockTime(date: Date) {
-  return date.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
-}
-
-function formatClockValue(date: Date | null) {
-  if (!date) {
-    return "--:--";
-  }
-
-  return formatClockTime(date);
 }
 
 export function IndexCompletedTaskItem({

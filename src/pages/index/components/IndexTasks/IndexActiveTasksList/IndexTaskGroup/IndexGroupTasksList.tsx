@@ -56,9 +56,11 @@ export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
         items={visibleChildren.map((task) => task.id)}
         strategy={verticalListSortingStrategy}
       >
-        {visibleChildren.map((task) => (
-          <IndexSortableTaskItem key={task.id} task={task} />
-        ))}
+        <div className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1">
+          {visibleChildren.map((task) => (
+            <IndexSortableTaskItem key={task.id} task={task} />
+          ))}
+        </div>
       </SortableContext>
     </DndContext>
   );

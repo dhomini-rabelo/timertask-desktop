@@ -13,13 +13,26 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../hooks/useListingTasks";
-import { isTaskGroup, useTasksState } from "../../../states/tasks";
+import { isTaskGroup, type TaskItem, useTasksState } from "../../../states/tasks";
 import { IndexSortableTaskGroup } from "./IndexSortableTaskGroup";
 import { IndexSortableTaskItem } from "./IndexSortableTaskItem";
 
+type Section = "active" | "paused" | "pending";
+
+function renderSectionItems(items: TaskItem[]) {
+  return items.map((item) =>
+    isTaskGroup(item) ? (
+      <IndexSortableTaskGroup key={item.id} group={item} />
+    ) : (
+      <IndexSortableTaskItem key={item.id} task={item} />
+    ),
+  );
+}
+
 export function IndexActiveTasksList() {
   const reorderItems = useTasksState((props) => props.actions.reorderItems);
-  const { activeListItems } = useListingTasks();
+  const { activeSectionItems, pausedSectionItems, pendingSectionItems } =
+    useListingTasks();
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -27,12 +40,28 @@ export function IndexActiveTasksList() {
     })
   );
 
+  const sectionByItemId = new Map<string, Section>();
+  activeSectionItems.forEach((item) => sectionByItemId.set(item.id, "active"));
+  pausedSectionItems.forEach((item) => sectionByItemId.set(item.id, "paused"));
+  pendingSectionItems.forEach((item) =>
+    sectionByItemId.set(item.id, "pending"),
+  );
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      reorderItems(active.id as string, over.id as string);
+    if (!over || active.id === over.id) {
+      return;
     }
+
+    const activeSection = sectionByItemId.get(active.id as string);
+    const overSection = sectionByItemId.get(over.id as string);
+
+    if (!activeSection || activeSection !== overSection) {
+      return;
+    }
+
+    reorderItems(active.id as string, over.id as string);
   }
 
   return (
@@ -41,18 +70,47 @@ export function IndexActiveTasksList() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext
-        items={activeListItems.map((item) => item.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        {activeListItems.map((item) =>
-          isTaskGroup(item) ? (
-            <IndexSortableTaskGroup key={item.id} group={item} />
-          ) : (
-            <IndexSortableTaskItem key={item.id} task={item} />
-          ),
-        )}
-      </SortableContext>
+      {activeSectionItems.length > 0 && (
+        <div className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1">
+          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
+            Active
+          </span>
+          <SortableContext
+            items={activeSectionItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {renderSectionItems(activeSectionItems)}
+          </SortableContext>
+        </div>
+      )}
+
+      {pausedSectionItems.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
+            Paused
+          </span>
+          <SortableContext
+            items={pausedSectionItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {renderSectionItems(pausedSectionItems)}
+          </SortableContext>
+        </div>
+      )}
+
+      {pendingSectionItems.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
+            Pending
+          </span>
+          <SortableContext
+            items={pendingSectionItems.map((item) => item.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {renderSectionItems(pendingSectionItems)}
+          </SortableContext>
+        </div>
+      )}
     </DndContext>
   );
 }

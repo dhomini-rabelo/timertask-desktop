@@ -40,9 +40,9 @@ export function IndexTimer() {
   const isOvertime = !isResting && currentTimeInSeconds <= 0;
 
   return (
-    <div className="w-64">
+    <div className="w-full">
       <Timer
-        className="w-full h-64 text-6xl"
+        className="mx-auto h-56 w-56 text-4xl"
         timerDisplayInSeconds={currentTimeInSeconds.toString()}
         initialTimeInMinutes={initialMinutes}
         lastExtraAddedMinutes={
@@ -57,7 +57,7 @@ export function IndexTimer() {
         }
         isOvertime={isOvertime}
       />
-      <div className="pt-4 flex flex-col gap-4 px-8">
+      <div className="pt-4 flex flex-col gap-4 px-4">
         {isOvertime ? (
           <div className="flex flex-col gap-2 w-full">
             {isRunning ? (
