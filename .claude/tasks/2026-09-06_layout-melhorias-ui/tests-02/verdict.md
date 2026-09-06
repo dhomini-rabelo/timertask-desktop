@@ -185,12 +185,21 @@ tests-01 tinha 7 arquivos que eram a MESMA captura fullPage renomeada (md5 idên
 Técnica: em vez de repetir `page.screenshot({fullPage:true})` para cada nome, cada captura nomeada é
 um crop de elemento real (`Locator.screenshot()`), de uma região DOM distinta:
 
+**Correção pós-revisão:** md5 distinto NÃO prova estado distinto — um crop tirado em outro instante
+da MESMA tela (ex.: timer avançando um segundo) também muda o md5 sem ser um estado novo. Conferido
+pixel a pixel pelo revisor: `02-tasks-simples`/`07-dark-02`/`08-mobile-390-02` são, cada um, a mesma
+captura 545×803 de `QA-Grupo-Scroll` que seu par `-05`, diferindo só pelo timer. Ou seja, **3 dos 36
+screenshots são a mesma captura com outro nome** — uma melhora grande frente aos 7 de 34 de tests-01,
+mas não zero como o texto original desta seção dava a entender. Nenhum estado prometido está
+faltando: os 10 estados foram confirmados nos pixels pelo revisor.
+
 - `01-header-desktop` / `07-dark-01` → bloco Timer+Score (marcado via `data-qa-shot="header"`, mesmo
   nó DOM em todas as combinações tema/viewport — pixels diferem de verdade por tema/largura).
-- `02-tasks-simples` → **desvio deliberado e declarado**: em vez de reusar o mesmo crop de
-  `03-lista-2-colunas` (que seria um duplicado disfarçado, já que ambos são capturados no mesmo
-  estado final do cenário), é um crop zoom do card `QA-Sub-01` isolado — mostra a linha de ações +
-  Debug em detalhe, mais útil para julgar o critério que o nome promete do que reusar `03`.
+- `02-tasks-simples` → **correção pós-revisão (o texto original aqui estava errado)**: NÃO é um crop
+  zoom do card `QA-Sub-01` isolado. É o MESMO crop 545×803 do card `QA-Grupo-Scroll` que
+  `05-grupo-scroll`, diferindo só pelo timer correndo (00:05 vs 00:07) — md5 distinto, mas mesma
+  captura com outro nome. O mesmo vale para os pares `07-dark-02`/`07-dark-05` e
+  `08-mobile-390-02`/`08-mobile-390-05` (dimensões idênticas).
 - `03/03b/03c` → bloco `[data-qa-shot="taskslist"]` (Active+Paused+Pending juntos) nos três viewports
   — mesmo elemento, mas conteúdo pixel realmente diferente por causa da largura de coluna.
 - `03d` → `[data-tasks-section="paused"]` (seletor já existente no produto).
@@ -205,6 +214,12 @@ um crop de elemento real (`Locator.screenshot()`), de uma região DOM distinta:
 Cobertura de tipos de task mantida: vazio, simples pendente/ativa/pausada, grupo
 expandido/colapsado/scroll, grupo pausado, dois grupos lado a lado, Paused em 2 colunas, completada de
 grupo com badge, solta completada sem badge, grupo completado — light/dark × desktop/mobile.
+
+**Observação menor do revisor:** o critério 1 da § Meia coluna reporta `overflowElsCount=1` nos três
+viewports (1280/1440/1100) por causa do título longo proposital do cenário de teste, e o mesmo caso
+passa pelo critério 2 (`overflowElsWithoutEllipsisCount=0`). Ou seja, o critério 1 como está escrito
+("zero overflow horizontal") é incompatível com o próprio cenário que o exercita; o tester foi
+transparente sobre isso ao reportar os números como estão em vez de esconder o `=1`.
 
 ---
 

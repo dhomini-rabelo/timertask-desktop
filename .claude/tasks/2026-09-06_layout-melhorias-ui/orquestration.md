@@ -95,3 +95,9 @@ Date: 2026-09-06
   - 7 itens + 16/16 auditContrast()=[] + borda verde em dark re-confirmados NESTA rodada (nao herdados)
   - honestidade de screenshot corrigida: 36 arquivos, 36 md5 distintos, por crop de regiao real do DOM
 - juiz-teste r02 | juiz-layout-melhorias-ui-test-r02 | opus FRESCO | lancado (aprovacao final da evidencia, exigencia do usuario)
+- juiz-teste r02 | juiz-layout-melhorias-ui-test-r02 | opus | janela 76k | **APROVADO_COM_RESSALVAS** | ponteiro: tests-02/juizo-evidencia.md
+  - 3 debitos da rodada anterior PAGOS; 10 estados confirmados nos pixels; 7 itens ATENDIDOS
+  - achou 1 afirmacao falsa na secao de honestidade (3 de 36 ainda sao mesma captura com outro nome) -> corrigida
+  - 3 ressalvas esteticas registradas (fade do scroll, buraco vertical do items-start, titulo colapsado em 320px) — nenhuma impede fechar
+- fix-honestidade | fix-honestidade-verdict-tests-02 | sonnet | janela 42k | secao corrigida, PASS e medicoes intactos
+- TASK FECHADA — 2 rodadas de teste, 5 rodadas de juiz (3 de plano + 2 de evidencia), 1 rodada de validate

@@ -19,10 +19,10 @@ Git: branch feat/layout-task-card | commit-base bd5df02
 - [x] Validate (fresh Opus) — r1 CHANGES_REQUIRED (1 bloqueante + 1 deveria)
 - [x] Fix round aplicado (tsc exit=0); re-validate dispensado (fix de 2 linhas) — prova vai para o browser
 - [x] Commit: validate
-- [ ] tests-01 — browser, screenshot of EVERY task/item (user requirement)
-- [ ] Test-return QUALITY JUDGE (subagente reusado julga o retorno)
-- [ ] Commit: system-test
-- [ ] Close
+- [x] tests-01 — FAIL (1 defeito real + 3 lacunas de criterio)
+- [x] Test-return QUALITY JUDGE — r01 BOA_COM_RESSALVAS, r02 APROVADO_COM_RESSALVAS
+- [x] Commit: system-test (01 e 02)
+- [x] Close
 
 ## Test attempts
 
