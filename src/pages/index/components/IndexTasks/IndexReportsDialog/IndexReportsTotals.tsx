@@ -40,7 +40,7 @@ export function IndexReportsTotals({
           key={tile.key}
           className="flex flex-col gap-1 p-3 rounded-xl bg-Black-100/30 dark:bg-Black-700"
         >
-          <span className="text-xs text-Black-400 flex items-center gap-1.5">
+          <span className="text-xs text-Black-450 dark:text-Black-400 flex items-center gap-1.5">
             <tile.icon className="w-3.5 h-3.5" />
             {tile.label}
           </span>

@@ -78,7 +78,7 @@ export function IndexFooter() {
       </div>
 
       {state.showCompleted && hasCompletedItems && (
-        <div className="flex flex-col gap-3 max-h-[calc(100vh-400px)] overflow-y-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
           {completedGroups.map((group) => (
             <IndexCompletedTaskGroup key={group.id} group={group} />
           ))}

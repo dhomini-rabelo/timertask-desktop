@@ -5,7 +5,7 @@ interface IndexReportsEmptyStateProps {
 export function IndexReportsEmptyState({ text }: IndexReportsEmptyStateProps) {
   return (
     <div className="py-6 flex items-center justify-center">
-      <span className="text-base text-Black-400">{text}</span>
+      <span className="text-base text-Black-450 dark:text-Black-400">{text}</span>
     </div>
   );
 }

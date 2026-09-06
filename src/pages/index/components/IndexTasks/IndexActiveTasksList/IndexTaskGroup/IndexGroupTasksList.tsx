@@ -15,7 +15,6 @@ import {
 import { useListingTasks } from "../../../../hooks/useListingTasks";
 import { useTasksState, type TaskGroup } from "../../../../states/tasks";
 import { IndexSortableTaskItem } from "../IndexSortableTaskItem";
-import { GroupTitleContext } from "./GroupTitleContext";
 
 interface IndexGroupTasksListProps {
   group: TaskGroup;
@@ -44,32 +43,34 @@ export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
   }
 
   if (visibleChildren.length === 0) {
-    return <p className="text-sm text-Black-400">No tasks yet.</p>;
+    return (
+      <p className="text-sm text-Black-450 dark:text-Black-400">
+        No tasks yet.
+      </p>
+    );
   }
 
   return (
-    <GroupTitleContext.Provider value={group.title}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext
+        items={visibleChildren.map((task) => task.id)}
+        strategy={verticalListSortingStrategy}
       >
-        <SortableContext
-          items={visibleChildren.map((task) => task.id)}
-          strategy={verticalListSortingStrategy}
+        <div
+          className="flex flex-col gap-3 max-h-[560px] overflow-y-auto pr-2 py-1"
+          tabIndex={0}
+          role="region"
+          aria-label={`${group.title} subtasks`}
         >
-          <div
-            className="flex flex-col gap-3 max-h-[420px] overflow-y-auto pr-1"
-            tabIndex={0}
-            role="region"
-            aria-label={`${group.title} subtasks`}
-          >
-            {visibleChildren.map((task) => (
-              <IndexSortableTaskItem key={task.id} task={task} />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
-    </GroupTitleContext.Provider>
+          {visibleChildren.map((task) => (
+            <IndexSortableTaskItem key={task.id} task={task} />
+          ))}
+        </div>
+      </SortableContext>
+    </DndContext>
   );
 }

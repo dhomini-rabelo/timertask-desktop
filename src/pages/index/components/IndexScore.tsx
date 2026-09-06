@@ -9,6 +9,7 @@ import {
   Zap,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import { Box } from "../../../layout/components/atoms/Box";
 import { useCountdownTimerState } from "../states/countdownTimer";
 import { useTasksState } from "../states/tasks";
 import {
@@ -110,8 +111,8 @@ export function IndexScore() {
   ];
 
   return (
-    <div className="w-full">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-6">
+    <Box className="w-full flex-1 p-4 sm:p-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-5">
         {scoreItems.map((item) => (
           <div key={item.label} className="flex flex-col gap-2 items-start">
             <div className="flex items-center gap-2">
@@ -137,6 +138,6 @@ export function IndexScore() {
           </div>
         ))}
       </div>
-    </div>
+    </Box>
   );
 }

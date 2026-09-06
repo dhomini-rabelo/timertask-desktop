@@ -25,7 +25,7 @@ export function IndexReportsTabs({
           className={
             tab.key === activeTab
               ? "px-3 py-1.5 rounded-lg text-sm font-medium bg-White text-Black-700 dark:bg-Black-600 dark:text-White"
-              : "px-3 py-1.5 rounded-lg text-sm font-medium text-Black-400 transition-colors hover:text-Black-500 dark:text-Black-400 dark:hover:text-White"
+              : "px-3 py-1.5 rounded-lg text-sm font-medium text-Black-450 transition-colors hover:text-Black-500 dark:text-Black-400 dark:hover:text-White"
           }
         >
           {tab.label}

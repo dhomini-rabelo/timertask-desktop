@@ -16,7 +16,7 @@ export function IndexReportTaskRow({
       <span className="text-sm font-medium text-Black-450 dark:text-Black-400 break-all">
         {task.title}
       </span>
-      <div className="flex items-center flex-wrap gap-2 text-xs text-Black-400">
+      <div className="flex items-center flex-wrap gap-2 text-xs text-Black-450 dark:text-Black-400">
         {task.groupTitle && (
           <span className="px-2 py-0.5 rounded-full font-medium bg-Black-100/50 text-Black-450 dark:bg-Black-600 dark:text-Black-400 break-all">
             {task.groupTitle}

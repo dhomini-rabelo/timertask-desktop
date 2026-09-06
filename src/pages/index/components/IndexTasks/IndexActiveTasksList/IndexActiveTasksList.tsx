@@ -9,8 +9,8 @@ import {
 } from "@dnd-kit/core";
 import {
   SortableContext,
+  rectSortingStrategy,
   sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { isTaskGroup, type TaskItem, useTasksState } from "../../../states/tasks";
@@ -74,19 +74,17 @@ export function IndexActiveTasksList() {
           <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
             Active
           </span>
-          <div
-            className="flex flex-col gap-3 max-h-[520px] overflow-y-auto pr-1"
-            tabIndex={0}
-            role="region"
-            aria-label="Active tasks"
+          <SortableContext
+            items={activeSectionItems.map((item) => item.id)}
+            strategy={rectSortingStrategy}
           >
-            <SortableContext
-              items={activeSectionItems.map((item) => item.id)}
-              strategy={verticalListSortingStrategy}
+            <div
+              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
+              data-tasks-section="active"
             >
               {renderSectionItems(activeSectionItems)}
-            </SortableContext>
-          </div>
+            </div>
+          </SortableContext>
         </div>
       )}
 
@@ -97,9 +95,14 @@ export function IndexActiveTasksList() {
           </span>
           <SortableContext
             items={pausedSectionItems.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
+            strategy={rectSortingStrategy}
           >
-            {renderSectionItems(pausedSectionItems)}
+            <div
+              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
+              data-tasks-section="paused"
+            >
+              {renderSectionItems(pausedSectionItems)}
+            </div>
           </SortableContext>
         </div>
       )}
@@ -111,9 +114,14 @@ export function IndexActiveTasksList() {
           </span>
           <SortableContext
             items={pendingSectionItems.map((item) => item.id)}
-            strategy={verticalListSortingStrategy}
+            strategy={rectSortingStrategy}
           >
-            {renderSectionItems(pendingSectionItems)}
+            <div
+              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
+              data-tasks-section="pending"
+            >
+              {renderSectionItems(pendingSectionItems)}
+            </div>
           </SortableContext>
         </div>
       )}

@@ -87,23 +87,28 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
   }
 
   return (
-    <div className="group space-y-0 bg-Black-100/50 border border-Black-300/15 rounded-xl dark:bg-Black-700/50 dark:border-Black-600">
-      <div className="flex items-center justify-between p-4 rounded-xl bg-white border border-Black-100/30 hover:border-Green-400/50 shadow-sm hover:shadow-md transition-all dark:bg-Black-700 dark:border-Black-600">
+    <div className="group rounded-xl border border-Black-100 bg-White shadow-sm hover:shadow-md transition-all overflow-hidden dark:bg-Black-700 dark:border-Black-600">
+      <div className="flex items-center justify-between p-4">
         {isEditing ? (
           <IndexEditInput initialValue={group.title} />
         ) : (
           <>
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
               <div
                 {...dragHandleProps}
-                className="cursor-grab active:cursor-grabbing text-Black-400 hover:text-Black-700 dark:hover:text-White transition-colors"
+                className="cursor-grab active:cursor-grabbing text-Black-450 dark:text-Black-400 hover:text-Black-700 dark:hover:text-White transition-colors"
               >
                 <GripVertical className="w-5 h-5" />
               </div>
 
-              <span className="text-sm font-medium text-Black-700 dark:text-White break-all">
-                {group.title}
-              </span>
+              <div className="min-w-0 flex-1">
+                <span
+                  className="text-sm font-medium text-Black-700 dark:text-White truncate block"
+                  title={group.title}
+                >
+                  {group.title}
+                </span>
+              </div>
             </div>
             <div className="flex items-center gap-1">
               <div className="flex items-center opacity-0 group-hover:opacity-100 transition-all">
@@ -140,7 +145,7 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
               </div>
               <button
                 onClick={handleToggleCollapsed}
-                className="text-Black-400 hover:text-Black-600 dark:hover:text-White transition-all p-2"
+                className="text-Black-450 dark:text-Black-400 hover:text-Black-600 dark:hover:text-White transition-all p-2"
               >
                 {group.collapsed ? (
                   <ChevronDown className="w-5 h-5" />
@@ -154,30 +159,33 @@ export function IndexTaskGroup({ group, dragHandleProps }: IndexTaskGroupProps) 
       </div>
 
       {!isEditing && (
-        <div className="px-4 pt-3 pb-3 flex flex-col gap-2">
+        <div className="bg-Black-100/40 border-t border-Black-100 px-4 py-3 flex flex-col gap-3 dark:bg-Black-800/40 dark:border-Black-600">
           <span className="text-sm font-medium text-Black-450 dark:text-Black-400">
             {completedCount} of {total} completed
           </span>
           <ProgressBar percentage={percentage} />
-        </div>
-      )}
 
-      {!isEditing && !group.collapsed && (
-        <div className="flex flex-col gap-3 px-4 pb-4">
-          <div className="flex gap-3">
-            <Input
-              placeholder="Add a task..."
-              value={childTitle}
-              onChange={handleChildTitleChange}
-              onKeyDown={handleChildKeyDown}
-              className="flex-1"
-            />
-            <Button onClick={handleAddChild} className="w-auto px-6 py-2">
-              Add
-            </Button>
-          </div>
+          {!group.collapsed && (
+            <>
+              <div className="flex gap-3">
+                <Input
+                  placeholder="Add a task..."
+                  value={childTitle}
+                  onChange={handleChildTitleChange}
+                  onKeyDown={handleChildKeyDown}
+                  className="flex-1 min-w-0"
+                />
+                <Button
+                  onClick={handleAddChild}
+                  className="w-auto shrink-0 px-4 py-2"
+                >
+                  Add
+                </Button>
+              </div>
 
-          <IndexGroupTasksList group={group} />
+              <IndexGroupTasksList group={group} />
+            </>
+          )}
         </div>
       )}
     </div>

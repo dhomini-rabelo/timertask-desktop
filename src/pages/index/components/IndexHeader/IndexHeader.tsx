@@ -27,14 +27,14 @@ export function IndexHeader({ showOnlyLogo }: IndexHeaderProps) {
 
   if (showOnlyLogo) {
     return (
-      <div className="flex w-full items-center justify-center pb-4 pt-2">
+      <div className="flex w-full items-center justify-center pt-2">
         <Logo />
       </div>
     );
   }
 
   return (
-    <div className="flex w-full items-center justify-between pb-4 pt-2">
+    <div className="flex w-full flex-wrap items-center justify-between gap-3 pb-2 pt-2">
       <Logo />
       <div className="flex items-center gap-3">
         <IndexWorkflowSelector

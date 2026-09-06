@@ -16,10 +16,10 @@ export function Button({
 }: ButtonProps) {
   const variantStyles: Record<ButtonVariant, string> = {
     primary:
-      "bg-Green-400 hover:bg-Green-300 text-White dark:bg-Green-500 dark:hover:bg-Green-400",
+      "bg-Green-500 hover:bg-Green-400 text-White dark:bg-Green-500 dark:hover:bg-Green-400",
     danger: "bg-Red-500 hover:bg-Red-400 text-White",
     secondary:
-      "bg-Blue-400 hover:bg-Blue-300 text-White dark:bg-Blue-600 dark:hover:bg-Blue-500",
+      "bg-Blue-600 hover:bg-Blue-500 text-White dark:bg-Blue-600 dark:hover:bg-Blue-500",
   };
 
   return (

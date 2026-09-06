@@ -58,3 +58,7 @@ Date: 2026-09-06
 - fix-prosa | fix-prosa-contraste-layout-melhorias-ui | sonnet | janela 47k | 2 trechos de prosa corrigidos, codigo/classes/auditor intocados
 - ESTAGIO PLAN FECHADO — 3 rodadas de juiz, 3 planners (r1 139k, p2 175k, p3 211k), 0 linha de codigo escrita
 - implement | 2 escopos em paralelo (footprints disjuntos confirmados nas 3 rodadas) | lancados
+- impl escopo A | impl-escopo-a-layout-melhorias-ui | sonnet | janela 57k | tsc exit=0 | 4 arquivos (page.tsx, IndexHeader, IndexTimer, IndexScore)
+- impl escopo B | impl-escopo-b-layout-melhorias-ui | sonnet | janela 134k | tsc exit=0 | ~20 arquivos (global.css, 5 atoms, IndexTasks/**, GroupTitleContext.ts apagado)
+  - 2 ressalvas cosmeticas nos proprios greps de auto-checagem (falsos positivos por substring: dark:hover:bg-Green-400 e hover:text-Blue-500), a confirmar no validate
+- type-check global: tsc exit=0 | NAO existe script de lint no projeto (npm error Missing script: "lint")

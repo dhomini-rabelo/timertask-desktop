@@ -26,7 +26,7 @@ export function IndexReportsDaySection({
         <span className="text-sm font-semibold text-Black-700 dark:text-White">
           {formatDayHeading(entry.date, isToday)}
         </span>
-        <span className="text-xs text-Black-400">
+        <span className="text-xs text-Black-450 dark:text-Black-400">
           {formatDuration(entry.focusedSeconds)} · {entry.cycles} cycles ·{" "}
           {entry.completedCount} done
         </span>
@@ -41,15 +41,15 @@ export function IndexReportsDaySection({
             />
           ))
         ) : entry.namesPurged ? (
-          <span className="text-sm text-Black-400">
+          <span className="text-sm text-Black-450 dark:text-Black-400">
             Task names are no longer retained for this day.
           </span>
         ) : hasAnyActivity(entry) ? (
-          <span className="text-sm text-Black-400">
+          <span className="text-sm text-Black-450 dark:text-Black-400">
             No tasks completed on this day.
           </span>
         ) : (
-          <span className="text-sm text-Black-400">
+          <span className="text-sm text-Black-450 dark:text-Black-400">
             No activity on this day.
           </span>
         )}

@@ -58,7 +58,7 @@ export function UpdateTimerDialog({
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between text-sm font-medium text-Black-450">
+            <div className="flex items-center justify-between text-sm font-medium text-Black-450 dark:text-Black-400">
               <span>Activity time</span>
               <span>{activityMinutes} min</span>
             </div>
@@ -77,7 +77,7 @@ export function UpdateTimerDialog({
             </div>
           </div>
           <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between text-sm font-medium text-Black-450">
+            <div className="flex items-center justify-between text-sm font-medium text-Black-450 dark:text-Black-400">
               <span>Resting time</span>
               <span>{percentageOfRestingTime}%</span>
             </div>

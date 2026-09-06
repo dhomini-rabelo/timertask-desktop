@@ -17,8 +17,8 @@ export function IndexTasks() {
   const { activeListItems, tasks } = useListingTasks();
 
   return (
-    <Box className="w-full p-6 flex flex-col gap-8">
-      <div className="flex items-start justify-between gap-4">
+    <Box className="w-full p-4 sm:p-6 flex flex-col gap-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold text-Black-700 dark:text-White flex items-center gap-1.5">
             Tasks
@@ -39,7 +39,7 @@ export function IndexTasks() {
         <div className="flex flex-col gap-3 min-h-[250px]">
           {activeListItems.length === 0 ? (
             <div className="grow flex items-center justify-center">
-              <span className="text-base text-Black-400">
+              <span className="text-base text-Black-450 dark:text-Black-400">
                 {tasks.length > 0
                   ? "All tasks completed!"
                   : "No tasks yet. Add one above!"}

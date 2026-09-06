@@ -98,7 +98,7 @@ export function IndexTaskNoteDialog({
               onChange={handleChange}
               onKeyDown={handleKeyDown}
               placeholder="Write your notes here..."
-              className="w-full min-h-[200px] p-4 text-sm text-Black-700 placeholder:text-Black-400 bg-Black-50/20 border border-Black-100 rounded-xl outline-none focus:border-Green-400 focus:ring-1 focus:ring-Green-400 transition-all resize-none dark:bg-Black-800 dark:border-Black-500 dark:text-Black-100 field-sizing-content"
+              className="w-full min-h-[200px] p-4 text-sm text-Black-700 placeholder:text-Black-450 dark:placeholder:text-Black-400 bg-Black-50/20 border border-Black-100 rounded-xl outline-none focus:border-Green-400 focus:ring-1 focus:ring-Green-400 transition-all resize-none dark:bg-Black-800 dark:border-Black-500 dark:text-Black-100 field-sizing-content"
             />
           </div>
           <Dialog.Footer>

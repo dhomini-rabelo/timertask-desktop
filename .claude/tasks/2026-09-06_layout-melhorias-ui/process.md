@@ -13,9 +13,9 @@ Git: branch feat/layout-task-card | commit-base bd5df02
 - [x] Plan QUALITY JUDGE — r1 REPROVADO, r2 REPROVADO, r3 APROVADO_COM_RESSALVAS (ressalva obrigatoria aplicada)
 - [x] Extract block in orquestration.md
 - [x] Commit: plan
-- [ ] Implement (Sonnet) — per scope
-- [ ] Lint + type-check (once)
-- [ ] Commit: implement
+- [x] Implement (Sonnet) — escopos A e B em paralelo, tsc exit=0
+- [x] Type-check (tsc exit=0) — projeto nao tem script de lint
+- [x] Commit: implement
 - [ ] Validate (fresh Opus)
 - [ ] Fix round / re-validate if needed
 - [ ] Commit: validate

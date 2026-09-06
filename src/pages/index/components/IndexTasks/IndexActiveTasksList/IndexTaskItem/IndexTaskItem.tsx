@@ -8,8 +8,8 @@ import {
   Square,
   Trash2,
 } from "lucide-react";
-import { useContext, useEffect, useRef, useState } from "react";
-import { formatClockValue, formatTime } from "../../../../../../code/utils/date";
+import { useEffect, useRef, useState } from "react";
+import { formatTime } from "../../../../../../code/utils/date";
 import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
@@ -17,13 +17,11 @@ import { useCountdownTimerState } from "../../../../states/countdownTimer";
 import { useTasksState, type Task } from "../../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
-  getTimeRangeFromEvents,
   shouldAutoStart,
 } from "../../../../states/tasks/utils";
 import { errorMessageAtom, indexTasksPageStateAtom } from "../../shared-state";
 import { IndexEditInput } from "../shared-components/IndexEditInput";
 import { IndexTaskNoteDialog } from "../IndexTaskNoteDialog";
-import { GroupTitleContext } from "../IndexTaskGroup/GroupTitleContext";
 import { IndexAlertSelect } from "./IndexAlertSelect";
 import { IndexDebugTimer, type IndexDebugTimerHandle } from "./IndexDebugTimer";
 
@@ -62,7 +60,6 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   });
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
-  const groupTitle = useContext(GroupTitleContext);
 
   const isTimerActive = timerState.isRunning;
   const hasBeenStarted = task.timeEvents.some(
@@ -70,8 +67,6 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   );
   const isGlobalActive = isGlobalTimerRunning && !isResting;
   const wasAutoPausedRef = useRef(false);
-  const taskTimeRange = getTimeRangeFromEvents(task.timeEvents);
-  const totalTimeInSeconds = calculateTotalTimeInSeconds(task.timeEvents);
 
   function handleToggleTaskTimer(isGlobalTimerRunning: boolean) {
     wasAutoPausedRef.current = false;
@@ -156,58 +151,56 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   }, [timerState.currentTimeInSeconds, state.alertMinutes]);
 
   return (
-    <div className="group space-y-0 bg-Black-100/50 border border-Black-300/15 rounded-xl dark:bg-Black-700/50 dark:border-Black-600">
+    <div
+      className={`group rounded-xl border bg-White shadow-sm hover:shadow-md transition-all overflow-hidden dark:bg-Black-700 dark:border-Black-600 ${
+        isTimerActive
+          ? "border-Green-400"
+          : "border-Black-100 hover:border-Green-400/50"
+      }`}
+    >
       <div
-        className={`flex items-center justify-between p-4 rounded-xl bg-white border transition-all shadow-sm hover:shadow-md dark:bg-Black-700 ${
-          isTimerActive
-            ? "border-Green-400 bg-Green-50/30 dark:bg-Green-400/10"
-            : "border-Black-100/30 hover:border-Green-400/50 dark:border-Black-600"
+        className={`flex items-center justify-between p-3 sm:p-4 transition-all ${
+          isTimerActive ? "bg-Green-400/5 dark:bg-Green-400/10" : ""
         }`}
       >
         {isEditing ? (
           <IndexEditInput initialValue={task.title} />
         ) : (
           <>
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="flex items-center gap-2">
                 {!isTimerActive && (
                   <div
                     {...dragHandleProps}
-                    className="cursor-grab active:cursor-grabbing text-Black-400 hover:text-Black-700 dark:hover:text-White transition-colors"
+                    className="cursor-grab active:cursor-grabbing text-Black-450 dark:text-Black-400 hover:text-Black-700 dark:hover:text-White transition-colors"
                   >
                     <GripVertical className="w-5 h-5" />
                   </div>
                 )}
 
                 {hasBeenStarted && (
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-16 h-16">
-                      <Timer
-                        className="w-full h-full text-xs"
-                        timerDisplayInSeconds={timerState.currentTimeInSeconds.toString()}
-                        initialTimeInMinutes={Number(state.alertMinutes)}
-                      />
-                    </div>
+                  <div className="relative w-14 h-14 shrink-0">
+                    <Timer
+                      className="w-full h-full text-[11px]"
+                      timerDisplayInSeconds={timerState.currentTimeInSeconds.toString()}
+                      initialTimeInMinutes={Number(state.alertMinutes)}
+                    />
                   </div>
                 )}
               </div>
 
               <span
-                className={`text-sm font-medium transition-colors break-all ${
+                className={`text-sm font-medium transition-colors truncate min-w-0 ${
                   task.completed
-                    ? "text-Black-400 line-through"
+                    ? "text-Black-450 dark:text-Black-400 line-through"
                     : isTimerActive
                       ? "text-Black-700 dark:text-White font-semibold"
                       : "text-Black-500 dark:text-Black-400"
                 }`}
+                title={task.title}
               >
                 {task.title}
               </span>
-              {groupTitle && (
-                <span className="px-2 py-0.5 rounded-full font-medium bg-Black-100/50 text-Black-450 dark:bg-Black-600 dark:text-Black-400 break-all text-xs">
-                  {groupTitle}
-                </span>
-              )}
             </div>
             <div className="flex items-center">
               <button
@@ -235,24 +228,8 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
         )}
       </div>
 
-      {!isEditing && hasBeenStarted && (
-        <div className="flex items-center px-3 py-1.5">
-          <div className="flex items-center gap-2 text-xs text-Black-400">
-            <span className="font-medium">
-              Start {formatClockValue(taskTimeRange.startTime)}
-            </span>
-            <span className="font-medium">
-              End {formatClockValue(taskTimeRange.endTime)}
-            </span>
-            <span className="font-medium">
-              Duration {formatTime(totalTimeInSeconds)}
-            </span>
-          </div>
-        </div>
-      )}
-
       {!isEditing && (
-        <div className="flex items-center justify-between gap-2 rounded-xl px-3 py-2 transition-all">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-t border-Black-100/60 dark:border-Black-600 transition-all">
           <div className="flex items-center gap-1 transition-all shrink-0">
             <button
               onClick={() => handleEditTask(task.id)}
@@ -270,7 +247,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
             )}
             <IndexTaskNoteDialog taskId={task.id} label="Notes" />
           </div>
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex flex-wrap items-center justify-end gap-2 min-w-0 grow">
             <IndexAlertSelect
               value={state.alertMinutes}
               onChange={(value) =>
@@ -281,7 +258,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
               }
             />
             {hasBeenStarted && (
-              <div className="flex-1 min-w-0">
+              <div className="w-full min-w-0">
                 <IndexDebugTimer
                   ref={debuggingTimerRef}
                   isRunning={timerState.isRunning}

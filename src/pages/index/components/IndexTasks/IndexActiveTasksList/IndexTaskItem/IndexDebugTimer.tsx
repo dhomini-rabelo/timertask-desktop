@@ -73,11 +73,11 @@ export const IndexDebugTimer = forwardRef<
   );
 
   return (
-    <div className="flex items-center gap-3 bg-Blue-300/10 border border-Blue-400/50 rounded-[10px] px-3 py-2">
+    <div className="flex items-center gap-3 bg-Blue-300/10 border border-Blue-400/50 rounded-[10px] px-2 py-1.5 sm:px-3 sm:py-2 w-full min-w-0">
       <Button
         variant="secondary"
         onClick={handleToggleDebugging}
-        className={`text-xs font-semibold px-3 py-1 rounded-[8px] transition-colors text-Blue-500 dark:text-white bg-White border border-Blue-400 hover:bg-Blue-300/40 ${
+        className={`text-xs font-semibold px-3 py-1 rounded-[8px] transition-colors text-Blue-600 dark:text-white bg-White border border-Blue-400 hover:bg-Blue-300/40 ${
           timerState.isRunning ? "" : ""
         }`}
       >
@@ -96,14 +96,14 @@ export const IndexDebugTimer = forwardRef<
           style={{ width: `${progressPercentage}%` }}
         />
       </div>
-      <span className="text-sm font-mono text-Blue-500 dark:text-white tabular-nums">
+      <span className="text-sm font-mono text-Blue-600 dark:text-white tabular-nums">
         {formatTime(timerState.currentTimeInSeconds)}
       </span>
       {isActive && (
         <Button
           variant="secondary"
           onClick={handleResetDebugging}
-          className="flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-[8px] border border-Blue-400 text-Blue-500 dark:text-white bg-White transition-colors hover:bg-Blue-300/40"
+          className="flex items-center gap-2 text-xs font-semibold px-3 py-1 rounded-[8px] border border-Blue-400 text-Blue-600 dark:text-white bg-White transition-colors hover:bg-Blue-300/40"
         >
           <Check className="w-4 h-4" />
         </Button>

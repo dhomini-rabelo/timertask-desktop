@@ -46,7 +46,7 @@ export function IndexNotificationRequest() {
         <p className="text-2xl font-semibold text-Black-700 dark:text-White">
           Allow notifications
         </p>
-        <p className="text-sm text-Black-400">
+        <p className="text-sm text-Black-450 dark:text-Black-400">
           We need your permission to send task reminders and track time in real
           time.
         </p>

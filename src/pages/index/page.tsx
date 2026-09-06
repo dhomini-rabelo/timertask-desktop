@@ -1,7 +1,6 @@
 import { isPermissionGranted } from "@tauri-apps/plugin-notification";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
-import { Box } from "../../layout/components/atoms/Box";
 import { IndexHeader } from "./components/IndexHeader/IndexHeader";
 import { IndexNotificationRequest } from "./components/IndexNotificationRequest";
 import { IndexScore } from "./components/IndexScore";
@@ -53,7 +52,7 @@ export function IndexPage() {
 
   return (
     <div className="body-df min-h-screen flex flex-col">
-      <div className="flex w-full flex-1 flex-col p-4">
+      <div className="flex w-full flex-1 flex-col p-3 sm:p-4">
         <div className="flex w-full flex-col items-center">
           <div className="flex w-full max-w-6xl flex-col gap-6">
             {/*
@@ -64,15 +63,13 @@ export function IndexPage() {
               useStoredWorkflows (which lives inside IndexHeader) and delay
               workflow hydration right after the permission check resolves.
             */}
-            <Box className="w-full flex flex-col gap-6 p-6">
-              <IndexHeader showOnlyLogo={shouldBlockContent} />
-              {hasInitializedPermissionStatus && !shouldBlockContent && (
-                <>
-                  <IndexTimer />
-                  <IndexScore />
-                </>
-              )}
-            </Box>
+            <IndexHeader showOnlyLogo={shouldBlockContent} />
+            {hasInitializedPermissionStatus && !shouldBlockContent && (
+              <div className="flex w-full flex-col lg:flex-row items-stretch gap-6">
+                <IndexTimer />
+                <IndexScore />
+              </div>
+            )}
             {hasInitializedPermissionStatus &&
               (shouldBlockContent ? (
                 <div className="flex flex-1 flex-col items-center justify-center gap-6 p-4">

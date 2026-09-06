@@ -13,7 +13,7 @@ export function ProgressBar({
 }: ProgressBarProps) {
   return (
     <div className={twMerge("pt-3", className)}>
-      <div className="flex items-center justify-between text-xs text-Black-500 dark:text-Black-300">
+      <div className="flex items-center justify-between text-xs text-Black-500 dark:text-Black-400">
         <span className="font-medium">{label}</span>
         <span className="font-semibold">{percentage}%</span>
       </div>
