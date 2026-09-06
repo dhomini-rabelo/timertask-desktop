@@ -101,3 +101,16 @@ Date: 2026-09-06
   - 3 ressalvas esteticas registradas (fade do scroll, buraco vertical do items-start, titulo colapsado em 320px) — nenhuma impede fechar
 - fix-honestidade | fix-honestidade-verdict-tests-02 | sonnet | janela 42k | secao corrigida, PASS e medicoes intactos
 - TASK FECHADA — 2 rodadas de teste, 5 rodadas de juiz (3 de plano + 2 de evidencia), 1 rodada de validate
+
+## Melhoria pos-close (pedido do usuario, imagem .claude/prompts/debug.png)
+
+- pedido: (1) Debug compacto colado no tempo no PC, como era antes (o w-full do plano tinha quebrado a fileira); (2) remover o texto "Notes" do lado do icone (redundante)
+- impl | impl-debug-inline-notes-icon-layout-melhorias-ui | sonnet | janela 84k | tsc exit=0
+  - IndexTaskItem.tsx: removido label="Notes"; wrapper do Debug w-full -> w-full sm:w-auto
+  - IndexDebugTimer.tsx: raiz w-full -> w-full sm:w-auto
+  - IndexTaskNoteDialog.tsx: aria-label + title = "Notes" (conserta tambem o uso ja icone-only do footer, que estava sem nome acessivel)
+  - a remocao do rotulo "Notes" liberou ~68px, o que tornou a forma compacta viavel sem concessao (era 474px em 478px)
+- test 03 | test-layout-melhorias-ui-browser-r03 | sonnet browser-tester | **PASS** | ponteiro: tests-03/verdict.md + 9 screenshots
+  - 1280/1440/1100: fileira em linha unica (height=61px), overlapPairs=0, overflowOffenders=0, gap Debug<->tempo = 24px, pill compacto (ratio 0,355-0,387)
+  - 390/320: sem regressao — Debug em linha propria (height=141px, ownLine=true), docScrollWidth==docClientWidth
+  - Notes: 3 botoes com aria-label="Notes" e textContent vazio (lista ativa/inativa + footer) | consoleErrors=0

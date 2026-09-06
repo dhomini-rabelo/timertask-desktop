@@ -73,7 +73,7 @@ export const IndexDebugTimer = forwardRef<
   );
 
   return (
-    <div className="flex items-center gap-3 bg-Blue-300/10 border border-Blue-400/50 rounded-[10px] px-2 py-1.5 sm:px-3 sm:py-2 w-full min-w-0">
+    <div className="flex items-center gap-3 bg-Blue-300/10 border border-Blue-400/50 rounded-[10px] px-2 py-1.5 sm:px-3 sm:py-2 w-full sm:w-auto min-w-0">
       <Button
         variant="secondary"
         onClick={handleToggleDebugging}

@@ -78,6 +78,8 @@ export function IndexTaskNoteDialog({
         <Dialog.Trigger>
           <Button
             variant="secondary"
+            aria-label={label || "Notes"}
+            title={label || "Notes"}
             className={
               buttonClassName ?? "flex items-center gap-2 p-1.5 text-xs"
             }

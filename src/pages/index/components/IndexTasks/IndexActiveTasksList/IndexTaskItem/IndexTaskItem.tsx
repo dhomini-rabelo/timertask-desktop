@@ -245,7 +245,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
                 <Trash2 className="w-5 h-5" />
               </button>
             )}
-            <IndexTaskNoteDialog taskId={task.id} label="Notes" />
+            <IndexTaskNoteDialog taskId={task.id} />
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2 min-w-0 grow">
             <IndexAlertSelect
@@ -258,7 +258,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
               }
             />
             {hasBeenStarted && (
-              <div className="w-full min-w-0">
+              <div className="w-full sm:w-auto min-w-0">
                 <IndexDebugTimer
                   ref={debuggingTimerRef}
                   isRunning={timerState.isRunning}

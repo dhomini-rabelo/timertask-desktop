@@ -1,9 +1,0 @@
-- generic [ref=f2e6]:
-  - generic [ref=f2e8]:
-    - img "Timertasks Logo" [ref=f2e9]
-    - generic [ref=f2e10]: Timertasks
-  - generic [ref=f2e12]:
-    - generic [ref=f2e19]:
-      - paragraph [ref=f2e20]: Allow notifications
-      - paragraph [ref=f2e21]: We need your permission to send task reminders and track time in real time.
-    - button "Allow notifications" [ref=f2e22] [cursor=pointer]
