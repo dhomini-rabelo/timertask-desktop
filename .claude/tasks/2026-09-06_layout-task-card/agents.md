@@ -1,0 +1,20 @@
+# Agents — layout-task-card
+
+Date: 2026-09-06
+Skill: claude-simple-loop
+
+## Level 0 — Orchestrator
+
+- Role: orchestrator (this chat) | Model: opus-5 | id: n/a
+- Budget: pointers e vereditos apenas.
+
+## Agents
+
+| When | Role | Nonce (`description`) | Agent id | Model | subagent_type | janela | Notes |
+|------|------|----------------------|----------|-------|---------------|--------|-------|
+| 2026-09-06 | recon | recon-layout-task-card | done | sonnet | general-purpose | 88k | complexa |
+| 2026-09-06 | planner | plan-layout-task-card | running | opus | general-purpose | - | sem batch de perguntas |
+
+## Ledger
+| 2026-09-06 | planner | plan-layout-task-card | done | opus | general-purpose | 92k | 2 escopos, 13 premissas |
+| 2026-09-06 | planner-fix | plan-layout-task-card-p2 | done | sonnet | general-purpose | 87k | corrigiu item 4 (full-width) |
