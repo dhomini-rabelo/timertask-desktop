@@ -34,8 +34,8 @@ export function IndexCompletedTaskItem({
   return (
     <div className="group flex flex-col p-4 rounded-xl bg-white border border-Black-100/30 dark:bg-Black-700 dark:border-Black-600">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4 flex-1 min-w-0">
-          <div className="w-5 h-5" />
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+          <div className="hidden sm:block w-5 h-5" />
           <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center border-Green-500 bg-Green-500 shrink-0">
             <Check className="w-4 h-4 text-White" strokeWidth={3} />
           </div>
@@ -75,7 +75,7 @@ export function IndexCompletedTaskItem({
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <IndexTaskNoteDialog taskId={task.id} className="shrink-0" label="" />
           {hasTrackedTime && (
             <button

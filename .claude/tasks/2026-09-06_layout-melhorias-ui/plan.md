@@ -71,8 +71,8 @@ Ressalvas da r1: 1024–1184px → **resolvida** (viewport de 1100px no roteiro)
 - **Zero overflow horizontal interno**: para todo elemento dentro do card de Tasks, `scrollWidth <= clientWidth + 2`.
 - **Zero texto cortado sem ellipsis**: nenhum elemento com `scrollWidth > clientWidth + 2` que não tenha `text-overflow: ellipsis` no `getComputedStyle`.
 - **Zero controle sobreposto**: a interseção de bounding-rects, par a par, entre os botões/controles da linha de ações de uma mesma subtask é **0**.
-- **Debug em linha própria**: `debug.getBoundingClientRect().top >= notesButton.getBoundingClientRect().bottom` no mesmo card.
-- **Duas colunas de fato**: dois cards de grupo lado a lado têm `top` igual (±4px), `left` diferente e `width` entre 500 e 560px cada (em 1100px a faixa é 440–500px).
+- **Debug ocupa linha própria dentro do seu bloco flex, sem sobreposição com Notes** (emendado após tests-01 — lacuna de critério: o antigo `debug.top >= notesButton.bottom` é falso por construção a 1280/1100, onde o Debug divide a linha com pencil+Notes porque o `w-full` é full do bloco DIREITO, não da linha inteira; só em 390px ele cai para linha própria da linha inteira). Mensurável por `debug.getBoundingClientRect().left == actionRow.getBoundingClientRect().left` OU por interseção de bounding-rects = 0 entre Debug e o botão Notes.
+- **Duas colunas de fato**: dois cards de grupo lado a lado têm `top` igual (±4px), `left` diferente e `width` entre 500 e 560px cada (em 1100px a faixa é **480–520px** — emendado após tests-01: a faixa antiga de 440–500px estava calculada para 1024px, não 1100px; pela própria fórmula do plano, (1100 − 24 de `p-3` − ~8 de scrollbar − 48 de `p-6` − 12 de gap)/2 ≈ 504px, ou seja `(interior − gap)/2 ± 8px`; o valor medido de 503px está conforme).
 
 ---
 
@@ -394,7 +394,7 @@ Diagnóstico: hoje o wrapper e o header são **dois cards empilhados sem offset*
 
 **Aceite:** em `getComputedStyle` do card raiz, `overflow` = `hidden` e `borderRadius` = `12px`; no primeiro filho (header) `borderRadius` = `0px` e `borderWidth` = `0px`.
 
-**Terceiro critério, reescrito (ressalva da r1 — o antigo era ambíguo para a linha de ações):** *nenhum elemento dentro de um card tem borda visível **nos 4 lados** com background igual ao do pai.* Formalmente: para cada descendente do card raiz, se `effBg(el) == effBg(el.parentElement)` (mesmos 3 canais, ±1), então **não** pode ter `border-width > 0` **simultaneamente nos 4 lados** com `border-style != none` e cor de alpha > 0. Isso reprova o "card dentro de card" que o item 3 mata e **libera** explicitamente o `border-t` da linha de ações e o `border-t` do corpo do grupo, que são **divisores de 1 lado, intencionais**. Screenshot `04-grupo-expandido` sem costura nos 4 cantos + pergunta **J1(b)** do gate visual (comparação com `grupo-0.png`).
+**Terceiro critério, reescrito (ressalva da r1 — o antigo era ambíguo para a linha de ações; emendado após tests-01, lacuna de critério):** *nenhum elemento dentro de um card tem borda visível **nos 4 lados** com background igual ao do pai.* Formalmente: para cada descendente do card raiz que **NÃO** seja controle interativo — `:not(button):not(input):not(select):not(textarea):not([role="combobox"])` —, se `effBg(el) == effBg(el.parentElement)` (mesmos 3 canais, ±1), então **não** pode ter `border-width > 0` **simultaneamente nos 4 lados** com `border-style != none` e cor de alpha > 0. Isso reprova o "card dentro de card" que o item 3 mata e **libera** explicitamente o `border-t` da linha de ações e o `border-t` do corpo do grupo, que são **divisores de 1 lado, intencionais**. Borda de affordance em controle de formulário (ex.: o trigger do `Select`/`Button` com `border border-Black-100 bg-White`) **não conta como card-dentro-de-card** — é o affordance padrão de controle, não a costura que o item 3 ataca. Screenshot `04-grupo-expandido` sem costura nos 4 cantos + pergunta **J1(b)** do gate visual (comparação com `grupo-0.png`).
 
 ## Item 4 — só o scroll interno do grupo
 
@@ -419,7 +419,7 @@ Screenshot `05-grupo-scroll` mostra um único trilho de scroll.
 `IndexFooter.tsx` — o container das completadas também vira `grid grid-cols-1 lg:grid-cols-2 gap-3 items-start`, igualmente **sem** `col-span` para `IndexCompletedTaskGroup`.
 
 **Aceite (o cenário foi reescrito para conseguir produzir este estado — bloqueador 4):**
-- **Dois grupos lado a lado, na MESMA seção:** em `[data-tasks-section="active"]`, os cards de `QA-Grupo-Scroll` e `QA-Grupo-Par` têm `top` igual (±4px), `left` diferente e `width` entre 500 e 560px (1280/1440) ou 440–500px (1100). Os dois estão na seção `active` **por construção**: o cenário dá Play numa subtask de **cada** um, e `getGroupActivityStatus` classifica o grupo pela atividade dos filhos (`states/tasks/utils.ts:118-134`) — dois filhos rodando ⇒ dois grupos "active". `executeTask` **não** para as outras tasks (`states/tasks/index.ts:338-366`), então rodar duas ao mesmo tempo é possível e determinístico.
+- **Dois grupos lado a lado, na MESMA seção:** em `[data-tasks-section="active"]`, os cards de `QA-Grupo-Scroll` e `QA-Grupo-Par` têm `top` igual (±4px), `left` diferente e `width` entre 500 e 560px (1280/1440) ou **480–520px (1100)** (emendado após tests-01 — mesma correção aritmética da § Meia coluna: a faixa antiga de 440–500px foi calculada para 1024px, não 1100px). Os dois estão na seção `active` **por construção**: o cenário dá Play numa subtask de **cada** um, e `getGroupActivityStatus` classifica o grupo pela atividade dos filhos (`states/tasks/utils.ts:118-134`) — dois filhos rodando ⇒ dois grupos "active". `executeTask` **não** para as outras tasks (`states/tasks/index.ts:338-366`), então rodar duas ao mesmo tempo é possível e determinístico.
 - **Duas tasks simples lado a lado:** em `[data-tasks-section="pending"]`, `QA-Task-Solta-C` e `QA-Task-Titulo-Muito-Comprido-…` (nenhuma das duas recebe Play ⇒ ambas "pending").
 - **Seção Paused existe e também é 2 colunas** (bloqueador 5): `[data-tasks-section="paused"]` contém `QA-Grupo-Pausado` e `QA-Task-Solta-A` lado a lado (Play→Stop em cada ⇒ tem evento `start` e `isRunning=false` ⇒ "paused").
 - **Footer:** o grid das completadas também tem 2 colunas, com `QA-Grupo-100` (grupo completado) e `QA-Task-Solta-B` (task solta completada) lado a lado.
@@ -572,3 +572,9 @@ Cobertura de **todos os tipos de task**: estado vazio, task simples (pendente, a
 5. As asserções de estado do passo 15 do cenário (se elas falharem, o problema é o script; conserta o script e roda de novo, não relaxe o critério).
 
 Modo de teste recomendado: **browser** (Docker/`.test` não se aplica — não há suíte no repo e a entrega é 100% visual).
+
+## Notes apos tests-01 (FAIL)
+
+- O criterio 3 da secao Meia coluna (sobreposicao) so foi medido em 1280; o plano exige 1280, 1440 e 1100 — a proxima rodada tem de medir os tres.
+- A pergunta J3 foi respondida por formalidade na parte do placeholder; ha screenshots de estado vazio (`00-estado-vazio`, `07-dark-00`) que permitem julga-la de fato.
+- 7 dos screenshots de tests-01 sao a MESMA captura fullPage renomeada (~3 estados reais em 7 nomes); a proxima rodada deve capturar estado distinto por nome, ou nomear honestamente.

@@ -79,3 +79,12 @@ Date: 2026-09-06
   - FALHA 1 (real): item 6 em 320px — IndexCompletedTaskItem.tsx:37-70, linha titulo+badge e linha Start/End/Duration transbordam 9-13px sem ellipsis (390/768/1100 limpos)
   - FALHA 2 (provavel lacuna de criterio): regra formal do item 3 acusou 3 violacoes, todas no trigger dos atoms Select/Button (border border-Black-100 bg-White), nao costura de card-dentro-de-card
   - FALHA 3 (provavel folga de criterio): secao Meia coluna crit. 5 em 1100px — card de grupo mede 503px contra teto de 440-500px do plano (3px acima)
+- juiz-teste r01 | juiz-layout-melhorias-ui-test-r01 | opus | janela 88k | BOA_COM_RESSALVAS | ponteiro: tests-01/juizo-evidencia.md
+  - julgamento visual: a tela esta boa DE VERDADE (ampliou os pixels com cropper proprio); item 7 e salto real vs o "antes"; costura do grupo-0.png sumiu; footer bate com tasks-completadas.png
+  - achado 1 = DEFEITO e MAIS grave que o reportado (em 320px o texto passa POR BAIXO do botao de nota) -> fix de 3 classes
+  - achados 2 e 3 = LACUNA_DE_CRITERIO (regra do item 3 nao devia valer para trigger de controle; faixa de 1100px estava aritmeticamente errada no plano) -> emenda, nao codigo
+  - achado 4 = criterio errado que o TESTER marcou OK sem numero (debug.top >= notes.bottom) -> emenda
+- fix-320 + emenda-criterios | 2 agentes em paralelo (arquivos disjuntos: IndexCompletedTaskItem.tsx vs plan.md) | lancados
+- fix-320 | impl-fix-320-layout-melhorias-ui | sonnet | janela 38k | tsc exit=0 | IndexCompletedTaskItem.tsx: gap-2 sm:gap-4 (l.37), hidden sm:block (l.38), shrink-0 (l.78)
+- emenda-criterios | plan-notes-emenda-criterios-layout-melhorias-ui | sonnet | janela 55k | 3 criterios emendados no plan.md + bloco "Notes apos tests-01 (FAIL)" | nenhum codigo tocado
+- test 02 | test-layout-melhorias-ui-browser-r02 | sonnet browser-tester FRESCO | lancado (re-teste focado: 320px + criterio 3 em 1440/1100 + J3 + criterios emendados)
