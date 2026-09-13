@@ -40,8 +40,8 @@ export function IndexInsertTaskPoint({
 
   const isOpen = indexTasksPageState.insertingBeforeId === beforeId;
 
-  // Fecha em outra fresta (RT-017), por timeout (RT-012) ou por blur/Esc: sempre
-  // reabre em branco na próxima vez, nunca com o texto de uma sessão anterior.
+  // Closes when another gap opens (RT-017), on timeout (RT-012), or via blur/Esc:
+  // always reopens blank next time, never with text left over from a previous session.
   useEffect(() => {
     if (!isOpen) {
       setTitle("");
