@@ -7,24 +7,19 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  rectSortingStrategy,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../hooks/useListingTasks";
 import { isTaskGroup, type TaskItem, useTasksState } from "../../../states/tasks";
 import type { TaskActivityStatus } from "../../../states/tasks/utils";
+import { IndexTasksSection } from "./shared-components/IndexTasksSection";
 import { IndexSortableTaskGroup } from "./IndexSortableTaskGroup";
 import { IndexSortableTaskItem } from "./IndexSortableTaskItem";
 
-function renderSectionItems(items: TaskItem[]) {
-  return items.map((item) =>
-    isTaskGroup(item) ? (
-      <IndexSortableTaskGroup key={item.id} group={item} />
-    ) : (
-      <IndexSortableTaskItem key={item.id} task={item} />
-    ),
+function renderSectionItem(item: TaskItem) {
+  return isTaskGroup(item) ? (
+    <IndexSortableTaskGroup key={item.id} group={item} />
+  ) : (
+    <IndexSortableTaskItem key={item.id} task={item} />
   );
 }
 
@@ -69,62 +64,32 @@ export function IndexActiveTasksList() {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      {activeSectionItems.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
-            Active
-          </span>
-          <SortableContext
-            items={activeSectionItems.map((item) => item.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
-              data-tasks-section="active"
-            >
-              {renderSectionItems(activeSectionItems)}
-            </div>
-          </SortableContext>
-        </div>
-      )}
+      <IndexTasksSection
+        status="active"
+        label="Active"
+        items={activeSectionItems}
+        groupId={null}
+        layout="grid"
+        renderItem={renderSectionItem}
+      />
 
-      {pausedSectionItems.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
-            Paused
-          </span>
-          <SortableContext
-            items={pausedSectionItems.map((item) => item.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
-              data-tasks-section="paused"
-            >
-              {renderSectionItems(pausedSectionItems)}
-            </div>
-          </SortableContext>
-        </div>
-      )}
+      <IndexTasksSection
+        status="paused"
+        label="Paused"
+        items={pausedSectionItems}
+        groupId={null}
+        layout="grid"
+        renderItem={renderSectionItem}
+      />
 
-      {pendingSectionItems.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <span className="text-[10px] font-bold uppercase tracking-tight text-Black-450 dark:text-Black-400">
-            Pending
-          </span>
-          <SortableContext
-            items={pendingSectionItems.map((item) => item.id)}
-            strategy={rectSortingStrategy}
-          >
-            <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start"
-              data-tasks-section="pending"
-            >
-              {renderSectionItems(pendingSectionItems)}
-            </div>
-          </SortableContext>
-        </div>
-      )}
+      <IndexTasksSection
+        status="pending"
+        label="Pending"
+        items={pendingSectionItems}
+        groupId={null}
+        layout="grid"
+        renderItem={renderSectionItem}
+      />
     </DndContext>
   );
 }
