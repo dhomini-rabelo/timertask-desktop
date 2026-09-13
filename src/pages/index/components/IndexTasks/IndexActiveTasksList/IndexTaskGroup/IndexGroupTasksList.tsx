@@ -7,13 +7,16 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useListingTasks } from "../../../../hooks/useListingTasks";
-import { useTasksState, type TaskGroup } from "../../../../states/tasks";
+import { useTasksState, type Task, type TaskGroup } from "../../../../states/tasks";
+import {
+  bucketByActivityStatus,
+  getGroupChildren,
+  getTaskActivityStatus,
+} from "../../../../states/tasks/utils";
+import type { TaskActivityStatus } from "../../../../states/tasks/utils";
+import { IndexTasksSection } from "../shared-components/IndexTasksSection";
 import { IndexSortableTaskItem } from "../IndexSortableTaskItem";
 
 interface IndexGroupTasksListProps {
@@ -30,19 +33,40 @@ export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
     })
   );
 
-  const visibleChildren = tasks.filter(
-    (task) => task.groupId === group.id && !task.completed
+  const children = getGroupChildren(tasks, group.id).filter(
+    (task) => !task.completed,
+  );
+  const {
+    active: activeSectionItems,
+    paused: pausedSectionItems,
+    pending: pendingSectionItems,
+  } = bucketByActivityStatus(children, getTaskActivityStatus);
+
+  const sectionByItemId = new Map<string, TaskActivityStatus>();
+  activeSectionItems.forEach((item) => sectionByItemId.set(item.id, "active"));
+  pausedSectionItems.forEach((item) => sectionByItemId.set(item.id, "paused"));
+  pendingSectionItems.forEach((item) =>
+    sectionByItemId.set(item.id, "pending"),
   );
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      reorderItems(active.id as string, over.id as string);
+    if (!over || active.id === over.id) {
+      return;
     }
+
+    const activeSection = sectionByItemId.get(active.id as string);
+    const overSection = sectionByItemId.get(over.id as string);
+
+    if (!activeSection || activeSection !== overSection) {
+      return;
+    }
+
+    reorderItems(active.id as string, over.id as string);
   }
 
-  if (visibleChildren.length === 0) {
+  if (children.length === 0) {
     return (
       <p className="text-sm text-Black-450 dark:text-Black-400">
         No tasks yet.
@@ -56,21 +80,45 @@ export function IndexGroupTasksList({ group }: IndexGroupTasksListProps) {
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
     >
-      <SortableContext
-        items={visibleChildren.map((task) => task.id)}
-        strategy={verticalListSortingStrategy}
+      <div
+        className="flex flex-col gap-3 max-h-[560px] overflow-y-auto pr-2 py-1"
+        tabIndex={0}
+        role="region"
+        aria-label={`${group.title} subtasks`}
       >
-        <div
-          className="flex flex-col gap-3 max-h-[560px] overflow-y-auto pr-2 py-1"
-          tabIndex={0}
-          role="region"
-          aria-label={`${group.title} subtasks`}
-        >
-          {visibleChildren.map((task) => (
-            <IndexSortableTaskItem key={task.id} task={task} />
-          ))}
-        </div>
-      </SortableContext>
+        <IndexTasksSection
+          status="active"
+          label="Active"
+          items={activeSectionItems}
+          groupId={group.id}
+          layout="list"
+          renderItem={(item) => (
+            <IndexSortableTaskItem key={item.id} task={item as Task} />
+          )}
+        />
+
+        <IndexTasksSection
+          status="paused"
+          label="Paused"
+          items={pausedSectionItems}
+          groupId={group.id}
+          layout="list"
+          renderItem={(item) => (
+            <IndexSortableTaskItem key={item.id} task={item as Task} />
+          )}
+        />
+
+        <IndexTasksSection
+          status="pending"
+          label="Pending"
+          items={pendingSectionItems}
+          groupId={group.id}
+          layout="list"
+          renderItem={(item) => (
+            <IndexSortableTaskItem key={item.id} task={item as Task} />
+          )}
+        />
+      </div>
     </DndContext>
   );
 }
