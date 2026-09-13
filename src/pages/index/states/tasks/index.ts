@@ -46,6 +46,11 @@ export interface TasksState {
 interface TasksActions {
   setItemsState: (items: TaskItem[]) => void;
   addTask: (title: string, groupId?: string | null) => void;
+  insertTask: (
+    title: string,
+    groupId: string | null,
+    beforeId: string,
+  ) => string | null;
   addGroup: (title: string) => void;
   toggleTask: (id: string) => void;
   toggleGroup: (id: string) => void;
@@ -77,6 +82,23 @@ export const useTasksState = create<TasksStore>((set, get) => {
     }));
   }
 
+  function createTask(
+    title: string,
+    workflowId: string,
+    groupId: string | null,
+  ): Task {
+    return {
+      type: "task",
+      id: crypto.randomUUID(),
+      title,
+      workflowId,
+      groupId,
+      completed: false,
+      isRunning: false,
+      timeEvents: [],
+    };
+  }
+
   function addTask(title: string, groupId?: string | null) {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
@@ -90,16 +112,11 @@ export const useTasksState = create<TasksStore>((set, get) => {
 
     const resolvedGroupId = groupId ?? null;
 
-    const newTask: Task = {
-      type: "task",
-      id: crypto.randomUUID(),
-      title: trimmedTitle,
-      workflowId: selectedWorkflowId,
-      groupId: resolvedGroupId,
-      completed: false,
-      isRunning: false,
-      timeEvents: [],
-    };
+    const newTask: Task = createTask(
+      trimmedTitle,
+      selectedWorkflowId,
+      resolvedGroupId,
+    );
 
     set((store) => {
       const items = store.state.items;
@@ -145,6 +162,47 @@ export const useTasksState = create<TasksStore>((set, get) => {
         actions: store.actions,
       };
     });
+  }
+
+  function insertTask(
+    title: string,
+    groupId: string | null,
+    beforeId: string,
+  ): string | null {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      return null;
+    }
+
+    const selectedWorkflowId = getSelectedWorkflowId();
+    if (!selectedWorkflowId) {
+      return null;
+    }
+
+    const newTask: Task = createTask(trimmedTitle, selectedWorkflowId, groupId);
+
+    set((store) => {
+      const items = store.state.items;
+      const insertIndex = items.findIndex((item) => item.id === beforeId);
+
+      const newItems =
+        insertIndex === -1
+          ? [...items, newTask]
+          : [
+              ...items.slice(0, insertIndex),
+              newTask,
+              ...items.slice(insertIndex),
+            ];
+
+      return {
+        state: {
+          items: newItems,
+        },
+        actions: store.actions,
+      };
+    });
+
+    return newTask.id;
   }
 
   function addGroup(title: string) {
@@ -402,6 +460,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
       setItemsState,
 
       addTask,
+      insertTask,
       addGroup,
       toggleTask,
       toggleGroup,

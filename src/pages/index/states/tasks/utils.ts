@@ -132,3 +132,26 @@ export function getGroupActivityStatus(
 
   return "pending";
 }
+
+export function bucketByActivityStatus<T>(
+  items: T[],
+  resolveStatus: (item: T) => TaskActivityStatus,
+): { active: T[]; paused: T[]; pending: T[] } {
+  const active: T[] = [];
+  const paused: T[] = [];
+  const pending: T[] = [];
+
+  items.forEach((item) => {
+    const status = resolveStatus(item);
+
+    if (status === "active") {
+      active.push(item);
+    } else if (status === "paused") {
+      paused.push(item);
+    } else {
+      pending.push(item);
+    }
+  });
+
+  return { active, paused, pending };
+}
