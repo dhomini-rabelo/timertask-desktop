@@ -58,4 +58,4 @@ nada — as três `AC (rn)` foram registradas no destino durável (`.claude/memo
   só com uma segunda origem de chamada; a regra em si não mudou.
 
 ## Commit
-(pendente — ver retorno)
+ee50ce6 — docs(memory): registra regras de insercao inline e seccionamento do grupo em business-rules
