@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useSettingsState, type SettingsState } from "../states/settings";
 
 const localStorageKey = "timertasks:settings";
@@ -17,15 +17,14 @@ export function useStoredSettings() {
   const setProjectsEnabled = useSettingsState(
     (props) => props.actions.setProjectsEnabled,
   );
-  const hasHydratedRef = useRef<boolean>(false);
-  const settingsRef = useRef<SettingsState>({ projectsEnabled });
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const storedSettings = localStorage.getItem(localStorageKey);
     if (!storedSettings) {
       setSettingsState(defaultSettings);
-      hasHydratedRef.current = true;
+      setHasHydrated(true);
       return;
     }
 
@@ -36,25 +35,21 @@ export function useStoredSettings() {
       } else {
         setSettingsState(parsedSettings);
       }
-      hasHydratedRef.current = true;
+      setHasHydrated(true);
     } catch {
       setSettingsState(defaultSettings);
-      hasHydratedRef.current = true;
+      setHasHydrated(true);
     }
   }, [setSettingsState]);
 
   useEffect(() => {
-    settingsRef.current = { projectsEnabled };
-  }, [projectsEnabled]);
-
-  useEffect(() => {
-    if (!hasHydratedRef.current) return;
+    if (!hasHydrated) return;
     if (typeof window === "undefined") return;
     localStorage.setItem(
       localStorageKey,
-      JSON.stringify(settingsRef.current),
+      JSON.stringify({ projectsEnabled }),
     );
-  }, [hasHydratedRef, projectsEnabled]);
+  }, [hasHydrated, projectsEnabled]);
 
   return { projectsEnabled, setProjectsEnabled };
 }

@@ -15,7 +15,7 @@ checkpoint 3 de 3, restam não
 ## Commits
 - 46c56db — feat(projects): store e persistência de projects e settings
 - 8d87c16 — feat(projects): fileira de chips, modal de projetos e prefixo do título
-- {preenchido após o commit desta rodada}
+- 8043860 — feat(projects): opcao Manage no select e modal de configuracoes com switch
 
 ## Arquivos alterados
 - [src/pages/index/states/projects/index.ts](src/pages/index/states/projects/index.ts) — novo. Store Zustand `useProjectsState` com `Project`, `ProjectsState`, `addProject`/`editProject`/`deleteProject`/`selectProject` (checkpoint 1)
@@ -38,7 +38,7 @@ checkpoint 3 de 3, restam não
 nenhum.
 
 ## Verificação
-comando de verificação: ok (`npx eslint . --fix` — 0 erros, 6 warnings pré-existentes não relacionados; `npx tsc --noEmit` — sem saída), rodado após o checkpoint 1, de novo após o checkpoint 2 e de novo após o checkpoint 3
+comando de verificação: ok (`npx eslint . --fix` — 0 erros, 6 warnings pré-existentes não relacionados; `npx tsc --noEmit` — sem saída), rodado após o checkpoint 1, de novo após o checkpoint 2, de novo após o checkpoint 3 e de novo após a rodada 1 (correção do RT-020)
 comando de teste: nenhum
 
 ## Como testar
@@ -85,6 +85,33 @@ header abrindo o modal de configurações (S16) e o switch "Projetos" (S17–S21
 - Passo 23 — `IndexProjectsSwitch.tsx`: lê/escreve `projectsEnabled` de `useStoredSettings()`;
   rótulo "Projects" + `<button role="switch" aria-checked>` estilizado à mão (trilho + círculo
   deslizante via classe condicional), sem `@radix-ui/react-switch`.
+
+## Rodada 1
+Correção disparada por `teste-1-browser.md`: RT-020 (AC-008) reprovado — o switch "Projetos"
+desligado voltava a ligado sozinho após reload da página.
+
+- **`src/pages/index/hooks/useStoredSettings.ts`** — troquei `hasHydratedRef`/`settingsRef` (dois
+  `useRef`) por um `hasHydrated` de `useState`, e a escrita em `localStorage` passou a serializar
+  `{ projectsEnabled }` direto (o valor do closure do próprio effect), sem o `settingsRef`
+  intermediário.
+  Causa raiz confirmada por leitura do fluxo de effects (o achado do teste apontava a instância
+  dupla do hook como gatilho, mas o problema é estrutural ao hook, presente mesmo numa instância
+  só): no mount, o effect de hidratação lia o `localStorage`, chamava `setSettingsState(parsed)` e
+  marcava `hasHydratedRef.current = true` **de forma síncrona, na mesma volta de effects** — sem
+  esperar o re-render que propaga o `projectsEnabled` novo. O effect de persistência, que corria
+  na sequência ainda nessa mesma volta, via `hasHydratedRef.current` já `true` e gravava
+  `settingsRef.current` — que o effect de sincronização do ref (`useEffect(() => {
+  settingsRef.current = { projectsEnabled }; }, [projectsEnabled])`) ainda não tinha atualizado,
+  porque ele também roda nesse mesmo primeiro commit com o `projectsEnabled` do render antigo
+  (`true`, o default) — regravando `true` por cima do `false` recém-lido do disco.
+  Com `hasHydrated` como estado do React em vez de ref, o `setHasHydrated(true)` fica no mesmo
+  batch do `setSettingsState(parsed)`: o effect de persistência só roda de novo **depois** do
+  commit em que os dois já se propagaram juntos, então o `projectsEnabled` que ele lê do closure
+  já é o valor hidratado — sem stale value, sem `ref` extra para dessincronizar. Isso corrige a
+  race independente de quantas instâncias do hook estão montadas ao mesmo tempo (confirmei por
+  grep que há três: `IndexAddInput.tsx`, `IndexProjectChips.tsx` e `IndexProjectsSwitch.tsx`), e
+  não exigiu tocar nenhum desses três arquivos nem `useStoredWorkflows.ts`/`useStoredProjects.ts` —
+  fora do escopo apontado pelo teste.
 
 ## Premissas
 - `setState` interno de `useProjectsState` usa `partial.selectedProjectId !== undefined` (em vez
