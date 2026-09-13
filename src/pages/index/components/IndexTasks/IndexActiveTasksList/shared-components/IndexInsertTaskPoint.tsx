@@ -141,14 +141,14 @@ export function IndexInsertTaskPoint({
     return (
       <div
         className={twMerge(
-          "group relative h-2 hover:h-9 transition-all",
+          "group/insert-point relative h-2 hover:h-9 transition-all",
           className,
         )}
       >
         <button
           type="button"
           onClick={open}
-          className="absolute inset-0 flex items-center justify-center rounded-lg opacity-0 group-hover:opacity-100 text-[11px] font-semibold text-Black-450 hover:text-Green-400 dark:text-Black-400 transition-opacity"
+          className="absolute inset-0 flex items-center justify-center rounded-lg opacity-0 group-hover/insert-point:opacity-100 text-[11px] font-semibold text-Black-450 hover:text-Green-400 dark:text-Black-400 transition-opacity"
         >
           + adicionar task
         </button>
