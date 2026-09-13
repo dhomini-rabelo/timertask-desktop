@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Button } from "../../../../layout/components/atoms/Button";
 import { Input } from "../../../../layout/components/atoms/Input";
+import { useStoredSettings } from "../../hooks/useStoredSettings";
+import { useProjectsState } from "../../states/projects";
 import { useTasksState } from "../../states/tasks";
 
 export function IndexAddInput() {
   const [title, setTitle] = useState("");
   const addTask = useTasksState((props) => props.actions.addTask);
   const addGroup = useTasksState((props) => props.actions.addGroup);
+  const projects = useProjectsState((props) => props.state.projects);
+  const selectedProjectId = useProjectsState(
+    (props) => props.state.selectedProjectId,
+  );
+  const { projectsEnabled } = useStoredSettings();
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setTitle(e.target.value);
@@ -32,7 +39,13 @@ export function IndexAddInput() {
     }
 
     if (title.trim()) {
-      addTask(title, null);
+      const selectedProject = projectsEnabled
+        ? projects.find((project) => project.id === selectedProjectId)
+        : undefined;
+      const composedTitle = selectedProject
+        ? `[${selectedProject.title}] ${title}`
+        : title;
+      addTask(composedTitle, null);
       setTitle("");
     }
   }

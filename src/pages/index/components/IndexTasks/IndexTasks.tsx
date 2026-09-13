@@ -7,6 +7,7 @@ import { IndexActiveTasksList } from "./IndexActiveTasksList/IndexActiveTasksLis
 import { IndexAddInput } from "./IndexAddInput";
 import { IndexErrorMessage } from "./IndexErrorMessage";
 import { IndexFooter } from "./IndexFooter/IndexFooter";
+import { IndexProjectChips } from "./IndexProjectChips/IndexProjectChips";
 import { IndexReportsDialog } from "./IndexReportsDialog/IndexReportsDialog";
 
 export function IndexTasks() {
@@ -33,6 +34,8 @@ export function IndexTasks() {
 
       <div className="flex flex-col gap-4">
         <IndexAddInput />
+
+        <IndexProjectChips />
 
         <IndexErrorMessage />
 
