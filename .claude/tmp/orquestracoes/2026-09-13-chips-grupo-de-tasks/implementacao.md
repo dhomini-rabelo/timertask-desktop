@@ -16,6 +16,7 @@ checkpoint 3 de 3, restam não
 - 46c56db — feat(projects): store e persistência de projects e settings
 - 8d87c16 — feat(projects): fileira de chips, modal de projetos e prefixo do título
 - 8043860 — feat(projects): opcao Manage no select e modal de configuracoes com switch
+- 503d5c1 — fix(projects): corrige race de hidratacao no useStoredSettings (RT-020)
 
 ## Arquivos alterados
 - [src/pages/index/states/projects/index.ts](src/pages/index/states/projects/index.ts) — novo. Store Zustand `useProjectsState` com `Project`, `ProjectsState`, `addProject`/`editProject`/`deleteProject`/`selectProject` (checkpoint 1)
