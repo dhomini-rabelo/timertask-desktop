@@ -8,13 +8,17 @@ import {
   Square,
   Trash2,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { formatTime } from "../../../../../../code/utils/date";
 import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
 import { useCountdownTimerState } from "../../../../states/countdownTimer";
-import { useTasksState, type Task } from "../../../../states/tasks";
+import {
+  defaultAlertMinutes,
+  useTasksState,
+  type Task,
+} from "../../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
   shouldAutoStart,
@@ -24,10 +28,6 @@ import { IndexEditInput } from "../shared-components/IndexEditInput";
 import { IndexTaskNoteDialog } from "../IndexTaskNoteDialog";
 import { IndexAlertSelect } from "./IndexAlertSelect";
 import { IndexDebugTimer, type IndexDebugTimerHandle } from "./IndexDebugTimer";
-
-interface IndexTaskItemState {
-  alertMinutes: string;
-}
 
 interface IndexTaskItemProps {
   task: Task;
@@ -43,6 +43,9 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   const executeTask = useTasksState((props) => props.actions.executeTask);
   const stopTask = useTasksState((props) => props.actions.stopTask);
   const toggleTask = useTasksState((props) => props.actions.toggleTask);
+  const updateAlertMinutes = useTasksState(
+    (props) => props.actions.updateAlertMinutes,
+  );
   const isGlobalTimerRunning = useCountdownTimerState(
     (store) => store.state.isRunning,
   );
@@ -55,9 +58,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
       task.isRunning &&
       shouldAutoStart(task.timeEvents),
   });
-  const [state, setState] = useState<IndexTaskItemState>({
-    alertMinutes: "5",
-  });
+  const alertMinutes = task.alertMinutes ?? defaultAlertMinutes;
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
 
@@ -66,10 +67,8 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
     (event) => event.type === "start",
   );
   const isGlobalActive = isGlobalTimerRunning && !isResting;
-  const wasAutoPausedRef = useRef(false);
 
   function handleToggleTaskTimer(isGlobalTimerRunning: boolean) {
-    wasAutoPausedRef.current = false;
     if (!timerState.isRunning) {
       if (isGlobalTimerRunning && !isResting) {
         executeTask(task.id);
@@ -115,21 +114,19 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
   useEffect(() => {
     if (!isGlobalActive) {
       if (timerState.isRunning) {
-        stopTask(task.id);
+        stopTask(task.id, { isAutoPause: true });
         timerActions.stop();
-        wasAutoPausedRef.current = true;
       }
       return;
     }
-    if (wasAutoPausedRef.current && !timerState.isRunning) {
+    if (task.isAutoPaused && !timerState.isRunning) {
       executeTask(task.id);
       timerActions.start();
     }
-    wasAutoPausedRef.current = false;
   }, [isGlobalActive]);
 
   useEffect(() => {
-    const alertTimerInSeconds = Number(state.alertMinutes) * 60;
+    const alertTimerInSeconds = Number(alertMinutes) * 60;
     const isAlertTimerReached =
       timerState.currentTimeInSeconds === alertTimerInSeconds;
     const hasAlertTimeBeenReachedAndPassedHalfWayToTheNextAlertTime =
@@ -148,7 +145,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
     if (shouldPlayAlert) {
       playAlertSound(timerState.currentTimeInSeconds);
     }
-  }, [timerState.currentTimeInSeconds, state.alertMinutes]);
+  }, [timerState.currentTimeInSeconds, alertMinutes]);
 
   return (
     <div
@@ -183,7 +180,7 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
                     <Timer
                       className="w-full h-full text-[11px]"
                       timerDisplayInSeconds={timerState.currentTimeInSeconds.toString()}
-                      initialTimeInMinutes={Number(state.alertMinutes)}
+                      initialTimeInMinutes={Number(alertMinutes)}
                     />
                   </div>
                 )}
@@ -249,20 +246,15 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
           </div>
           <div className="flex flex-wrap items-center justify-end gap-2 min-w-0 grow">
             <IndexAlertSelect
-              value={state.alertMinutes}
-              onChange={(value) =>
-                setState((previousState) => ({
-                  ...previousState,
-                  alertMinutes: value,
-                }))
-              }
+              value={alertMinutes}
+              onChange={(value) => updateAlertMinutes(task.id, value)}
             />
             {hasBeenStarted && (
               <div className="w-full sm:w-auto min-w-0">
                 <IndexDebugTimer
                   ref={debuggingTimerRef}
                   isRunning={timerState.isRunning}
-                  targetMinutes={Number(state.alertMinutes)}
+                  targetMinutes={Number(alertMinutes)}
                 />
               </div>
             )}

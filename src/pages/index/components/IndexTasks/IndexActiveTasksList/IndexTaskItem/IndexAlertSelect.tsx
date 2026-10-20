@@ -1,16 +1,16 @@
 import { Bell } from "lucide-react";
 import { Select } from "../../../../../../layout/components/atoms/Select";
+import { alertMinutesOptions } from "../../../../states/tasks";
 
 interface IndexAlertSelectProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const alertOptions = [
-  { label: "5 min", value: "5" },
-  { label: "10 min", value: "10" },
-  { label: "15 min", value: "15" },
-];
+const alertOptions = alertMinutesOptions.map((minutes) => ({
+  label: `${minutes} min`,
+  value: minutes,
+}));
 
 export function IndexAlertSelect(props: IndexAlertSelectProps) {
   return (
