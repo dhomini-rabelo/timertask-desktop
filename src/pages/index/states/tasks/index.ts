@@ -21,6 +21,17 @@ export interface Task extends BaseTaskItem {
   completed: boolean;
   isRunning: boolean;
   timeEvents: TaskTimeEvent[];
+  alertMinutes?: string;
+  isAutoPaused?: boolean;
+}
+
+export const alertMinutesOptions = ["5", "10", "15"];
+export const defaultAlertMinutes = "5";
+
+export function parseAlertMinutes(value: unknown): string | undefined {
+  return typeof value === "string" && alertMinutesOptions.includes(value)
+    ? value
+    : undefined;
 }
 
 export interface TaskGroup extends BaseTaskItem {
@@ -60,7 +71,12 @@ interface TasksActions {
   reorderItems: (activeId: string, overId: string) => void;
   clearItems: () => void;
   executeTask: (id: string) => void;
-  stopTask: (id: string) => void;
+  stopTask: (id: string, options?: StopTaskOptions) => void;
+  updateAlertMinutes: (id: string, alertMinutes: string) => void;
+}
+
+interface StopTaskOptions {
+  isAutoPause?: boolean;
 }
 
 interface TasksStore {
@@ -416,6 +432,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
             return {
               ...item,
               isRunning: true,
+              isAutoPaused: false,
               timeEvents: [...item.timeEvents, startEvent],
             };
           }),
@@ -425,7 +442,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
     });
   }
 
-  function stopTask(id: string) {
+  function stopTask(id: string, options?: StopTaskOptions) {
     set((store) => {
       const stopDate = new Date();
       const stopEvent: TaskTimeEvent = {
@@ -443,6 +460,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
             return {
               ...item,
               isRunning: false,
+              isAutoPaused: options?.isAutoPause ?? false,
               timeEvents: [...item.timeEvents, stopEvent],
             };
           }),
@@ -450,6 +468,17 @@ export const useTasksState = create<TasksStore>((set, get) => {
         actions: store.actions,
       };
     });
+  }
+
+  function updateAlertMinutes(id: string, alertMinutes: string) {
+    set((store) => ({
+      state: {
+        items: store.state.items.map((item) =>
+          item.id === id && isTask(item) ? { ...item, alertMinutes } : item,
+        ),
+      },
+      actions: store.actions,
+    }));
   }
 
   return {
@@ -471,6 +500,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
       clearItems,
       executeTask,
       stopTask,
+      updateAlertMinutes,
     },
   };
 });

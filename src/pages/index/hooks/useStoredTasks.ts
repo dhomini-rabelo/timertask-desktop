@@ -1,5 +1,12 @@
 import { useEffect, useRef } from "react";
-import { isTask, useTasksState, type Task, type TaskItem, type TaskTimeEvent } from "../states/tasks";
+import {
+  isTask,
+  parseAlertMinutes,
+  useTasksState,
+  type Task,
+  type TaskItem,
+  type TaskTimeEvent,
+} from "../states/tasks";
 
 const localStorageKey = "timertasks:tasks";
 
@@ -26,6 +33,7 @@ interface LegacyTaskEntry {
   isRunning?: boolean;
   timeEvents?: LegacyTimeEvent[];
   groupId?: string | null;
+  alertMinutes?: unknown;
   collapsed?: boolean;
   subtasks?: LegacySubTask[];
 }
@@ -64,6 +72,7 @@ function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
         completed: !!entry.completed,
         isRunning: !!entry.isRunning,
         timeEvents: reviveEvents(entry.timeEvents),
+        alertMinutes: parseAlertMinutes(entry.alertMinutes),
       },
     ];
   }
