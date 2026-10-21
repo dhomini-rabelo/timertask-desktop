@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { useCountdownTimerState } from "../countdownTimer";
+import { isAlertMinutesInList } from "../settings/alertTimes";
 import { useWorkflowsState } from "../workflows";
 import { canCompleteGroup, getGroupChildren } from "./utils";
 
@@ -25,11 +26,11 @@ export interface Task extends BaseTaskItem {
   isAutoPaused?: boolean;
 }
 
-export const alertMinutesOptions = ["5", "10", "15"];
-export const defaultAlertMinutes = "5";
-
-export function parseAlertMinutes(value: unknown): string | undefined {
-  return typeof value === "string" && alertMinutesOptions.includes(value)
+export function parseAlertMinutes(
+  value: unknown,
+  alertTimes: number[],
+): string | undefined {
+  return typeof value === "string" && isAlertMinutesInList(value, alertTimes)
     ? value
     : undefined;
 }
@@ -73,6 +74,7 @@ interface TasksActions {
   executeTask: (id: string) => void;
   stopTask: (id: string, options?: StopTaskOptions) => void;
   updateAlertMinutes: (id: string, alertMinutes: string) => void;
+  resetAlertMinutes: (alertMinutes: string) => void;
 }
 
 interface StopTaskOptions {
@@ -481,6 +483,19 @@ export const useTasksState = create<TasksStore>((set, get) => {
     }));
   }
 
+  function resetAlertMinutes(alertMinutes: string) {
+    set((store) => ({
+      state: {
+        items: store.state.items.map((item) =>
+          isTask(item) && item.alertMinutes === alertMinutes
+            ? { ...item, alertMinutes: undefined }
+            : item,
+        ),
+      },
+      actions: store.actions,
+    }));
+  }
+
   return {
     state: {
       items: [],
@@ -501,6 +516,7 @@ export const useTasksState = create<TasksStore>((set, get) => {
       executeTask,
       stopTask,
       updateAlertMinutes,
+      resetAlertMinutes,
     },
   };
 });

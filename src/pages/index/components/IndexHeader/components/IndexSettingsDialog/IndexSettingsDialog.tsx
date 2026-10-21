@@ -1,4 +1,5 @@
 import { Dialog } from "../../../../../../layout/components/atoms/Dialog";
+import { IndexAlertTimesSettings } from "./IndexAlertTimesSettings.tsx";
 import { IndexProjectsSwitch } from "./IndexProjectsSwitch.tsx";
 
 interface IndexSettingsDialogProps {
@@ -15,6 +16,9 @@ export function IndexSettingsDialog({
       <Dialog.Content title="Settings" description="App-wide preferences">
         <div className="flex flex-col gap-3">
           <IndexProjectsSwitch />
+          <div className="border-t border-Black-100/60 pt-3 dark:border-Black-600">
+            <IndexAlertTimesSettings />
+          </div>
         </div>
       </Dialog.Content>
     </Dialog.Root>
