@@ -1,6 +1,7 @@
 import { Bell } from "lucide-react";
 import { Select } from "../../../../../../layout/components/atoms/Select";
 import { useSettingsState } from "../../../../states/settings";
+import { formatAlertTimeLabel } from "../../../../states/settings/alertTimes";
 
 interface IndexAlertSelectProps {
   value: string;
@@ -10,7 +11,7 @@ interface IndexAlertSelectProps {
 export function IndexAlertSelect(props: IndexAlertSelectProps) {
   const alertTimes = useSettingsState((store) => store.state.alertTimes);
   const alertOptions = alertTimes.map((minutes) => ({
-    label: `${minutes} min`,
+    label: formatAlertTimeLabel(minutes),
     value: String(minutes),
   }));
 
