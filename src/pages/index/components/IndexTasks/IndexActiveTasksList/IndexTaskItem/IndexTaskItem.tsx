@@ -14,11 +14,9 @@ import { Timer } from "../../../../../../layout/components/common/Timer";
 import { useCountUpTimer } from "../../../../../../layout/components/common/Timer/hooks/useCountUpTimer";
 
 import { useCountdownTimerState } from "../../../../states/countdownTimer";
-import {
-  defaultAlertMinutes,
-  useTasksState,
-  type Task,
-} from "../../../../states/tasks";
+import { useSettingsState } from "../../../../states/settings";
+import { resolveAlertMinutes } from "../../../../states/settings/alertTimes";
+import { useTasksState, type Task } from "../../../../states/tasks";
 import {
   calculateTotalTimeInSeconds,
   shouldAutoStart,
@@ -58,7 +56,14 @@ export function IndexTaskItem({ task, dragHandleProps }: IndexTaskItemProps) {
       task.isRunning &&
       shouldAutoStart(task.timeEvents),
   });
-  const alertMinutes = task.alertMinutes ?? defaultAlertMinutes;
+  const alertTimes = useSettingsState((store) => store.state.alertTimes);
+  const defaultAlertTime = useSettingsState(
+    (store) => store.state.defaultAlertTime,
+  );
+  const alertMinutes = resolveAlertMinutes(task.alertMinutes, {
+    alertTimes,
+    defaultAlertTime,
+  });
   const dispatchErrorMessage = useSetAtom(errorMessageAtom);
   const debuggingTimerRef = useRef<IndexDebugTimerHandle | null>(null);
 

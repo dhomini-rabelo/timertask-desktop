@@ -7,6 +7,7 @@ import {
   type TaskItem,
   type TaskTimeEvent,
 } from "../states/tasks";
+import { readStoredSettings } from "./useStoredSettings";
 
 const localStorageKey = "timertasks:tasks";
 
@@ -45,7 +46,10 @@ function reviveEvents(events?: LegacyTimeEvent[]): TaskTimeEvent[] {
   }));
 }
 
-function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
+function migrateEntry(
+  entry: LegacyTaskEntry,
+  alertTimes: number[],
+): TaskItem[] {
   if (entry?.type === "group") {
     return [
       {
@@ -72,7 +76,7 @@ function migrateEntry(entry: LegacyTaskEntry): TaskItem[] {
         completed: !!entry.completed,
         isRunning: !!entry.isRunning,
         timeEvents: reviveEvents(entry.timeEvents),
-        alertMinutes: parseAlertMinutes(entry.alertMinutes),
+        alertMinutes: parseAlertMinutes(entry.alertMinutes, alertTimes),
       },
     ];
   }
@@ -123,7 +127,11 @@ function migrateStoredItems(parsed: unknown): TaskItem[] {
     return [];
   }
 
-  return (parsed as LegacyTaskEntry[]).flatMap(migrateEntry);
+  const { alertTimes } = readStoredSettings();
+
+  return (parsed as LegacyTaskEntry[]).flatMap((entry) =>
+    migrateEntry(entry, alertTimes),
+  );
 }
 
 export function useStoredTasks() {
